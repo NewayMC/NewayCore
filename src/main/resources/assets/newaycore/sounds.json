@@ -1,0 +1,18 @@
+{
+  "ak47_fire": {
+    "sounds": [
+      {
+        "name": "newaycore:ak47_fire",
+        "stream": false
+      }
+    ]
+  },
+  "ak47_reload": {
+    "sounds": [
+      {
+        "name": "newaycore:ak47_reload",
+        "stream": false
+      }
+    ]
+  }
+}
