@@ -14,6 +14,7 @@ public class GetEliteShooterEntity {
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_recoil) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_recovery_time) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_shoot) : 0,
-                entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_speed) : 0);
+                entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_speed) : 0,
+                entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_ai_type) : "");
     }
 }
