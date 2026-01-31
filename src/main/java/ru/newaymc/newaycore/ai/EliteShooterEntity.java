@@ -28,8 +28,8 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 import net.minecraftforge.registries.ForgeRegistries;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
-import ru.newaymc.newaycore.init.NewaycoreModEntities;
-import ru.newaymc.newaycore.init.NewaycoreModItems;
+import ru.newaymc.newaycore.init.ModEntitiesInit;
+import ru.newaymc.newaycore.init.ModItemsInit;
 
 public class EliteShooterEntity extends Monster implements RangedAttackMob {
 
@@ -43,7 +43,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     public static final EntityDataAccessor<Integer> DATA_recovery_time = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
 
     public EliteShooterEntity(PlayMessages.SpawnEntity packet, Level world) {
-        this(NewaycoreModEntities.ELITE_SHOOTER_ENTITY.get(), world);
+        this(ModEntitiesInit.ELITE_SHOOTER_ENTITY.get(), world);
     }
 
     public EliteShooterEntity(EntityType<EliteShooterEntity> type, Level world) {
@@ -54,7 +54,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
         setCustomName(Component.literal("Elite Shooter Entity"));
         setCustomNameVisible(true);
         setPersistenceRequired();
-        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(NewaycoreModItems.M_4_A_1.get()));
+        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItemsInit.M_4_A_1.get()));
     }
 
     public static void init() {

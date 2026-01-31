@@ -26,8 +26,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
-import ru.newaymc.newaycore.init.NewaycoreModBlocks;
-import ru.newaymc.newaycore.init.NewaycoreModEntities;
+import ru.newaymc.newaycore.init.ModBlocksInit;
+import ru.newaymc.newaycore.init.ModEntitiesInit;
 import ru.newaymc.newaycore.network.NewaycoreModVariables;
 
 import java.util.List;
@@ -194,7 +194,7 @@ public class ShooterAIModule {
                         (GetShooterEntity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().putInt("ShootedAmmo",
                                 (GetShooterEntity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().getInt("ShootedAmmo") + 1);
                         if (!projectileLevel.isClientSide()) {
-                            Projectile _entityToSpawn = initArrowProjectile(new GunAmmoEntity(NewaycoreModEntities.GUN_AMMO.get(), projectileLevel), null, (float) damage, true, false, false, AbstractArrow.Pickup.DISALLOWED);
+                            Projectile _entityToSpawn = initArrowProjectile(new GunAmmoEntity(ModEntitiesInit.GUN_AMMO.get(), projectileLevel), null, (float) damage, true, false, false, AbstractArrow.Pickup.DISALLOWED);
                             _entityToSpawn.setPos(_shootFrom.getX(), _shootFrom.getEyeY() - 0.3, _shootFrom.getZ());
                             _entityToSpawn.shoot(_shootFrom.getLookAngle().x, _shootFrom.getLookAngle().y, _shootFrom.getLookAngle().z, (float) speed,
                                     (float) ((GetShooterEntity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().getDouble("Inaccuracy")
@@ -243,7 +243,7 @@ public class ShooterAIModule {
                     if (isGunInHand) {
                         (GetShooterEntity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().putDouble("Inaccuracy", 1.0D);
                         if (!projectileLevel.isClientSide()) {
-                            Projectile _entityToSpawn = initArrowProjectile(createArrowWeaponItemStack(new GunAmmoEntity(NewaycoreModEntities.GUN_AMMO.get(), 0, 0, 0, projectileLevel), 1, (byte) 2), null, (float) damage, true, false, true,
+                            Projectile _entityToSpawn = initArrowProjectile(createArrowWeaponItemStack(new GunAmmoEntity(ModEntitiesInit.GUN_AMMO.get(), 0, 0, 0, projectileLevel), 1, (byte) 2), null, (float) damage, true, false, true,
                                     AbstractArrow.Pickup.DISALLOWED);
                             _entityToSpawn.setPos(_shootFrom.getX(), _shootFrom.getEyeY() - 0.3, _shootFrom.getZ());
                             _entityToSpawn.shoot(_shootFrom.getLookAngle().x, _shootFrom.getLookAngle().y, _shootFrom.getLookAngle().z, (float) speed,
@@ -307,7 +307,7 @@ public class ShooterAIModule {
                 for (int index1 = 0; index1 < 16; index1++) {
                     sz = -3;
                     for (int index2 = 0; index2 < 16; index2++) {
-                        if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == NewaycoreModBlocks.COVER_MARKER_AI.get()) {
+                        if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == ModBlocksInit.COVER_MARKER_AI.get()) {
                             if (GetShooterEntity instanceof Mob _entity)
                                 _entity.getNavigation().moveTo((x + sx), (y + sy), (z + sz), 2);
                             break;
@@ -342,7 +342,7 @@ public class ShooterAIModule {
                     for (int index4 = 0; index4 < 32; index4++) {
                         sz = -3;
                         for (int index5 = 0; index5 < 32; index5++) {
-                            if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == NewaycoreModBlocks.OBJECT_MARKER_AI.get()) {
+                            if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == ModBlocksInit.OBJECT_MARKER_AI.get()) {
                                 if (GetShooterEntity instanceof Mob _entity)
                                     _entity.getNavigation().moveTo((x + sx), (y + sy), (z + sz), 1);
                             }
@@ -360,7 +360,7 @@ public class ShooterAIModule {
                 for (int index7 = 0; index7 < 32; index7++) {
                     sz = -3;
                     for (int index8 = 0; index8 < 32; index8++) {
-                        if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == NewaycoreModBlocks.OBJECT_MARKER_AI.get()) {
+                        if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == ModBlocksInit.OBJECT_MARKER_AI.get()) {
                             if (GetShooterEntity instanceof Mob _entity)
                                 _entity.getNavigation().moveTo((x + sx), (y + sy), (z + sz), 1);
                             found = true;

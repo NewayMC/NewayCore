@@ -17,14 +17,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 import net.minecraftforge.registries.ForgeRegistries;
-import ru.newaymc.newaycore.init.NewaycoreModEntities;
+import ru.newaymc.newaycore.init.ModEntitiesInit;
 
 @OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
 public class GunAmmoEntity extends AbstractArrow implements ItemSupplier {
     public static final ItemStack PROJECTILE_ITEM = new ItemStack(Blocks.AIR);
 
     public GunAmmoEntity(PlayMessages.SpawnEntity packet, Level world) {
-        super(NewaycoreModEntities.GUN_AMMO.get(), world);
+        super(ModEntitiesInit.GUN_AMMO.get(), world);
     }
 
     public GunAmmoEntity(EntityType<? extends GunAmmoEntity> type, Level world) {
@@ -48,7 +48,7 @@ public class GunAmmoEntity extends AbstractArrow implements ItemSupplier {
     }
 
     public static GunAmmoEntity shoot(Level world, LivingEntity entity, RandomSource random, float power, double damage, int knockback) {
-        GunAmmoEntity entityarrow = new GunAmmoEntity(NewaycoreModEntities.GUN_AMMO.get(), entity, world);
+        GunAmmoEntity entityarrow = new GunAmmoEntity(ModEntitiesInit.GUN_AMMO.get(), entity, world);
         entityarrow.shoot(entity.getViewVector(1).x, entity.getViewVector(1).y, entity.getViewVector(1).z, power * 2, 0);
         entityarrow.setSilent(true);
         entityarrow.setCritArrow(true);
@@ -60,7 +60,7 @@ public class GunAmmoEntity extends AbstractArrow implements ItemSupplier {
     }
 
     public static GunAmmoEntity shoot(LivingEntity entity, LivingEntity target) {
-        GunAmmoEntity entityarrow = new GunAmmoEntity(NewaycoreModEntities.GUN_AMMO.get(), entity, entity.level());
+        GunAmmoEntity entityarrow = new GunAmmoEntity(ModEntitiesInit.GUN_AMMO.get(), entity, entity.level());
         double dx = target.getX() - entity.getX();
         double dy = target.getY() + target.getEyeHeight() - 1.1;
         double dz = target.getZ() - entity.getZ();

@@ -29,25 +29,19 @@ import java.util.function.Supplier;
 public class NewaycoreMod {
     public static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.class);
     public static final String MODID = "newaycore";
-    // Start of user code block mod methods
-    // End of user code block mod methods
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel PACKET_HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, clientVersion -> true);
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
     private static int messageID = 0;
 
     public NewaycoreMod(FMLJavaModLoadingContext context) {
-        // Start of user code block mod constructor
-        // End of user code block mod constructor
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = context.getModEventBus();
-        NewaycoreModSounds.REGISTRY.register(bus);
-        NewaycoreModBlocks.REGISTRY.register(bus);
-        NewaycoreModItems.REGISTRY.register(bus);
-        NewaycoreModEntities.REGISTRY.register(bus);
-        NewaycoreModTabs.REGISTRY.register(bus);
-        // Start of user code block mod init
-        // End of user code block mod init
+        ModSoundsInit.REGISTRY.register(bus);
+        ModBlocksInit.REGISTRY.register(bus);
+        ModItemsInit.REGISTRY.register(bus);
+        ModEntitiesInit.REGISTRY.register(bus);
+        ModTabsInit.REGISTRY.register(bus);
     }
 
     public static <T> void addNetworkMessage(Class<T> messageType, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {

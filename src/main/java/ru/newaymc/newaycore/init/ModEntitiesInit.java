@@ -1,6 +1,3 @@
-/*
- *    MCreator note: This file will be REGENERATED on each build.
- */
 package ru.newaymc.newaycore.init;
 
 import net.minecraft.world.entity.Entity;
@@ -18,7 +15,7 @@ import ru.newaymc.newaycore.ai.EliteShooterEntity;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class NewaycoreModEntities {
+public class ModEntitiesInit {
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, NewaycoreMod.MODID);
 
     // Start of user code block custom entities

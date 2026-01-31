@@ -17,7 +17,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Mod.EventBusSubscriber
-public class LoadWorld1Procedure {
+public class LoadWorld1 {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         execute(event, event.getEntity().level());

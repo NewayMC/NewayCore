@@ -1,6 +1,3 @@
-/*
- *	MCreator note: This file will be REGENERATED on each build.
- */
 package ru.newaymc.newaycore.init;
 
 import net.minecraft.client.KeyMapping;
@@ -15,7 +12,7 @@ import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.network.ResetStateMessage;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class NewaycoreModKeyMappings {
+public class ModKeyMappingsInit {
     public static final KeyMapping RESET_STATE = new KeyMapping("key.newaycore.reset_state", GLFW.GLFW_KEY_Z, "key.categories.misc") {
         private boolean isDownOld = false;
 

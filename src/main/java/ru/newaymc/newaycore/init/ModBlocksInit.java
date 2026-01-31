@@ -1,6 +1,3 @@
-/*
- *    MCreator note: This file will be REGENERATED on each build.
- */
 package ru.newaymc.newaycore.init;
 
 import net.minecraft.world.level.block.Block;
@@ -12,7 +9,7 @@ import ru.newaymc.newaycore.block.CoverMarkerAI;
 import ru.newaymc.newaycore.block.EmptyBlock;
 import ru.newaymc.newaycore.block.ObjectMarkerAI;
 
-public class NewaycoreModBlocks {
+public class ModBlocksInit {
     public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, NewaycoreMod.MODID);
     public static final RegistryObject<Block> COVER_MARKER_AI;
     public static final RegistryObject<Block> OBJECT_MARKER_AI;
