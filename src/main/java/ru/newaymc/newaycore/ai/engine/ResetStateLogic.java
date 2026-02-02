@@ -3,7 +3,7 @@ package ru.newaymc.newaycore.ai.engine;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
-import ru.newaymc.newaycore.network.ModVariables;
+import ru.newaymc.newaycore.network.vars.ModVariables;
 
 public class ResetStateLogic {
     public static void execute(LevelAccessor world) {

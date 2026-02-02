@@ -10,7 +10,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.network.ModVariables;
+import ru.newaymc.newaycore.network.vars.ModVariables;
 
 import javax.annotation.Nullable;
 import java.io.*;

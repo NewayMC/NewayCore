@@ -28,7 +28,7 @@ import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModBlocksInit;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
-import ru.newaymc.newaycore.network.ModVariables;
+import ru.newaymc.newaycore.network.vars.ModVariables;
 
 import java.util.List;
 import java.util.function.Supplier;

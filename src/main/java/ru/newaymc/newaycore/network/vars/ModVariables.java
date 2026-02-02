@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.network;
+package ru.newaymc.newaycore.network.vars;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
