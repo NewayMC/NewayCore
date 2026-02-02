@@ -29,8 +29,7 @@ public class LoadWorld1 {
     }
 
     private static void execute(@Nullable Event event, LevelAccessor world) {
-        File WorldFile = new File("");
-        WorldFile = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/NewayCore/Worlds/world_1/"), File.separator + "world.zip");
+        File WorldFile = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/NewayCore/Worlds/world_1/"), File.separator + "world.zip");
         if (WorldFile.exists()) {
             if (!ModVariables.MapVariables.get(world).FirstJoin) {
                 try {
