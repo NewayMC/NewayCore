@@ -15,19 +15,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
+
 import ru.newaymc.newaycore.NewaycoreMod;
 
-import java.io.File;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class NewaycoreModVariables {
-    public static boolean FirstJoin = false;
-    public static File StandartShooterFile = new File("");
-    public static com.google.gson.JsonObject StandartShooterJsonObj = new com.google.gson.JsonObject();
-    public static File EliteShooterFile = new File("");
-    public static com.google.gson.JsonObject EliteShooterJsonObj = new com.google.gson.JsonObject();
-
+public class ModVariables {
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
         NewaycoreMod.addNetworkMessage(SavedDataSyncMessage.class, SavedDataSyncMessage::buffer, SavedDataSyncMessage::new, SavedDataSyncMessage::handleData);
@@ -110,6 +104,7 @@ public class NewaycoreModVariables {
         public static final String DATA_NAME = "newaycore_mapvars";
         static MapVariables clientSide = new MapVariables();
         public boolean AIstate = false;
+        public boolean FirstJoin = false;
         boolean _syncDirty = false;
 
         public static MapVariables load(CompoundTag tag) {
@@ -128,11 +123,13 @@ public class NewaycoreModVariables {
 
         public void read(CompoundTag nbt) {
             AIstate = nbt.getBoolean("AIstate");
+            FirstJoin = nbt.getBoolean("FirstJoin");
         }
 
         @Override
         public CompoundTag save(CompoundTag nbt) {
             nbt.putBoolean("AIstate", AIstate);
+            nbt.putBoolean("FirstJoin", FirstJoin);
             return nbt;
         }
 

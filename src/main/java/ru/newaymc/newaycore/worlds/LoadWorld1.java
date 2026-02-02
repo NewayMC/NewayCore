@@ -8,8 +8,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.network.NewaycoreModVariables;
+import ru.newaymc.newaycore.network.ModVariables;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -31,7 +32,7 @@ public class LoadWorld1 {
         File WorldFile = new File("");
         WorldFile = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/NewayCore/Worlds/world_1/"), File.separator + "world.zip");
         if (WorldFile.exists()) {
-            if (!NewaycoreModVariables.FirstJoin) {
+            if (!ModVariables.MapVariables.get(world).FirstJoin) {
                 try {
                     new Object() {
                         public static void unzipFile(File fileToUnzip, String destDir) throws IOException {

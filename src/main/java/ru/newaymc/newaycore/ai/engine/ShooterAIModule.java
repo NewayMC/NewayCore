@@ -28,7 +28,7 @@ import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModBlocksInit;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
-import ru.newaymc.newaycore.network.NewaycoreModVariables;
+import ru.newaymc.newaycore.network.ModVariables;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -128,14 +128,14 @@ public class ShooterAIModule {
                                 ((GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75),
                                 ((GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getZ())));
                 NewaycoreMod.queueServerWork(60, () -> {
-                    NewaycoreModVariables.MapVariables.get(world).AIstate = true;
-                    NewaycoreModVariables.MapVariables.get(world).markSyncDirty();
+                    ModVariables.MapVariables.get(world).AIstate = true;
+                    ModVariables.MapVariables.get(world).markSyncDirty();
                 });
             }
         }
         // Entity detection end
         // Allow attack start
-        if (NewaycoreModVariables.MapVariables.get(world).AIstate) {
+        if (ModVariables.MapVariables.get(world).AIstate) {
             if (GetShooterEntity instanceof Mob _mob) {
                 if (!(_mob.getTarget() instanceof LivingEntity) || !_mob.getTarget().isAlive()) {
                     try {
@@ -321,7 +321,7 @@ public class ShooterAIModule {
         }
         // Find cover if low heath end
         // Targets ( patrol or going to object point ) start
-        if (NewaycoreModVariables.MapVariables.get(world).AIstate) {
+        if (ModVariables.MapVariables.get(world).AIstate) {
             if (!((Supplier<Boolean>) (() -> {
                 if (GetShooterEntity == null || (GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
                     return false;

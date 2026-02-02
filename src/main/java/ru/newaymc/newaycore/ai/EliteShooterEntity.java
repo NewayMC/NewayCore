@@ -98,10 +98,12 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
                 return this.mob.getBbWidth() * this.mob.getBbWidth() + entity.getBbWidth();
             }
         });
+
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(4, new FloatGoal(this));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, false));
+
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 1024, 10f) {
             @Override
             public boolean canContinueToUse() {

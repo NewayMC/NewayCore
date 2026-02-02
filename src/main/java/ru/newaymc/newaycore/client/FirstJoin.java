@@ -1,10 +1,11 @@
 package ru.newaymc.newaycore.client;
 
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import ru.newaymc.newaycore.network.NewaycoreModVariables;
+import ru.newaymc.newaycore.network.ModVariables;
 
 import javax.annotation.Nullable;
 
@@ -12,16 +13,17 @@ import javax.annotation.Nullable;
 public class FirstJoin {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        execute(event);
+        execute(event, event.getEntity().level());
     }
 
-    public static void execute() {
-        execute(null);
+    public static void execute(LevelAccessor world) {
+        execute(null, world);
     }
 
-    private static void execute(@Nullable Event event) {
-        if (!NewaycoreModVariables.FirstJoin) {
-            NewaycoreModVariables.FirstJoin = true;
+
+    private static void execute(@Nullable Event event, LevelAccessor world) {
+        if (!ModVariables.MapVariables.get(world).FirstJoin) {
+            ModVariables.MapVariables.get(world).FirstJoin = true;
         }
     }
 }
