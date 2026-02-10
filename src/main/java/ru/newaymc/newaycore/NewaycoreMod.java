@@ -2,11 +2,13 @@ package ru.newaymc.newaycore;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkEvent;
@@ -15,6 +17,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.init.*;
+import ru.newaymc.newaycore.network.vars.ModVariables;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -65,6 +68,12 @@ public class NewaycoreMod {
             });
             actions.forEach(e -> e.getKey().run());
             workQueue.removeAll(actions);
+        }
+    }
+
+    private static void commonSetup(final FMLCommonSetupEvent event, LevelAccessor world) {
+        if (!ModVariables.MapVariables.get(world).FirstJoin) {
+            ModVariables.MapVariables.get(world).FirstJoin = true;
         }
     }
 }

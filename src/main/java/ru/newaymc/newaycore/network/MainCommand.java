@@ -11,7 +11,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import ru.newaymc.newaycore.factions.FactionRegister;
+// import ru.newaymc.newaycore.als.factions.FactionRegister;
 import ru.newaymc.newaycore.network.command.ExecuteLogic;
 
 // Now, it only needs for some tests
@@ -36,7 +36,7 @@ public class MainCommand {
                     if (entity != null)
                         direction = entity.getDirection();
 
-                    FactionRegister.execute();
+                    // FactionRegister.execute();
                     return 0;
 
 

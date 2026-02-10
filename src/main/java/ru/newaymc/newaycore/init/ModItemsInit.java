@@ -35,8 +35,6 @@ public class ModItemsInit {
         EMPTY_BLOCK = block(ModBlocksInit.EMPTY_BLOCK);
     }
 
-    // Start of user code block custom items
-    // End of user code block custom items
     private static RegistryObject<Item> block(RegistryObject<Block> block) {
         return block(block, new Item.Properties());
     }

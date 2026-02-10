@@ -20,6 +20,4 @@ public class ModBlocksInit {
         OBJECT_MARKER_AI = REGISTRY.register("object_marker_ai", ObjectMarkerAI::new);
         EMPTY_BLOCK = REGISTRY.register("empty_block", EmptyBlock::new);
     }
-    // Start of user code block custom blocks
-    // End of user code block custom blocks
 }

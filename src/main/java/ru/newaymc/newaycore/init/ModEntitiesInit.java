@@ -19,8 +19,6 @@ import ru.newaymc.newaycore.entity.GunAmmoEntity;
 public class ModEntitiesInit {
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, NewaycoreMod.MODID);
 
-    // Start of user code block custom entities
-    // End of user code block custom entities
     private static <T extends Entity> RegistryObject<EntityType<T>> register(String registryname, EntityType.Builder<T> entityTypeBuilder) {
         return REGISTRY.register(registryname, () -> entityTypeBuilder.build(registryname));
     }
