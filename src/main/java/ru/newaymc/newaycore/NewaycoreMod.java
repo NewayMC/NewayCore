@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -71,7 +72,8 @@ public class NewaycoreMod {
         }
     }
 
-    private static void commonSetup(final FMLCommonSetupEvent event, LevelAccessor world) {
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event, LevelAccessor world) {
         if (!ModVariables.MapVariables.get(world).FirstJoin) {
             ModVariables.MapVariables.get(world).FirstJoin = true;
         }

@@ -17,10 +17,15 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import ru.newaymc.newaycore.NewaycoreMod;
 
+import java.io.File;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModVariables {
+    public static File OutpostFile = new File("");
+    public static com.google.gson.JsonObject OutpostJsonObj = new com.google.gson.JsonObject();
+    public static com.google.gson.JsonArray OutpostXYZArray = new com.google.gson.JsonArray();
+
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
         NewaycoreMod.addNetworkMessage(SavedDataSyncMessage.class, SavedDataSyncMessage::buffer, SavedDataSyncMessage::new, SavedDataSyncMessage::handleData);
@@ -104,6 +109,7 @@ public class ModVariables {
         static MapVariables clientSide = new MapVariables();
         public boolean AIstate = false;
         public boolean FirstJoin = false;
+        public double NextOutpostID = 0;
         boolean _syncDirty = false;
 
         public static MapVariables load(CompoundTag tag) {
@@ -123,12 +129,14 @@ public class ModVariables {
         public void read(CompoundTag nbt) {
             AIstate = nbt.getBoolean("AIstate");
             FirstJoin = nbt.getBoolean("FirstJoin");
+            NextOutpostID = nbt.getDouble("NextOutpostID");
         }
 
         @Override
         public CompoundTag save(CompoundTag nbt) {
             nbt.putBoolean("AIstate", AIstate);
             nbt.putBoolean("FirstJoin", FirstJoin);
+            nbt.putDouble("NextOutpostID", NextOutpostID);
             return nbt;
         }
 

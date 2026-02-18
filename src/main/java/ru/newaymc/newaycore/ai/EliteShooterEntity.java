@@ -33,6 +33,7 @@ import ru.newaymc.newaycore.init.ModItemsInit;
 
 public class EliteShooterEntity extends Monster implements RangedAttackMob {
 
+    public static final EntityDataAccessor<Boolean> DATA_als_state = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<String> DATA_ai_type = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.STRING);
     public static final EntityDataAccessor<Integer> DATA_shoot = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_damage = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
@@ -79,6 +80,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
+        this.entityData.define(DATA_als_state, true);
         this.entityData.define(DATA_ai_type, "standart");
         this.entityData.define(DATA_shoot, 5);
         this.entityData.define(DATA_damage, 4);
@@ -140,6 +142,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
+        compound.putBoolean("Dataals_state", this.entityData.get(DATA_als_state));
         compound.putString("Dataai_type", this.entityData.get(DATA_ai_type));
         compound.putInt("Datashoot", this.entityData.get(DATA_shoot));
         compound.putInt("Datadamage", this.entityData.get(DATA_damage));
@@ -153,6 +156,8 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
+        if (compound.contains("Dataals_state"))
+            this.entityData.set(DATA_als_state, compound.getBoolean("Dataals_state"));
         if (compound.contains("Dataai_type"))
             this.entityData.set(DATA_ai_type, compound.getString("Dataai_type"));
         if (compound.contains("Datashoot"))

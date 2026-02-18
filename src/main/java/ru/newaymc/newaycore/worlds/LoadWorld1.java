@@ -67,7 +67,7 @@ public class LoadWorld1 {
                 }
             }
         } else {
-            NewaycoreMod.LOGGER.fatal("[NewayCore/Worlds] World file not found. ( world_1 )");
+            NewaycoreMod.LOGGER.error("[NewayCore/Worlds] World file not found. ( world_1 )");
         }
     }
 }
