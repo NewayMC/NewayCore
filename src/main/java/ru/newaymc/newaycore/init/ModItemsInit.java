@@ -4,6 +4,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -13,9 +14,12 @@ import ru.newaymc.newaycore.item.AkmItem;
 import ru.newaymc.newaycore.item.M4A1Item;
 import ru.newaymc.newaycore.item.MP5Item;
 
+import static ru.newaymc.newaycore.init.ModBlocksInit.OUTPOST_HUB;
+
 public class ModItemsInit {
     public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, NewaycoreMod.MODID);
     public static final RegistryObject<Item> ELITE_SHOOTER_ENTITY_SPAWN_EGG;
+    public static final RegistryObject<Item> STANDART_SHOOTER_ENTITY_SPAWN_EGG;
     public static final RegistryObject<Item> COVER_MARKER_AI;
     public static final RegistryObject<Item> OBJECT_MARKER_AI;
     public static final RegistryObject<Item> AKM;
@@ -23,9 +27,11 @@ public class ModItemsInit {
     public static final RegistryObject<Item> MP_5;
     public static final RegistryObject<Item> AR_15_SNIPER;
     public static final RegistryObject<Item> EMPTY_BLOCK;
+    public static final RegistryObject<Item> OUTPOST_HUB;
 
     static {
         ELITE_SHOOTER_ENTITY_SPAWN_EGG = REGISTRY.register("elite_shooter_entity_spawn_egg", () -> new ForgeSpawnEggItem(ModEntitiesInit.ELITE_SHOOTER_ENTITY, -13421773, -10066330, new Item.Properties()));
+        STANDART_SHOOTER_ENTITY_SPAWN_EGG = REGISTRY.register("standart_shooter_entity_spawn_egg", () -> new ForgeSpawnEggItem(ModEntitiesInit.STANDART_SHOOTER_ENTITY, -13421773, -10066330, new Item.Properties()));
         COVER_MARKER_AI = block(ModBlocksInit.COVER_MARKER_AI);
         OBJECT_MARKER_AI = block(ModBlocksInit.OBJECT_MARKER_AI);
         AKM = REGISTRY.register("akm", AkmItem::new);
@@ -33,6 +39,7 @@ public class ModItemsInit {
         MP_5 = REGISTRY.register("mp_5", MP5Item::new);
         AR_15_SNIPER = REGISTRY.register("ar_15_sniper", AR15SniperItem::new);
         EMPTY_BLOCK = block(ModBlocksInit.EMPTY_BLOCK);
+        OUTPOST_HUB = block(ModBlocksInit.OUTPOST_HUB);
     }
 
     private static RegistryObject<Item> block(RegistryObject<Block> block) {

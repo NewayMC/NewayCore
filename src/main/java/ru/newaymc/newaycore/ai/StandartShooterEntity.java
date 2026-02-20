@@ -27,37 +27,34 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
 import ru.newaymc.newaycore.init.ModItemsInit;
 
-public class EliteShooterEntity extends Monster implements RangedAttackMob {
+public class StandartShooterEntity extends Monster implements RangedAttackMob {
+    public static final EntityDataAccessor<String> DATA_ai_type = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<Integer> DATA_shoot = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_damage = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_speed = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_inaccurace_accumulation = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_recoil = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_ammunation = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DATA_recovery_time = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Boolean> DATA_CanBeInSquad = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public static final EntityDataAccessor<String> DATA_ai_type = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.STRING); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_shoot = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_damage = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_speed = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_inaccurace_accumulation = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_recoil = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_ammunation = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Integer> DATA_recovery_time = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT); // mandatory
-    public static final EntityDataAccessor<Boolean> DATA_CanBeCommander = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.BOOLEAN); // optional
-    public static final EntityDataAccessor<Boolean> DATA_CanBeInSquad = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.BOOLEAN); // mandatory
-
-    public EliteShooterEntity(PlayMessages.SpawnEntity packet, Level world) {
-        this(ModEntitiesInit.ELITE_SHOOTER_ENTITY.get(), world);
+    public StandartShooterEntity(PlayMessages.SpawnEntity packet, Level world) {
+        this(ModEntitiesInit.STANDART_SHOOTER_ENTITY.get(), world);
     }
 
-    public EliteShooterEntity(EntityType<EliteShooterEntity> type, Level world) {
+    public StandartShooterEntity(EntityType<StandartShooterEntity> type, Level world) {
         super(type, world);
         setMaxUpStep(0.6f);
         xpReward = 0;
         setNoAi(false);
-        setCustomName(Component.literal("Elite Shooter Entity"));
+        setCustomName(Component.literal("Standart Shooter Entity"));
         setCustomNameVisible(true);
         setPersistenceRequired();
-        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItemsInit.M_4_A_1.get()));
+        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItemsInit.AKM.get()));
     }
 
     public static void init() {
@@ -66,7 +63,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     public static AttributeSupplier.Builder createAttributes() {
         AttributeSupplier.Builder builder = Mob.createMobAttributes();
         builder = builder.add(Attributes.MOVEMENT_SPEED, 0.2);
-        builder = builder.add(Attributes.MAX_HEALTH, 500);
+        builder = builder.add(Attributes.MAX_HEALTH, 300);
         builder = builder.add(Attributes.ARMOR, 5);
         builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
         builder = builder.add(Attributes.FOLLOW_RANGE, 32);
@@ -90,8 +87,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
         this.entityData.define(DATA_recoil, 1);
         this.entityData.define(DATA_ammunation, 30);
         this.entityData.define(DATA_recovery_time, 30);
-        this.entityData.define(DATA_CanBeCommander, true);
-        this.entityData.define(DATA_CanBeInSquad, false);
+        this.entityData.define(DATA_CanBeInSquad, true);
     }
 
     @Override
@@ -103,12 +99,10 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
                 return this.mob.getBbWidth() * this.mob.getBbWidth() + entity.getBbWidth();
             }
         });
-
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(4, new FloatGoal(this));
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, false));
-
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 1024, 10f) {
             @Override
             public boolean canContinueToUse() {
@@ -153,7 +147,6 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
         compound.putInt("Datarecoil", this.entityData.get(DATA_recoil));
         compound.putInt("Dataammunation", this.entityData.get(DATA_ammunation));
         compound.putInt("Datarecovery_time", this.entityData.get(DATA_recovery_time));
-        compound.putBoolean("DataCanBeCommander", this.entityData.get(DATA_CanBeCommander));
         compound.putBoolean("DataCanBeInSquad", this.entityData.get(DATA_CanBeInSquad));
     }
 
@@ -176,8 +169,6 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
             this.entityData.set(DATA_ammunation, compound.getInt("Dataammunation"));
         if (compound.contains("Datarecovery_time"))
             this.entityData.set(DATA_recovery_time, compound.getInt("Datarecovery_time"));
-        if (compound.contains("DataCanBeCommander"))
-            this.entityData.set(DATA_CanBeCommander, compound.getBoolean("DataCanBeCommander"));
         if (compound.contains("DataCanBeInSquad"))
             this.entityData.set(DATA_CanBeInSquad, compound.getBoolean("DataCanBeInSquad"));
     }
@@ -185,7 +176,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     @Override
     public void baseTick() {
         super.baseTick();
-        GetEliteShooterEntity.execute(this.level(), this.getX(), this.getY(), this.getZ(), this);
+        GetStandartShooterEntity.execute(this.level(), this.getX(), this.getY(), this.getZ(), this);
     }
 
     @Override

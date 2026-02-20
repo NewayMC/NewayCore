@@ -1,16 +1,15 @@
 package ru.newaymc.newaycore.als.faction;
 
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import javax.annotation.Nullable;
-
-import java.io.IOException;
-import java.io.FileWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NeutralFactionCreate {

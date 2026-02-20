@@ -1,15 +1,14 @@
 package ru.newaymc.newaycore.als.faction;
 
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLPaths;
+
 import ru.newaymc.newaycore.NewaycoreMod;
 
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-
 import javax.annotation.Nullable;
-
 import java.io.File;
 
 @Mod.EventBusSubscriber

@@ -13,6 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.EliteShooterEntity;
+import ru.newaymc.newaycore.ai.StandartShooterEntity;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -27,6 +28,7 @@ public class ModEntitiesInit {
     public static void init(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             EliteShooterEntity.init();
+            StandartShooterEntity.init();
         });
     }    public static final RegistryObject<EntityType<GunAmmoEntity>> GUN_AMMO = register("gun_ammo",
             EntityType.Builder.<GunAmmoEntity>of(GunAmmoEntity::new, MobCategory.MISC).setCustomClientFactory(GunAmmoEntity::new).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
@@ -34,6 +36,8 @@ public class ModEntitiesInit {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ELITE_SHOOTER_ENTITY.get(), EliteShooterEntity.createAttributes().build());
+        event.put(STANDART_SHOOTER_ENTITY.get(), StandartShooterEntity.createAttributes().build());
+
     }
 
     public static final RegistryObject<EntityType<EliteShooterEntity>> ELITE_SHOOTER_ENTITY = register("elite_shooter_entity",
@@ -41,7 +45,11 @@ public class ModEntitiesInit {
 
                     .sized(0.6f, 1.8f));
 
+    public static final RegistryObject<EntityType<StandartShooterEntity>> STANDART_SHOOTER_ENTITY = register("standart_shooter_entity",
+            EntityType.Builder.<StandartShooterEntity>of(StandartShooterEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
+                    .setCustomClientFactory(StandartShooterEntity::new)
 
+                    .sized(0.6f, 1.8f));
 
 
 }

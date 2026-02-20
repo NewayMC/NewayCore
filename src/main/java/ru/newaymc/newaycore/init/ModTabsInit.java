@@ -6,6 +6,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
+
 import ru.newaymc.newaycore.NewaycoreMod;
 
 public class ModTabsInit {
@@ -19,5 +20,12 @@ public class ModTabsInit {
                 tabData.accept(ModBlocksInit.COVER_MARKER_AI.get().asItem());
                 tabData.accept(ModBlocksInit.OBJECT_MARKER_AI.get().asItem());
                 tabData.accept(ModItemsInit.ELITE_SHOOTER_ENTITY_SPAWN_EGG.get());
+                tabData.accept(ModItemsInit.STANDART_SHOOTER_ENTITY_SPAWN_EGG.get());
             }).build());
+
+    public static final RegistryObject<CreativeModeTab> ALS_TAB = REGISTRY.register("als_tab",
+            () -> CreativeModeTab.builder().title(Component.translatable("item_group.newaycore.als_tab")).icon(() -> new ItemStack(ModBlocksInit.OUTPOST_HUB.get())).displayItems((parameters, tabData) -> {
+                tabData.accept(ModBlocksInit.OUTPOST_HUB.get().asItem());
+            }).withTabsBefore(GUNS.getId()).build());
+
 }

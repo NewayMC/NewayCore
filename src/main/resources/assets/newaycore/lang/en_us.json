@@ -9,11 +9,15 @@
   "item.newaycore.ar_15_sniper": "AR-15",
   "block.newaycore.empty_block": "Empty Block",
   "item_group.newaycore.guns": "NewayCore - Guns",
+  "item_group.newaycore.als_tab": "NewayCore - ALS",
   "key.newaycore.reset_state": "Reset State",
   "item.newaycore.elite_shooter_entity_spawn_egg": "Elite Shooter Entity Spawn Egg",
   "block.newaycore.cover_marker_ai": "Cover Marker AI",
   "item.newaycore.m_4_a_1": "M4A1",
   "item.newaycore.cover_marker_ai": "Cover Marker AI",
   "item.newaycore.object_marker_ai": "Object Marker AI",
-  "item.newaycore.empty_block": "Empty Block"
+  "item.newaycore.empty_block": "Empty Block",
+  "block.newaycore.outpost_hub": "Outpost Hub",
+  "item.newaycore.standart_shooter_entity_spawn_egg": "Standart Shooter Entity Spawn Egg",
+  "entity.newaycore.standart_shooter_entity": "Standart Shooter Entity"
 }
