@@ -6,6 +6,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -23,26 +25,37 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.ai.EliteShooterEntity;
+import ru.newaymc.newaycore.als.outpost.OutpostRegister;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModBlocksInit;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.Comparator;
 
 public class ShooterAIModule {
-    public static void execute(LevelAccessor world, double x, double y, double z, Entity GetShooterEntity, double ammunation, double damage, double inaccurace_accumulation, double recoil, double recovery_time, double shoot, double speed, String ai_type) {
+    public static void execute(LevelAccessor world, double x, double y, double z, Entity GetShooterEntity, boolean CanBeCommander, boolean CanBeInSquad, double ammunation, double damage, double inaccurace_accumulation, double recoil, double recovery_time, double shoot, double speed, String ai_type) {
         if (GetShooterEntity == null)
             return;
         double sx = 0;
         double sy = 0;
         double sz = 0;
+        double rnd = 0;
         boolean found = false;
-        if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(64 / 2d), e -> true).isEmpty()) {
+        Entity cmd = null;
+        File TargetOutpost = new File("");
+        if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(128 / 2d), e -> true).isEmpty()) {
             // Entity detection start
             if (((Supplier<Boolean>) (() -> {
                 if (GetShooterEntity == null || (GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
@@ -123,7 +136,7 @@ public class ShooterAIModule {
                     }
                     return nearest;
                 })).get() instanceof Player) {
-                    GetShooterEntity.getPersistentData().putBoolean("forceStopBorderPatrol", true);
+                    // GetShooterEntity.getPersistentData().putBoolean("forceStopBorderPatrol", true);
                     GetShooterEntity.lookAt(EntityAnchorArgument.Anchor.EYES,
                             new Vec3(((GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX()),
                                     ((GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (GetShooterEntity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75),
@@ -142,7 +155,7 @@ public class ShooterAIModule {
                         try {
                             GoalSelector _targetSelector = _mob.targetSelector;
                             NearestAttackableTargetGoal<LivingEntity> _goal = new NearestAttackableTargetGoal<>(_mob, LivingEntity.class, 10, true, false,
-                                    e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("minecraft:player"))) && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("minecraft:no_entities"))));
+                                    e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("player"))) && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("no_entities"))));
                             _targetSelector.addGoal(1, _goal);
                         } catch (Exception ignored) {
                         }
@@ -277,9 +290,9 @@ public class ShooterAIModule {
             if ((GetShooterEntity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().getBoolean("IsShooting")) {
                 if (world instanceof Level _level) {
                     if (!_level.isClientSide()) {
-                        _level.playSound(null, BlockPos.containing(GetShooterEntity.getX(), GetShooterEntity.getY(), GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1);
+                        _level.playSound(null, BlockPos.containing(GetShooterEntity.getX(), GetShooterEntity.getY(), GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_fire")), SoundSource.NEUTRAL, 1, 1);
                     } else {
-                        _level.playLocalSound((GetShooterEntity.getX()), (GetShooterEntity.getY()), (GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
+                        _level.playLocalSound((GetShooterEntity.getX()), (GetShooterEntity.getY()), (GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
                     }
                 }
             }
@@ -290,10 +303,10 @@ public class ShooterAIModule {
             })).get()) {
                 if (world instanceof Level _level) {
                     if (!_level.isClientSide()) {
-                        _level.playSound(null, BlockPos.containing(GetShooterEntity.getX(), GetShooterEntity.getY(), GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_reload")), SoundSource.NEUTRAL, 1,
+                        _level.playSound(null, BlockPos.containing(GetShooterEntity.getX(), GetShooterEntity.getY(), GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_reload")), SoundSource.NEUTRAL, 1,
                                 1);
                     } else {
-                        _level.playLocalSound((GetShooterEntity.getX()), (GetShooterEntity.getY()), (GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_reload")), SoundSource.NEUTRAL, 1, 1, false);
+                        _level.playLocalSound((GetShooterEntity.getX()), (GetShooterEntity.getY()), (GetShooterEntity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_reload")), SoundSource.NEUTRAL, 1, 1, false);
                     }
                 }
             }
@@ -388,7 +401,43 @@ public class ShooterAIModule {
                 }
             }
             // Targets ( patrol or going to object point ) end
-
+        }
+        // Temporarily disabled (awaiting testing)
+        if (ModVariables.MapVariables.get(world).ALSToggle) {
+            if (CanBeInSquad && !(GetShooterEntity instanceof EliteShooterEntity)) {
+                if (!world.getEntitiesOfClass(EliteShooterEntity.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(8 / 2d), e -> true).isEmpty()
+                        && ((findEntityInWorldRange(world, EliteShooterEntity.class, x, y, z, 8)) instanceof EliteShooterEntity _datEntL77 && _datEntL77.getEntityData().get(EliteShooterEntity.DATA_CanBeCommander))) {
+                    cmd = findEntityInWorldRange(world, EliteShooterEntity.class, x, y, z, 8);
+                    GetShooterEntity.getPersistentData().putBoolean("forceStopSimpleFormation", false);
+                    GetShooterEntity.getPersistentData().putBoolean("simpleFormationCanBeStopped", true);
+                    if (GetShooterEntity instanceof PathfinderMob mob && (cmd != null && cmd instanceof PathfinderMob commander)) {
+                        mob.goalSelector.addGoal(2, new GoalsExtension.SimpleFormationGoal(mob, commander, 6, 0.7 * 3.0D, 1));
+                    }
+                }
+            }
+            if (CanBeCommander && !CanBeInSquad) {
+                rnd = Mth.nextInt(RandomSource.create(), 0, (int) (OutpostRegister.execute(world) - 1));
+                TargetOutpost = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/Outposts/"), File.separator + ("outpost_id_" + rnd + ".json"));
+                if (TargetOutpost.exists()) {
+                    {
+                        try {
+                            BufferedReader bufferedReader = new BufferedReader(new FileReader(TargetOutpost));
+                            StringBuilder jsonstringbuilder = new StringBuilder();
+                            String line;
+                            while ((line = bufferedReader.readLine()) != null) {
+                                jsonstringbuilder.append(line);
+                            }
+                            bufferedReader.close();
+                            ModVariables.OutpostJsonObj = new com.google.gson.Gson().fromJson(jsonstringbuilder.toString(), com.google.gson.JsonObject.class);
+                            if (GetShooterEntity instanceof Mob _entity)
+                                _entity.getNavigation().moveTo(ModVariables.OutpostJsonObj.get("coordinate-x").getAsDouble(), ModVariables.OutpostJsonObj.get("coordinate-y").getAsDouble(),
+                                        ModVariables.OutpostJsonObj.get("coordinate-z").getAsDouble(), 1);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -413,4 +462,7 @@ public class ShooterAIModule {
         return entityToSpawn;
     }
 
+    private static Entity findEntityInWorldRange(LevelAccessor world, Class<? extends Entity> clazz, double x, double y, double z, double range) {
+        return world.getEntitiesOfClass(clazz, AABB.ofSize(new Vec3(x, y, z), range, range, range), e -> true).stream().sorted(Comparator.comparingDouble(e -> e.distanceToSqr(x, y, z))).findFirst().orElse(null);
+    }
 }

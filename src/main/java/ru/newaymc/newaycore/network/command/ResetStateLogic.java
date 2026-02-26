@@ -1,13 +1,15 @@
-package ru.newaymc.newaycore.client;
+package ru.newaymc.newaycore.network.command;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
+
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
 public class ResetStateLogic {
     public static void execute(LevelAccessor world) {
         ModVariables.MapVariables.get(world).AIstate = false;
+        ModVariables.MapVariables.get(world).ALSToggle = false;
         ModVariables.MapVariables.get(world).NextOutpostID = 0;
         ModVariables.MapVariables.get(world).markSyncDirty();
         if (world instanceof ServerLevel _level) {

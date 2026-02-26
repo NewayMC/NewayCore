@@ -16,6 +16,6 @@ public class EliteShooterEntityRenderer extends HumanoidMobRenderer<EliteShooter
 
     @Override
     public ResourceLocation getTextureLocation(EliteShooterEntity entity) {
-        return new ResourceLocation("newaycore:textures/entities/elite_nautilus.png");
+        return  ResourceLocation.fromNamespaceAndPath("newaycore", "textures/entities/elite_nautilus.png");
     }
 }

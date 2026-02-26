@@ -9,6 +9,6 @@ import ru.newaymc.newaycore.NewaycoreMod;
 
 public class ModSoundsInit {
     public static final DeferredRegister<SoundEvent> REGISTRY = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, NewaycoreMod.MODID);
-    public static final RegistryObject<SoundEvent> AK47_FIRE = REGISTRY.register("ak47_fire", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("newaycore", "ak47_fire")));
-    public static final RegistryObject<SoundEvent> AK47_RELOAD = REGISTRY.register("ak47_reload", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("newaycore", "ak47_reload")));
+    public static final RegistryObject<SoundEvent> AK47_FIRE = REGISTRY.register("ak47_fire", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_fire")));
+    public static final RegistryObject<SoundEvent> AK47_RELOAD = REGISTRY.register("ak47_reload", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_reload")));
 }

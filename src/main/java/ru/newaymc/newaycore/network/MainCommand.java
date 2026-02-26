@@ -11,50 +11,84 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-// import ru.newaymc.newaycore.als.factions.FactionRegister;
+import ru.newaymc.newaycore.als.faction.FactionRegister;
+import ru.newaymc.newaycore.als.outpost.OutpostRegister;
 import ru.newaymc.newaycore.network.command.ExecuteLogic;
+import ru.newaymc.newaycore.network.command.ResetStateLogic;
 
-// Now, it only needs for some tests
 @Mod.EventBusSubscriber
 public class MainCommand {
     @SubscribeEvent
     public static void registerCommand(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("newaycore")
+        event.getDispatcher().register(Commands.literal("newaycore").requires(s -> s.hasPermission(4)).then(Commands.literal("als").then(Commands.literal("reload").executes(arguments -> {
+            Level world = arguments.getSource().getUnsidedLevel();
 
-                .then(Commands.literal("reload").executes(arguments -> {
-                    Level world = arguments.getSource().getUnsidedLevel();
+            double x = arguments.getSource().getPosition().x();
+            double y = arguments.getSource().getPosition().y();
+            double z = arguments.getSource().getPosition().z();
 
-                    double x = arguments.getSource().getPosition().x();
-                    double y = arguments.getSource().getPosition().y();
-                    double z = arguments.getSource().getPosition().z();
+            Entity entity = arguments.getSource().getEntity();
+            if (entity == null && world instanceof ServerLevel _servLevel)
+                entity = FakePlayerFactory.getMinecraft(_servLevel);
 
-                    Entity entity = arguments.getSource().getEntity();
-                    if (entity == null && world instanceof ServerLevel _servLevel)
-                        entity = FakePlayerFactory.getMinecraft(_servLevel);
+            Direction direction = Direction.DOWN;
+            if (entity != null)
+                direction = entity.getDirection();
 
-                    Direction direction = Direction.DOWN;
-                    if (entity != null)
-                        direction = entity.getDirection();
+            FactionRegister.execute();
+            return 0;
+        }).executes(arguments -> {
+            Level world = arguments.getSource().getUnsidedLevel();
 
-                    // FactionRegister.execute();
-                    return 0;
+            double x = arguments.getSource().getPosition().x();
+            double y = arguments.getSource().getPosition().y();
+            double z = arguments.getSource().getPosition().z();
 
+            Entity entity = arguments.getSource().getEntity();
+            if (entity == null && world instanceof ServerLevel _servLevel)
+                entity = FakePlayerFactory.getMinecraft(_servLevel);
 
-                })).then(Commands.literal("execute").then(Commands.argument("command", MessageArgument.message()).executes(arguments -> {
-                    Level world = arguments.getSource().getUnsidedLevel();
-                    double x = arguments.getSource().getPosition().x();
-                    double y = arguments.getSource().getPosition().y();
-                    double z = arguments.getSource().getPosition().z();
-                    Entity entity = arguments.getSource().getEntity();
-                    if (entity == null && world instanceof ServerLevel _servLevel)
-                        entity = FakePlayerFactory.getMinecraft(_servLevel);
-                    Direction direction = Direction.DOWN;
-                    if (entity != null)
-                        direction = entity.getDirection();
+            Direction direction = Direction.DOWN;
+            if (entity != null)
+                direction = entity.getDirection();
 
-                    ExecuteLogic.execute(arguments, entity);
-                    return 0;
-                }))));
+            OutpostRegister.execute(world);
+            return 0;
+        }))).then(Commands.literal("execute").then(Commands.argument("command", MessageArgument.message()).executes(arguments -> {
+            Level world = arguments.getSource().getUnsidedLevel();
+
+            double x = arguments.getSource().getPosition().x();
+            double y = arguments.getSource().getPosition().y();
+            double z = arguments.getSource().getPosition().z();
+
+            Entity entity = arguments.getSource().getEntity();
+            if (entity == null && world instanceof ServerLevel _servLevel)
+                entity = FakePlayerFactory.getMinecraft(_servLevel);
+
+            Direction direction = Direction.DOWN;
+            if (entity != null)
+                direction = entity.getDirection();
+
+            ExecuteLogic.execute(arguments, entity);
+            return 0;
+        }))).then(Commands.literal("reset").executes(arguments -> {
+            Level world = arguments.getSource().getUnsidedLevel();
+
+            double x = arguments.getSource().getPosition().x();
+            double y = arguments.getSource().getPosition().y();
+            double z = arguments.getSource().getPosition().z();
+
+            Entity entity = arguments.getSource().getEntity();
+            if (entity == null && world instanceof ServerLevel _servLevel)
+                entity = FakePlayerFactory.getMinecraft(_servLevel);
+
+            Direction direction = Direction.DOWN;
+            if (entity != null)
+                direction = entity.getDirection();
+
+            ResetStateLogic.execute(world);
+            return 0;
+        })));
     }
 
 }

@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.NetworkEvent;
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.client.ResetStateLogic;
+import ru.newaymc.newaycore.network.command.ResetStateLogic;
 
 import java.util.function.Supplier;
 

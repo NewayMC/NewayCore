@@ -17,6 +17,6 @@ public class StandartShooterEntityRenderer extends HumanoidMobRenderer<StandartS
 
     @Override
     public ResourceLocation getTextureLocation(StandartShooterEntity entity) {
-        return new ResourceLocation("newaycore:textures/entities/standart.png");
+        return  ResourceLocation.fromNamespaceAndPath("newaycore", "textures/entities/standart.png");
     }
 }

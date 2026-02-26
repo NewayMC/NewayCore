@@ -1,6 +1,8 @@
 package ru.newaymc.newaycore.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -11,6 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
+
+import ru.newaymc.newaycore.als.outpost.OutpostControl;
 import ru.newaymc.newaycore.als.outpost.OutpostCreation;
 import ru.newaymc.newaycore.block.entity.OutpostHubBlockEntity;
 
@@ -28,6 +32,15 @@ public class OutpostHub extends Block implements EntityBlock {
     public void onPlace(BlockState blockstate, Level world, BlockPos pos, BlockState oldState, boolean moving) {
         super.onPlace(blockstate, world, pos, oldState, moving);
         OutpostCreation.execute(world, pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    @Override
+    public void tick(BlockState blockstate, ServerLevel world, BlockPos pos, RandomSource random) {
+        super.tick(blockstate, world, pos, random);
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        OutpostControl.execute(world, x, y, z);
     }
 
     @Override

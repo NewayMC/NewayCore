@@ -8,13 +8,15 @@ public class GetEliteShooterEntity {
     public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
         if (entity == null)
             return;
-        ShooterAIModule.execute(world, x, y, z, entity, entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_ammunation) : 0,
+        ShooterAIModule.execute(world, x, y, z, entity, entity instanceof EliteShooterEntity _datEntL8 && _datEntL8.getEntityData().get(EliteShooterEntity.DATA_CanBeCommander),
+                entity instanceof EliteShooterEntity _datEntL8 && _datEntL8.getEntityData().get(EliteShooterEntity.DATA_CanBeInSquad),
+                entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_ammunation) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_damage) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_inaccurace_accumulation) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_recoil) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_recovery_time) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_shoot) : 0,
                 entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_speed) : 0,
-                entity instanceof EliteShooterEntity _datEntI ? _datEntI.getEntityData().get(EliteShooterEntity.DATA_ai_type) : "");
+                entity instanceof EliteShooterEntity _datEntS ? _datEntS.getEntityData().get(EliteShooterEntity.DATA_ai_type) : "");
     }
 }

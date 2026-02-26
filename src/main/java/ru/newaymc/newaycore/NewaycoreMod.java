@@ -58,6 +58,13 @@ public class NewaycoreMod {
     }
 
     @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event, LevelAccessor world) {
+        if (!ModVariables.MapVariables.get(world).FirstJoin) {
+            ModVariables.MapVariables.get(world).FirstJoin = true;
+        }
+    }
+
+    @SubscribeEvent
     public void tick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
@@ -68,13 +75,6 @@ public class NewaycoreMod {
             });
             actions.forEach(e -> e.getKey().run());
             workQueue.removeAll(actions);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event, LevelAccessor world) {
-        if (!ModVariables.MapVariables.get(world).FirstJoin) {
-            ModVariables.MapVariables.get(world).FirstJoin = true;
         }
     }
 }

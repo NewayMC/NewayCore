@@ -27,11 +27,11 @@ public class OutpostRegister {
         execute(event, event.getEntity().level());
     }
 
-    public static void execute(LevelAccessor world) {
-        execute(null, world);
+    public static double execute(LevelAccessor world) {
+        return execute(null, world);
     }
 
-    private static void execute(@Nullable Event event, LevelAccessor world) {
+    private static double execute(@Nullable Event event, LevelAccessor world) {
         double BlockX = 0;
         double BlockY = 0;
         double BlockZ = 0;
@@ -61,6 +61,7 @@ public class OutpostRegister {
                                 if (_blockEntity != null) {
                                     _blockEntity.getPersistentData().putString("outpost-id", ModVariables.OutpostJsonObj.get("id").getAsString());
                                     _blockEntity.getPersistentData().putString("faction", ModVariables.OutpostJsonObj.get("faction").getAsString());
+                                    _blockEntity.getPersistentData().putDouble("security-count", ModVariables.OutpostJsonObj.get("security-count").getAsDouble());
                                 }
                                 if (world instanceof Level _level)
                                     _level.sendBlockUpdated(_bp, _bs, _bs, 3);
@@ -78,6 +79,7 @@ public class OutpostRegister {
                                 if (_blockEntity != null) {
                                     _blockEntity.getPersistentData().putString("outpost-id", ModVariables.OutpostJsonObj.get("id").getAsString());
                                     _blockEntity.getPersistentData().putString("faction", ModVariables.OutpostJsonObj.get("faction").getAsString());
+                                    _blockEntity.getPersistentData().putDouble("security-count", ModVariables.OutpostJsonObj.get("security-count").getAsDouble());
                                 }
                                 if (world instanceof Level _level)
                                     _level.sendBlockUpdated(_bp, _bs, _bs, 3);
@@ -96,5 +98,6 @@ public class OutpostRegister {
                 break;
             }
         }
+        return CheckMultiplier;
     }
 }

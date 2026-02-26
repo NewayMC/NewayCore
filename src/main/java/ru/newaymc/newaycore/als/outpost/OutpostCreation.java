@@ -25,6 +25,7 @@ public class OutpostCreation {
         ModVariables.OutpostJsonObj.addProperty("coordinate-x", x);
         ModVariables.OutpostJsonObj.addProperty("coordinate-y", y);
         ModVariables.OutpostJsonObj.addProperty("coordinate-z", z);
+        ModVariables.OutpostJsonObj.addProperty("security-count", 5);
         {
             com.google.gson.Gson mainGSONBuilderVariable = new com.google.gson.GsonBuilder().setPrettyPrinting().create();
             try {

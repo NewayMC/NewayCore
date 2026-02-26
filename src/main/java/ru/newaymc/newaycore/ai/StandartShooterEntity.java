@@ -40,6 +40,7 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
     public static final EntityDataAccessor<Integer> DATA_recoil = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_ammunation = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_recovery_time = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Boolean> DATA_CanBeCommander = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> DATA_CanBeInSquad = SynchedEntityData.defineId(StandartShooterEntity.class, EntityDataSerializers.BOOLEAN);
 
     public StandartShooterEntity(PlayMessages.SpawnEntity packet, Level world) {
@@ -62,12 +63,11 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
 
     public static AttributeSupplier.Builder createAttributes() {
         AttributeSupplier.Builder builder = Mob.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.2);
+        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
         builder = builder.add(Attributes.MAX_HEALTH, 300);
         builder = builder.add(Attributes.ARMOR, 5);
         builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
         builder = builder.add(Attributes.FOLLOW_RANGE, 32);
-        builder = builder.add(Attributes.ATTACK_KNOCKBACK, 0.5);
         return builder;
     }
 
@@ -87,6 +87,7 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
         this.entityData.define(DATA_recoil, 1);
         this.entityData.define(DATA_ammunation, 30);
         this.entityData.define(DATA_recovery_time, 30);
+        this.entityData.define(DATA_CanBeCommander, false);
         this.entityData.define(DATA_CanBeInSquad, true);
     }
 
@@ -128,12 +129,12 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
 
     @Override
     public SoundEvent getHurtSound(DamageSource ds) {
-        return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.generic.hurt"));
+        return ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.withDefaultNamespace("entity.generic.hurt"));
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.generic.death"));
+        return ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.withDefaultNamespace("entity.generic.death"));
     }
 
     @Override
@@ -147,6 +148,7 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
         compound.putInt("Datarecoil", this.entityData.get(DATA_recoil));
         compound.putInt("Dataammunation", this.entityData.get(DATA_ammunation));
         compound.putInt("Datarecovery_time", this.entityData.get(DATA_recovery_time));
+        compound.putBoolean("DataCanBeCommander", this.entityData.get(DATA_CanBeCommander));
         compound.putBoolean("DataCanBeInSquad", this.entityData.get(DATA_CanBeInSquad));
     }
 
@@ -169,6 +171,8 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
             this.entityData.set(DATA_ammunation, compound.getInt("Dataammunation"));
         if (compound.contains("Datarecovery_time"))
             this.entityData.set(DATA_recovery_time, compound.getInt("Datarecovery_time"));
+        if (compound.contains("DataCanBeCommander"))
+            this.entityData.set(DATA_CanBeCommander, compound.getBoolean("DataCanBeCommander"));
         if (compound.contains("DataCanBeInSquad"))
             this.entityData.set(DATA_CanBeInSquad, compound.getBoolean("DataCanBeInSquad"));
     }

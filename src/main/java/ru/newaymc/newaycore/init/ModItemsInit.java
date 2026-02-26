@@ -4,7 +4,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -13,8 +12,6 @@ import ru.newaymc.newaycore.item.AR15SniperItem;
 import ru.newaymc.newaycore.item.AkmItem;
 import ru.newaymc.newaycore.item.M4A1Item;
 import ru.newaymc.newaycore.item.MP5Item;
-
-import static ru.newaymc.newaycore.init.ModBlocksInit.OUTPOST_HUB;
 
 public class ModItemsInit {
     public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, NewaycoreMod.MODID);
