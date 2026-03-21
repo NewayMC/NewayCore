@@ -50,7 +50,7 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
     public StandartShooterEntity(EntityType<StandartShooterEntity> type, Level world) {
         super(type, world);
         setMaxUpStep(0.6f);
-        xpReward = 0;
+        xpReward = 6;
         setNoAi(false);
         setCustomName(Component.literal("Standart Shooter Entity"));
         setCustomNameVisible(true);
@@ -80,13 +80,13 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(DATA_ai_type, "standart");
-        this.entityData.define(DATA_shoot, 5);
-        this.entityData.define(DATA_damage, 4);
-        this.entityData.define(DATA_speed, 4);
+        this.entityData.define(DATA_shoot, 1);
+        this.entityData.define(DATA_damage, 3);
+        this.entityData.define(DATA_speed, 3);
         this.entityData.define(DATA_inaccurace_accumulation, 2);
         this.entityData.define(DATA_recoil, 1);
         this.entityData.define(DATA_ammunation, 30);
-        this.entityData.define(DATA_recovery_time, 30);
+        this.entityData.define(DATA_recovery_time, 10);
         this.entityData.define(DATA_CanBeCommander, false);
         this.entityData.define(DATA_CanBeInSquad, true);
     }
@@ -103,7 +103,7 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(4, new FloatGoal(this));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, false));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, true));
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 1024, 10f) {
             @Override
             public boolean canContinueToUse() {
