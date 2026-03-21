@@ -18,7 +18,6 @@ public class ModItemsInit {
     public static final RegistryObject<Item> ELITE_SHOOTER_ENTITY_SPAWN_EGG;
     public static final RegistryObject<Item> STANDART_SHOOTER_ENTITY_SPAWN_EGG;
     public static final RegistryObject<Item> COVER_MARKER_AI;
-    public static final RegistryObject<Item> OBJECT_MARKER_AI;
     public static final RegistryObject<Item> AKM;
     public static final RegistryObject<Item> M_4_A_1;
     public static final RegistryObject<Item> MP_5;
@@ -30,7 +29,6 @@ public class ModItemsInit {
         ELITE_SHOOTER_ENTITY_SPAWN_EGG = REGISTRY.register("elite_shooter_entity_spawn_egg", () -> new ForgeSpawnEggItem(ModEntitiesInit.ELITE_SHOOTER_ENTITY, -13421773, -10066330, new Item.Properties()));
         STANDART_SHOOTER_ENTITY_SPAWN_EGG = REGISTRY.register("standart_shooter_entity_spawn_egg", () -> new ForgeSpawnEggItem(ModEntitiesInit.STANDART_SHOOTER_ENTITY, -13421773, -10066330, new Item.Properties()));
         COVER_MARKER_AI = block(ModBlocksInit.COVER_MARKER_AI);
-        OBJECT_MARKER_AI = block(ModBlocksInit.OBJECT_MARKER_AI);
         AKM = REGISTRY.register("akm", AkmItem::new);
         M_4_A_1 = REGISTRY.register("m_4_a_1", M4A1Item::new);
         MP_5 = REGISTRY.register("mp_5", MP5Item::new);

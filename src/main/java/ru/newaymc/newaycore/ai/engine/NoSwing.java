@@ -15,14 +15,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import javax.annotation.Nullable;
-
 @Mod.EventBusSubscriber
-public class NoSwingAnimation {
+public class NoSwing {
     public static ItemStack lastMainHandItem = ItemStack.EMPTY;
 
     @OnlyIn(Dist.CLIENT)
@@ -84,12 +81,5 @@ public class NoSwingAnimation {
                 }
             }
         }
-    }
-
-    public static void execute() {
-        execute(null);
-    }
-
-    private static void execute(@Nullable Event event) {
     }
 }

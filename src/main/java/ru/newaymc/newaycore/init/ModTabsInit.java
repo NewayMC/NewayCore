@@ -18,7 +18,6 @@ public class ModTabsInit {
                 tabData.accept(ModItemsInit.MP_5.get());
                 tabData.accept(ModItemsInit.AR_15_SNIPER.get());
                 tabData.accept(ModBlocksInit.COVER_MARKER_AI.get().asItem());
-                tabData.accept(ModBlocksInit.OBJECT_MARKER_AI.get().asItem());
                 tabData.accept(ModItemsInit.ELITE_SHOOTER_ENTITY_SPAWN_EGG.get());
                 tabData.accept(ModItemsInit.STANDART_SHOOTER_ENTITY_SPAWN_EGG.get());
             }).build());
