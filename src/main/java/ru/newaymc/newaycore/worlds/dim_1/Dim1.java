@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.worlds.dimension;
+package ru.newaymc.newaycore.worlds.dim_1;
 
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.resources.ResourceLocation;
@@ -10,7 +10,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
-public class World1Dimension {
+public class Dim1 {
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class World1SpecialEffectsHandler {
         @SubscribeEvent
@@ -27,7 +27,7 @@ public class World1Dimension {
                     return false;
                 }
             };
-            event.register(new ResourceLocation("newaycore:world_1"), customEffect);
+            event.register(new ResourceLocation("newaycore:dim_1"), customEffect);
         }
     }
 }

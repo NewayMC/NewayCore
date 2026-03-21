@@ -1,5 +1,5 @@
 {
-  "type": "newaycore:world_1",
+  "type": "newaycore:dim_1",
   "generator": {
     "type": "minecraft:noise",
     "biome_source": {
@@ -20,7 +20,7 @@
       ]
     },
     "settings": {
-      "name": "newaycore:world_1",
+      "name": "newaycore:dim_1",
       "sea_level": 0,
       "legacy_random_source": true,
       "disable_mob_generation": false,

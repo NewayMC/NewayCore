@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.worlds;
+package ru.newaymc.newaycore.worlds.dim_1;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.LevelAccessor;
@@ -18,7 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Mod.EventBusSubscriber
-public class LoadWorld1 {
+public class LoadDim1 {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         execute(event, event.getEntity().level());
@@ -67,7 +67,7 @@ public class LoadWorld1 {
                 }
             }
         } else {
-            NewaycoreMod.LOGGER.error("[NewayCore/Worlds] World file not found. ( world_1 )");
+            NewaycoreMod.LOGGER.error("[NewayCore/Worlds] World file not found. ( dim_1 )");
         }
     }
 }
