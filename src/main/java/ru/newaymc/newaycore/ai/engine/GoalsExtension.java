@@ -10,11 +10,9 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -27,13 +25,7 @@ public class GoalsExtension {
         CompoundTag data = event.getEntity().getPersistentData();
         data.putBoolean("borderPatrolCall", false);
         data.putBoolean("simpleFormationCall", false);
-    }
-
-    public static void execute() {
-        execute(null);
-    }
-
-    private static void execute(@Nullable Event event) {
+        data.putBoolean("findCoverCall", false);
     }
 
     public static class BorderPatrolGoal extends Goal {
@@ -385,4 +377,26 @@ public class GoalsExtension {
             return mob.getY();
         }
     }
+
+   /* public static class FindCover extends Goal {
+        private final PathfinderMob mob;
+        private Vec3 nextPos;
+
+        public FindCover(PathfinderMob mob) {
+            this.mob = mob;
+            this.setFlags(EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            return mob.getPersistentData().getBoolean("findCoverCanBeStopped") || mob.getPersistentData().getBoolean("findCover");
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            if (mob.getPersistentData().getBoolean("forceStopFindCover"))
+                mob.goalSelector.removeGoal(this);
+            return mob.getPersistentData().getBoolean("findCoverCanBeStopped") || mob.getPersistentData().getBoolean("findCover");
+        }
+    }*/
 }
