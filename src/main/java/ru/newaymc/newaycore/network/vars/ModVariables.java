@@ -106,9 +106,7 @@ public class ModVariables {
     public static class MapVariables extends SavedData {
         public static final String DATA_NAME = "newaycore_mapvars";
         static MapVariables clientSide = new MapVariables();
-        public boolean AIstate = false;
         public boolean FirstJoin = false;
-        public boolean ALSToggle = false;
         public double NextOutpostID = 0;
         boolean _syncDirty = false;
 
@@ -127,17 +125,13 @@ public class ModVariables {
         }
 
         public void read(CompoundTag nbt) {
-            AIstate = nbt.getBoolean("AIstate");
             FirstJoin = nbt.getBoolean("FirstJoin");
-            ALSToggle = nbt.getBoolean("ALSToggle");
             NextOutpostID = nbt.getDouble("NextOutpostID");
         }
 
         @Override
         public CompoundTag save(CompoundTag nbt) {
-            nbt.putBoolean("AIstate", AIstate);
             nbt.putBoolean("FirstJoin", FirstJoin);
-            nbt.putBoolean("ALSToggle", ALSToggle);
             nbt.putDouble("NextOutpostID", NextOutpostID);
             return nbt;
         }

@@ -27,6 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 import net.minecraftforge.registries.ForgeRegistries;
+import ru.newaymc.newaycore.ai.engine.ShooterMain;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
 import ru.newaymc.newaycore.init.ModItemsInit;
@@ -63,7 +64,7 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
 
     public static AttributeSupplier.Builder createAttributes() {
         AttributeSupplier.Builder builder = Mob.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
+        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.2);
         builder = builder.add(Attributes.MAX_HEALTH, 300);
         builder = builder.add(Attributes.ARMOR, 5);
         builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
@@ -100,10 +101,31 @@ public class StandartShooterEntity extends Monster implements RangedAttackMob {
                 return this.mob.getBbWidth() * this.mob.getBbWidth() + entity.getBbWidth();
             }
         });
-        this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new HurtByTargetGoal(this).setAlertOthers());
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(4, new FloatGoal(this));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, true));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal(this, Player.class, true, false) {
+            @Override
+            public boolean canUse() {
+                double x = StandartShooterEntity.this.getX();
+                double y = StandartShooterEntity.this.getY();
+                double z = StandartShooterEntity.this.getZ();
+                Entity entity = StandartShooterEntity.this;
+                Level world = StandartShooterEntity.this.level();
+                return super.canUse() && ShooterMain.BattleAI.getAllowAttack();
+            }
+
+            @Override
+            public boolean canContinueToUse() {
+                double x = StandartShooterEntity.this.getX();
+                double y = StandartShooterEntity.this.getY();
+                double z = StandartShooterEntity.this.getZ();
+                Entity entity = StandartShooterEntity.this;
+                Level world = StandartShooterEntity.this.level();
+                return super.canContinueToUse() && ShooterMain.BattleAI.getAllowAttack();
+            }
+        });
+
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 1024, 10f) {
             @Override
             public boolean canContinueToUse() {

@@ -28,6 +28,7 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import ru.newaymc.newaycore.ai.engine.ShooterMain;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
 import ru.newaymc.newaycore.init.ModItemsInit;
@@ -103,10 +104,30 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
             }
         });
 
-        this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new HurtByTargetGoal(this).setAlertOthers());
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(4, new FloatGoal(this));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, false));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal(this, Player.class, true, false) {
+            @Override
+            public boolean canUse() {
+                double x = EliteShooterEntity.this.getX();
+                double y = EliteShooterEntity.this.getY();
+                double z = EliteShooterEntity.this.getZ();
+                Entity entity = EliteShooterEntity.this;
+                Level world = EliteShooterEntity.this.level();
+                return super.canUse() && ShooterMain.BattleAI.getAllowAttack();
+            }
+
+            @Override
+            public boolean canContinueToUse() {
+                double x = EliteShooterEntity.this.getX();
+                double y = EliteShooterEntity.this.getY();
+                double z = EliteShooterEntity.this.getZ();
+                Entity entity = EliteShooterEntity.this;
+                Level world = EliteShooterEntity.this.level();
+                return super.canContinueToUse() && ShooterMain.BattleAI.getAllowAttack();
+            }
+        });
 
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 1024, 10f) {
             @Override
