@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.Mod;
 import ru.newaymc.newaycore.als.faction.FactionRegister;
 import ru.newaymc.newaycore.als.outpost.OutpostRegister;
 import ru.newaymc.newaycore.network.command.ExecuteLogic;
-import ru.newaymc.newaycore.network.command.ResetStateLogic;
 
 @Mod.EventBusSubscriber
 public class MainCommand {
@@ -71,24 +70,6 @@ public class MainCommand {
 
             ExecuteLogic.execute(arguments, entity);
             return 0;
-        }))).then(Commands.literal("reset").executes(arguments -> {
-            Level world = arguments.getSource().getUnsidedLevel();
-
-            double x = arguments.getSource().getPosition().x();
-            double y = arguments.getSource().getPosition().y();
-            double z = arguments.getSource().getPosition().z();
-
-            Entity entity = arguments.getSource().getEntity();
-            if (entity == null && world instanceof ServerLevel _servLevel)
-                entity = FakePlayerFactory.getMinecraft(_servLevel);
-
-            Direction direction = Direction.DOWN;
-            if (entity != null)
-                direction = entity.getDirection();
-
-            ResetStateLogic.execute(world);
-            return 0;
-        })));
+        }))));
     }
-
 }
