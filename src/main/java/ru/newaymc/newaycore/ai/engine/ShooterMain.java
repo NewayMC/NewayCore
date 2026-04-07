@@ -49,7 +49,7 @@ import java.util.function.Supplier;
 public class ShooterMain {
     public static class BattleAI {
         private static String aiState = "";
-        private static Boolean allowAttack = true;
+        private static Boolean allowAttack = false;
 
         public static void init(LevelAccessor world, double x, double y, double z, Entity entity, double ammunation, double damage, double inaccuraceAccumulation, double recoil, double recoveryTime, double shoot, double speed, String aiType) {
             if (entity == null || aiType == null)
@@ -151,8 +151,8 @@ public class ShooterMain {
                                         try {
                                             GoalSelector _targetSelector = _mob.targetSelector;
                                             NearestAttackableTargetGoal<LivingEntity> _goal = new NearestAttackableTargetGoal<>(_mob, LivingEntity.class, 10, true, false,
-                                                    e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("minecraft:player")))
-                                                            && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("minecraft:no_entities"))));
+                                                    e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("player")))
+                                                            && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("no_entities"))));
                                             _targetSelector.addGoal((int) 1, _goal);
                                         } catch (Exception ignored) {
                                         }
@@ -298,10 +298,10 @@ public class ShooterMain {
                 if ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().getBoolean("IsShooting")) {
                     if (world instanceof Level _level) {
                         if (!_level.isClientSide()) {
-                            _level.playSound(null, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1,
+                            _level.playSound(null, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_fire")), SoundSource.NEUTRAL, 1,
                                     1);
                         } else {
-                            _level.playLocalSound((entity.getX()), (entity.getY()), (entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
+                            _level.playLocalSound((entity.getX()), (entity.getY()), (entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
                         }
                     }
                 }
@@ -312,10 +312,10 @@ public class ShooterMain {
                 })).get()) {
                     if (world instanceof Level _level) {
                         if (!_level.isClientSide()) {
-                            _level.playSound(null, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_reload")), SoundSource.NEUTRAL,
+                            _level.playSound(null, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_reload")), SoundSource.NEUTRAL,
                                     1, 1);
                         } else {
-                            _level.playLocalSound((entity.getX()), (entity.getY()), (entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("newaycore:ak47_reload")), SoundSource.NEUTRAL, 1, 1, false);
+                            _level.playLocalSound((entity.getX()), (entity.getY()), (entity.getZ()), ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.fromNamespaceAndPath("newaycore", "ak47_reload")), SoundSource.NEUTRAL, 1, 1, false);
                         }
                     }
                 }
@@ -363,7 +363,7 @@ public class ShooterMain {
                 // Check new Pos
                 if (checkNewPos == true) {
                     if (nextPosX == x && nextPosY == y && nextPosZ == z) {
-                        allowAttack = false;
+                        allowAttack = true;
                         checkNewPos = false;
                     }
                 }

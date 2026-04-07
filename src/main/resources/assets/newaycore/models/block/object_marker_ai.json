@@ -1,8 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "newaycore:block/object_marker_ai",
-    "particle": "newaycore:block/object_marker_ai"
-  },
-  "render_type": "solid"
-}

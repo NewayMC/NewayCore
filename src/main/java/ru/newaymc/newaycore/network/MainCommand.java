@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import ru.newaymc.newaycore.als.faction.FactionRegister;
 import ru.newaymc.newaycore.als.outpost.OutpostRegister;
-import ru.newaymc.newaycore.network.command.ExecuteLogic;
+import ru.newaymc.newaycore.network.command.MainCommandLogic;
 
 @Mod.EventBusSubscriber
 public class MainCommand {
@@ -68,7 +68,7 @@ public class MainCommand {
             if (entity != null)
                 direction = entity.getDirection();
 
-            ExecuteLogic.execute(arguments, entity);
+            MainCommandLogic.executeParam(arguments, entity);
             return 0;
         }))));
     }

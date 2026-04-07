@@ -8,9 +8,8 @@ import net.minecraft.commands.arguments.MessageArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 
-// Logic for execute param in MainCommand
-public class ExecuteLogic {
-    public static void execute(CommandContext<CommandSourceStack> arguments, Entity entity) {
+public class MainCommandLogic {
+    public static void executeParam(CommandContext<CommandSourceStack> arguments, Entity entity) {
         if (entity == null)
             return;
         {
