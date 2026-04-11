@@ -2,7 +2,6 @@ package ru.newaymc.newaycore.ai.engine;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
@@ -29,9 +28,12 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.EliteShooterEntity;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
-import ru.newaymc.newaycore.init.ModBlocksInit;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
@@ -47,9 +49,12 @@ import java.util.function.Supplier;
  * @version v2
  */
 public class ShooterMain {
+    public static final Logger LOGGER = LogManager.getLogger(ShooterMain.class);
+
     public static class BattleAI {
-        private static String aiState = "";
-        private static Boolean allowAttack = false;
+        public static String aiState = "";
+        public static Boolean canFindCover = false;
+        public static Boolean allowAttack = true;
 
         public static void init(LevelAccessor world, double x, double y, double z, Entity entity, double ammunation, double damage, double inaccuraceAccumulation, double recoil, double recoveryTime, double shoot, double speed, String aiType) {
             if (entity == null || aiType == null)
@@ -58,10 +63,6 @@ public class ShooterMain {
             double sx = 0;
             double sy = 0;
             double sz = 0;
-            double nextPosX = 0;
-            double nextPosY = 0;
-            double nextPosZ = 0;
-            boolean checkNewPos = false;
 
             if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(128 / 2d), e -> true).isEmpty()) {
                 // Entity detection
@@ -144,8 +145,9 @@ public class ShooterMain {
                         }
                         return nearest;
                     })).get() instanceof Player) {
-                        if (BattleAI.getAllowAttack() == true) {
+                        if (allowAttack) {
                             if ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) instanceof LivingEntity && (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).isAlive()) {
+                                aiState = "inBattle";
                                 if (entity instanceof Mob _mob) {
                                     if (!(_mob.getTarget() instanceof LivingEntity) || !((LivingEntity) _mob.getTarget()).isAlive()) {
                                         try {
@@ -163,7 +165,6 @@ public class ShooterMain {
                                                 ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75),
                                                 ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getZ())));
                                 (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().putBoolean("IsMousePressed", true);
-                                aiState = "inBattle";
                             } else {
                                 (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrCreateTag().putBoolean("IsMousePressed", false);
                             }
@@ -321,60 +322,14 @@ public class ShooterMain {
                 }
                 // Cover system
                 if ((aiState).equals("inBattle")) {
-                    sx = -3;
-                    for (int index0 = 0; index0 < 16; index0++) {
-                        sy = -3;
-                        for (int index1 = 0; index1 < 16; index1++) {
-                            sz = -3;
-                            for (int index2 = 0; index2 < 16; index2++) {
-                                if ((world.getBlockState(BlockPos.containing(x + sx, y + sy, z + sz))).getBlock() == ModBlocksInit.COVER_MARKER_AI.get()) {
-                                    checkNewPos = true;
-                                    nextPosX = x + sx;
-                                    nextPosY = y + sy;
-                                    nextPosZ = z + sz;
-                                    if ((entity.getDirection()) == Direction.SOUTH) {
-                                        nextPosZ = (z + sz) - 1;
-                                        if (entity instanceof Mob _entity)
-                                            _entity.getNavigation().moveTo(nextPosX, nextPosY, nextPosZ, 2);
-                                    } else if ((entity.getDirection()) == Direction.NORTH) {
-                                        nextPosZ = z + sz + 1;
-                                        if (entity instanceof Mob _entity)
-                                            _entity.getNavigation().moveTo(nextPosX, nextPosY, nextPosZ, 2);
-                                    } else if ((entity.getDirection()) == Direction.WEST) {
-                                        nextPosX = x + sx + 1;
-                                        if (entity instanceof Mob _entity)
-                                            _entity.getNavigation().moveTo(nextPosX, nextPosY, nextPosZ, 2);
-                                    } else if ((entity.getDirection()) == Direction.EAST) {
-                                        nextPosX = (x + sx) - 1;
-                                        if (entity instanceof Mob _entity)
-                                            _entity.getNavigation().moveTo(nextPosX, nextPosY, nextPosZ, 2);
-                                    }
-                                    break;
-                                } else {
-                                    allowAttack = true;
-                                }
-                                sz = sz + 1;
-                            }
-                            sy = sy + 1;
-                        }
-                        sx = sx + 1;
+                    if (entity instanceof PathfinderMob mob) {
+                        canFindCover = true;
+                        mob.goalSelector.addGoal(1, new GoalsExtension.FindCover(mob, x, y, z, world));
                     }
-                }
-                // Check new Pos
-                if (checkNewPos == true) {
-                    if (nextPosX == x && nextPosY == y && nextPosZ == z) {
-                        allowAttack = true;
-                        checkNewPos = false;
-                    }
-                }
-
+               }
             } else {
                 aiState = "normal";
             }
-        }
-
-        public static String getAiState() {
-            return aiState;
         }
 
         public static Boolean getAllowAttack() {
@@ -403,6 +358,7 @@ public class ShooterMain {
         }
     }
     // Not used
+    @Deprecated(since = "26.2.1")
     public static class AlsController {
         public static void init(LevelAccessor world, double x, double y, double z, Entity entity, boolean canBeCommander, boolean canBeInSquad) {
             if (entity == null)
@@ -416,7 +372,7 @@ public class ShooterMain {
             boolean hasTarget = false;
             boolean timeOut = false;
             // Squads control
-            if ((BattleAI.getAiState()).equals("normal")) {
+            if ((BattleAI.aiState).equals("normal")) {
                 if (canBeInSquad && !canBeCommander) {
                     if (!world.getEntitiesOfClass(EliteShooterEntity.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(16 / 2d), e -> true).isEmpty()) {
                         squadLead = findEntityInWorldRange(world, EliteShooterEntity.class, x, y, z, 16);

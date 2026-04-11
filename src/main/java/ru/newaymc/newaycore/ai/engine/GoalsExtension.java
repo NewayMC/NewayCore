@@ -1,17 +1,21 @@
 package ru.newaymc.newaycore.ai.engine;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import ru.newaymc.newaycore.init.ModBlocksInit;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -378,25 +382,91 @@ public class GoalsExtension {
         }
     }
 
-   /* public static class FindCover extends Goal {
+    public static class FindCover extends Goal {
         private final PathfinderMob mob;
-        private Vec3 nextPos;
+        private static LevelAccessor world;
+        private static Vec3 nextPos;
+        private static Vec3 pos;
+        private static boolean arrived = false;
 
-        public FindCover(PathfinderMob mob) {
+        public FindCover(PathfinderMob mob, double x, double y, double z, LevelAccessor world) {
             this.mob = mob;
+            this.pos = new Vec3(x, y, z);
+            this.world = world;
             this.setFlags(EnumSet.of(Flag.MOVE));
         }
 
         @Override
         public boolean canUse() {
-            return mob.getPersistentData().getBoolean("findCoverCanBeStopped") || mob.getPersistentData().getBoolean("findCover");
+            return ShooterMain.BattleAI.canFindCover;
         }
 
         @Override
         public boolean canContinueToUse() {
-            if (mob.getPersistentData().getBoolean("forceStopFindCover"))
+            if (!ShooterMain.BattleAI.canFindCover)
                 mob.goalSelector.removeGoal(this);
-            return mob.getPersistentData().getBoolean("findCoverCanBeStopped") || mob.getPersistentData().getBoolean("findCover");
+            return ShooterMain.BattleAI.canFindCover;
         }
-    }*/
+
+        @Override
+        public void stop() {
+            ShooterMain.BattleAI.canFindCover = false;
+            mob.getNavigation().stop();
+            ShooterMain.BattleAI.allowAttack = true;
+            nextPos = null;
+        }
+
+        @Override
+        public void tick() {
+            if (nextPos != null) {
+                double dist = mob.position().distanceTo(findCover() /*nextPos*/);
+                if (dist <= 0.05) {
+                    mob.setPos(nextPos.x, nextPos.y, nextPos.z);
+                    arrived = true;
+                    stop();
+                } else {
+                    arrived = false;
+                    PathNavigation nav = mob.getNavigation();
+                    if (nav.isDone()) {
+                        nav.moveTo(nextPos.x, nextPos.y, nextPos.z, 2);
+                    } else {
+                        nav.tick();
+                    }
+                }
+            }
+        }
+
+        public Vec3 findCover() {
+            Vec3 targetPos = new Vec3(null);
+            double sx = 0;
+            double sy = 0;
+            double sz = 0;
+
+            sx = -3;
+            for (int index0 = 0; index0 < 16; index0++) {
+                sy = -3;
+                for (int index1 = 0; index1 < 16; index1++) {
+                    sz = -3;
+                    for (int index2 = 0; index2 < 16; index2++) {
+                        if ((world.getBlockState(BlockPos.containing(pos.x + sx, pos.y + sy, pos.z + sz))).getBlock() == ModBlocksInit.COVER_MARKER_AI.get()) {
+                            nextPos = new Vec3(pos.x + sx, pos.y + sy, pos.z + sz);
+                            if ((mob.getDirection()) == Direction.SOUTH) {
+                                nextPos = new Vec3(nextPos.x, nextPos.y, nextPos.z - 1);
+                            } else if ((mob.getDirection()) == Direction.NORTH) {
+                                nextPos = new Vec3(nextPos.x, nextPos.y, nextPos.z + 1);
+                            } else if ((mob.getDirection()) == Direction.WEST) {
+                                nextPos = new Vec3(nextPos.x + 1, nextPos.y, nextPos.z);
+                            } else if ((mob.getDirection()) == Direction.EAST) {
+                                nextPos = new Vec3(nextPos.x + 1, nextPos.y, nextPos.z);
+                            }
+                            break;
+                        } else {
+                            stop();
+                        }
+                    }
+                }
+            }
+            return targetPos;
+        }
+    }
 }

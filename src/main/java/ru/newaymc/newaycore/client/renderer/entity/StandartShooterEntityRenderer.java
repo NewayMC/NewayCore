@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.client.renderer;
+package ru.newaymc.newaycore.client.renderer.entity;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;

@@ -97,17 +97,17 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1, false) {
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1, false) {
             @Override
             protected double getAttackReachSqr(LivingEntity entity) {
                 return this.mob.getBbWidth() * this.mob.getBbWidth() + entity.getBbWidth();
             }
         });
 
-        this.targetSelector.addGoal(2, new HurtByTargetGoal(this).setAlertOthers());
-        this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(4, new FloatGoal(this));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal(this, Player.class, true, false) {
+        this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
+        this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(5, new FloatGoal(this));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, false) {
             @Override
             public boolean canUse() {
                 double x = EliteShooterEntity.this.getX();
@@ -129,7 +129,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
             }
         });
 
-        this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.25, 1024, 10f) {
+        this.goalSelector.addGoal(2, new RangedAttackGoal(this, 1.25, 1024, 10f) {
             @Override
             public boolean canContinueToUse() {
                 return this.canUse();
