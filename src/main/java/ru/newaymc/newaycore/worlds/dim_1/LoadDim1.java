@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@Deprecated(forRemoval = true)
 @Mod.EventBusSubscriber
 public class LoadDim1 {
     @SubscribeEvent

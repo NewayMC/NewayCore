@@ -9,10 +9,11 @@ import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+@Deprecated(forRemoval = true)
 @Mod.EventBusSubscriber
 public class Dim1 {
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class World1SpecialEffectsHandler {
+    public static class Dim1SpecialEffectsHandler {
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
         public static void registerDimensionSpecialEffects(RegisterDimensionSpecialEffectsEvent event) {
