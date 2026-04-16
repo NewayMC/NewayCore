@@ -1,20 +1,23 @@
 package ru.newaymc.newaycore.als.faction;
 
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-import ru.newaymc.newaycore.NewaycoreMod;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class FactionRegister {
+    public static final Logger LOGGER = LogManager.getLogger(FactionRegister.class);
+
     @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void onPlayerLoggedIn(FMLCommonSetupEvent event) {
         execute(event);
     }
 
@@ -30,10 +33,10 @@ public class FactionRegister {
             if (FactionFile.exists()) {
                 CheckMultiplier = CheckMultiplier + 1;
             } else if (CheckMultiplier == 0) {
-                NewaycoreMod.LOGGER.warn("[NewayCore/ALS] Factions not found");
+                FactionRegister.LOGGER.warn("Factions not found");
                 break;
             } else {
-                NewaycoreMod.LOGGER.info(("[NewayCore/Factions] Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " faction's"));
+                FactionRegister.LOGGER.info(("Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " faction's"));
                 break;
             }
         }

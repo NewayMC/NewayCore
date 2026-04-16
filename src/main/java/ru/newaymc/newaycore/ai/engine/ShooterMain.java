@@ -30,8 +30,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.newaymc.newaycore.NewaycoreMod;
+
 import ru.newaymc.newaycore.ai.EliteShooterEntity;
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModEntitiesInit;
@@ -49,8 +48,6 @@ import java.util.function.Supplier;
  * @version v2
  */
 public class ShooterMain {
-    public static final Logger LOGGER = LogManager.getLogger(ShooterMain.class);
-
     public static class BattleAI {
         public static String aiState = "";
         public static Boolean canFindCover = false;

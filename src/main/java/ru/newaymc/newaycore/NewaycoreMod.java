@@ -3,12 +3,17 @@ package ru.newaymc.newaycore;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkEvent;
@@ -19,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.init.*;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
+import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,13 +64,6 @@ public class NewaycoreMod {
     }
 
     @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event, LevelAccessor world) {
-        if (!ModVariables.MapVariables.get(world).FirstJoin) {
-            ModVariables.MapVariables.get(world).FirstJoin = true;
-        }
-    }
-
-    @SubscribeEvent
     public void tick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
@@ -75,6 +74,50 @@ public class NewaycoreMod {
             });
             actions.forEach(e -> e.getKey().run());
             workQueue.removeAll(actions);
+        }
+    }
+
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = {Dist.DEDICATED_SERVER})
+    public static class ServerEvents {
+        @SubscribeEvent
+        public static void init(FMLDedicatedServerSetupEvent event) {
+            if (!ModVariables.firstStartup) {
+                ModVariables.firstStartup = true;
+                NewaycoreMod.LOGGER.info(ModVariables.firstStartup);
+            }
+            ModVariables.serverType = "server";
+            NewaycoreMod.LOGGER.info("Loaded as" + ModVariables.serverType);
+        }
+
+    }
+
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class ClientEvents {
+        @SubscribeEvent
+        public static void init(FMLClientSetupEvent event) {
+            ModVariables.serverType = "client";
+            NewaycoreMod.LOGGER.info("Loaded as " + ModVariables.serverType);
+        }
+
+    }
+
+    @Mod.EventBusSubscriber
+    public static class PlayerLoggedIn {
+        @SubscribeEvent
+        public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+            execute(event, event.getEntity().level());
+        }
+
+        public static void execute(LevelAccessor world) {
+            execute(null, world);
+        }
+
+        private static void execute(@Nullable Event event, LevelAccessor world) {
+            if (ModVariables.serverType.equals("client")) {
+                if (!ModVariables.MapVariables.get(world).FirstJoin) {
+                    ModVariables.MapVariables.get(world).FirstJoin = true;
+                }
+            }
         }
     }
 }

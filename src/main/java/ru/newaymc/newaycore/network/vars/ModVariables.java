@@ -24,6 +24,8 @@ import java.util.function.Supplier;
 public class ModVariables {
     public static File OutpostFile = new File("");
     public static com.google.gson.JsonObject OutpostJsonObj = new com.google.gson.JsonObject();
+    public static String serverType = "";
+    public static boolean firstStartup = false;
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
