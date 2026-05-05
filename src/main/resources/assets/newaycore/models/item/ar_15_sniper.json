@@ -1,7 +1,0 @@
-{
-  "parent": "newaycore:custom/ar15_sniper",
-  "textures": {
-    "1": "newaycore:block/ar15_sniper",
-    "particle": "newaycore:item/ar15_sniper"
-  }
-}

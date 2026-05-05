@@ -1,7 +1,0 @@
-{
-  "parent": "newaycore:custom/ak47",
-  "textures": {
-    "1": "newaycore:block/ak47",
-    "particle": "newaycore:item/ak47"
-  }
-}
