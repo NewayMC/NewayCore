@@ -1,6 +1,6 @@
 package ru.newaymc.newaycore.als.faction;
 
-import javafx.event.Event;
+import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
