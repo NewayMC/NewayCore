@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "newaycore:block/empty",
+    "particle": "newaycore:block/empty"
+  },
+  "render_type": "solid"
+}

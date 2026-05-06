@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "newaycore:block/cover_marker_ai"
+    }
+  }
+}
