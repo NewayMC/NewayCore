@@ -1,6 +1,3 @@
-/*
- *    MCreator note: This file will be REGENERATED on each build.
- */
 package ru.newaymc.newaycore.init;
 
 import net.minecraft.world.level.block.Block;

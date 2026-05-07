@@ -296,9 +296,9 @@ public class ShooterMain {
                 if ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getBoolean("IsShooting")) {
                     if (world instanceof Level _level) {
                         if (!_level.isClientSide()) {
-                            _level.playSound(null, BlockPos.containing(x, y, z), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("ru.newaymc.newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1);
+                            _level.playSound(null, BlockPos.containing(x, y, z), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1);
                         } else {
-                            _level.playLocalSound(x, y, z, BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("ru.newaymc.newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
+                            _level.playLocalSound(x, y, z, BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
                         }
                     }
                 }
@@ -309,9 +309,9 @@ public class ShooterMain {
                 })).get()) {
                     if (world instanceof Level _level) {
                         if (!_level.isClientSide()) {
-                            _level.playSound(null, BlockPos.containing(x, y, z), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("ru.newaymc.newaycore:ak47_reload")), SoundSource.NEUTRAL, 1, 1);
+                            _level.playSound(null, BlockPos.containing(x, y, z), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("ru.newaymc.newaycore:ak47_reload")), SoundSource.NEUTRAL, 1f, 1f);
                         } else {
-                            _level.playLocalSound(x, y, z, BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("ru.newaymc.newaycore:ak47_reload")), SoundSource.NEUTRAL, 1, 1, false);
+                            _level.playLocalSound(x, y, z, BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), SoundSource.NEUTRAL, 1f, 1f, false);
                         }
                     }
                 }
