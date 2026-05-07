@@ -291,29 +291,11 @@ public class ShooterMain {
                     tag.putBoolean("IsReloading", true);
                     (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
                     (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().putInt("RecoveryTime", (int) recoveryTime);
+                    entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), 1, 1 );
                 }
                 // Sounds
                 if ((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getBoolean("IsShooting")) {
-                    if (world instanceof Level _level) {
-                        if (!_level.isClientSide()) {
-                            _level.playSound(null, BlockPos.containing(x, y, z), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1);
-                        } else {
-                            _level.playLocalSound(x, y, z, BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), SoundSource.NEUTRAL, 1, 1, false);
-                        }
-                    }
-                }
-                if (((Supplier<Boolean>) (() -> {
-                    boolean boly_ = (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getBoolean("IsReloading");
-                    (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().putBoolean("IsReloading", false);
-                    return boly_;
-                })).get()) {
-                    if (world instanceof Level _level) {
-                        if (!_level.isClientSide()) {
-                            _level.playSound(null, BlockPos.containing(x, y, z), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("ru.newaymc.newaycore:ak47_reload")), SoundSource.NEUTRAL, 1f, 1f);
-                        } else {
-                            _level.playLocalSound(x, y, z, BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), SoundSource.NEUTRAL, 1f, 1f, false);
-                        }
-                    }
+                    entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), 1, 1);
                 }
 
                 // Cover system

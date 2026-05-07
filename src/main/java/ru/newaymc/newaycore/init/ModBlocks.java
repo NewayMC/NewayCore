@@ -19,6 +19,4 @@ public class ModBlocks {
         EMPTY_BLOCK = REGISTRY.register("empty_block", EmptyBlockBlock::new);
         OUTPOST_HUB = REGISTRY.register("outpost_hub", OutpostHubBlock::new);
     }
-    // Start of user code block custom blocks
-    // End of user code block custom blocks
 }

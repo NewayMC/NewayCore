@@ -29,8 +29,6 @@ public class ModEntities {
 
                     .ridingOffset(-0.6f).sized(0.6f, 1.8f));
 
-    // Start of user code block custom entities
-    // End of user code block custom entities
     private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(String registryname, EntityType.Builder<T> entityTypeBuilder) {
         return REGISTRY.register(registryname, () -> (EntityType<T>) entityTypeBuilder.build(registryname));
     }
