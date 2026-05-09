@@ -10,7 +10,7 @@ import ru.newaymc.newaycore.ai.engine.ShooterMain;
 import javax.annotation.Nullable;
 import java.io.File;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class FactionLoader {
 
     @SubscribeEvent

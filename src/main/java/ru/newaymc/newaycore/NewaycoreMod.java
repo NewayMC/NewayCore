@@ -87,7 +87,7 @@ public class NewaycoreMod {
         workQueue.removeAll(actions);
     }
 
-    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = {Dist.DEDICATED_SERVER})
+    @EventBusSubscriber(value = {Dist.DEDICATED_SERVER})
     public static class ServerEvents {
         @SubscribeEvent
         public static void init(FMLDedicatedServerSetupEvent event) {
@@ -100,7 +100,7 @@ public class NewaycoreMod {
         }
     }
 
-    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(value = Dist.CLIENT)
     public static class ClientEvents {
         @SubscribeEvent
         public static void init(FMLClientSetupEvent event) {
