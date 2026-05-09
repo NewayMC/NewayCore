@@ -1,13 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
-
 license = "${mod_license }"
+issueTrackerURL = "https://github.com/NewayMC/NewayCore/issues"
 
 [[mods]] #mandatory
 modId = "${mod_id}"
 version = "${mod_version}"
 displayName = "${mod_name}"
-displayURL="https://newaymc.github.io/"
+displayURL="https://github.com/NewayMC/NewayCore"
 logoFile="logo.png"
 credits="NewayMC Studio"
 authors = "${mod_author}"
