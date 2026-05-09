@@ -25,8 +25,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+
 import ru.newaymc.newaycore.ai.engine.ShooterMain;
-import ru.newaymc.newaycore.entity.GunAmmoEntity;
+import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.init.ModItems;
 
 public class EliteShooterEntity extends Monster implements RangedAttackMob {
@@ -176,7 +177,7 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
 
     @Override
     public void performRangedAttack(LivingEntity target, float flval) {
-        GunAmmoEntity.shoot(this, target);
+        GunAmmo.shoot(this, target);
     }
 
     public static void init(RegisterSpawnPlacementsEvent event) {
