@@ -1,13 +1,11 @@
 package ru.newaymc.newaycore.ai.engine;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,17 +27,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
 import ru.newaymc.newaycore.entity.GunAmmoEntity;
 import ru.newaymc.newaycore.init.ModEntities;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * <h1>Shooter entity AI</h1>
- *
- * @version v2
- */
 public class ShooterMain {
     public static class BattleAI {
         public static String aiState = "";
@@ -49,10 +43,6 @@ public class ShooterMain {
         public static void init(LevelAccessor world, double x, double y, double z, Entity entity, double ammunation, double damage, double inaccuraceAccumulation, double recoil, double recoveryTime, double shoot, double speed, String aiType) {
             if (entity == null || aiType == null)
                 return;
-
-            double sx = 0;
-            double sy = 0;
-            double sz = 0;
 
             if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(128 / 2d), e -> true).isEmpty()) {
                 // Entity detection
@@ -154,7 +144,7 @@ public class ShooterMain {
                                         new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX()),
                                                 ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75),
                                                 ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getZ())));
-                                (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().putBoolean("IsMousePressed", false);
+                                (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().putBoolean("IsMousePressed", true);
                             } else {
                                 (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY).getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().putBoolean("IsMousePressed", false);
                             }
@@ -335,6 +325,5 @@ public class ShooterMain {
                 weapon.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.PIERCING), piercing);
             return weapon;
         }
-
     }
 }

@@ -28,7 +28,6 @@ public class GoalsExtension {
         CompoundTag data = event.getEntity().getPersistentData();
         data.putBoolean("borderPatrolCall", false);
         data.putBoolean("simpleFormationCall", false);
-        data.putBoolean("findCoverCall", false);
     }
 
     public static class BorderPatrolGoal extends Goal {
@@ -418,7 +417,7 @@ public class GoalsExtension {
         @Override
         public void tick() {
             if (nextPos != null) {
-                double dist = mob.position().distanceTo(findCover() /*nextPos*/);
+                double dist = mob.position().distanceTo(findCover());
                 if (dist <= 0.05) {
                     mob.setPos(nextPos.x, nextPos.y, nextPos.z);
                     arrived = true;

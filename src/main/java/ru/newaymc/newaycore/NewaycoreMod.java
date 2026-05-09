@@ -4,14 +4,18 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.neoforged.fml.util.thread.SidedThreadGroups;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
@@ -21,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.init.*;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -93,6 +98,34 @@ public class NewaycoreMod {
             ModVariables.serverType = "server";
             NewaycoreMod.LOGGER.info("Loaded as" + ModVariables.serverType);
         }
+    }
 
+    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class ClientEvents {
+        @SubscribeEvent
+        public static void init(FMLClientSetupEvent event) {
+            ModVariables.serverType = "client";
+            NewaycoreMod.LOGGER.info("Loaded as " + ModVariables.serverType);
+        }
+    }
+
+    @EventBusSubscriber
+    public static class PlayerLoggedIn {
+        @SubscribeEvent
+        public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+            execute(event, event.getEntity().level());
+        }
+
+        public static void execute(LevelAccessor world) {
+            execute(null, world);
+        }
+
+        private static void execute(@Nullable Event event, LevelAccessor world) {
+            if (ModVariables.serverType.equals("client")) {
+                if (!ModVariables.MapVariables.get(world).FirstJoin) {
+                    ModVariables.MapVariables.get(world).FirstJoin = true;
+                }
+            }
+        }
     }
 }
