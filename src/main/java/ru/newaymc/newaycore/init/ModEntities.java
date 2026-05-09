@@ -13,13 +13,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.EliteShooterEntity;
 import ru.newaymc.newaycore.ai.StandartShooterEntity;
-import ru.newaymc.newaycore.entity.GunAmmoEntity;
+import ru.newaymc.newaycore.gun.entity.GunAmmo;
 
 @EventBusSubscriber
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create(Registries.ENTITY_TYPE, NewaycoreMod.MODID);
-    public static final DeferredHolder<EntityType<?>, EntityType<GunAmmoEntity>> GUN_AMMO = register("gun_ammo",
-            EntityType.Builder.<GunAmmoEntity>of(GunAmmoEntity::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
+    public static final DeferredHolder<EntityType<?>, EntityType<GunAmmo>> GUN_AMMO = register("gun_ammo",
+            EntityType.Builder.<GunAmmo>of(GunAmmo::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
     public static final DeferredHolder<EntityType<?>, EntityType<EliteShooterEntity>> ELITE_SHOOTER_ENTITY = register("elite_shooter_entity",
             EntityType.Builder.<EliteShooterEntity>of(EliteShooterEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3)
 

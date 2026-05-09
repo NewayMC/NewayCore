@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.entity;
+package ru.newaymc.newaycore.gun.entity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -24,21 +24,21 @@ import ru.newaymc.newaycore.init.ModEntities;
 import javax.annotation.Nullable;
 
 @OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
-public class GunAmmoEntity extends AbstractArrow implements ItemSupplier {
+public class GunAmmo extends AbstractArrow implements ItemSupplier {
     public static final ItemStack PROJECTILE_ITEM = new ItemStack(Blocks.AIR);
     private int knockback = 0;
 
-    public GunAmmoEntity(EntityType<? extends GunAmmoEntity> type, Level world) {
+    public GunAmmo(EntityType<? extends GunAmmo> type, Level world) {
         super(type, world);
     }
 
-    public GunAmmoEntity(EntityType<? extends GunAmmoEntity> type, double x, double y, double z, Level world, @Nullable ItemStack firedFromWeapon) {
+    public GunAmmo(EntityType<? extends GunAmmo> type, double x, double y, double z, Level world, @Nullable ItemStack firedFromWeapon) {
         super(type, x, y, z, world, PROJECTILE_ITEM, firedFromWeapon);
         if (firedFromWeapon != null)
             setKnockback(EnchantmentHelper.getItemEnchantmentLevel(world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.KNOCKBACK), firedFromWeapon));
     }
 
-    public GunAmmoEntity(EntityType<? extends GunAmmoEntity> type, LivingEntity entity, Level world, @Nullable ItemStack firedFromWeapon) {
+    public GunAmmo(EntityType<? extends GunAmmo> type, LivingEntity entity, Level world, @Nullable ItemStack firedFromWeapon) {
         super(type, entity, world, PROJECTILE_ITEM, firedFromWeapon);
         if (firedFromWeapon != null)
             setKnockback(EnchantmentHelper.getItemEnchantmentLevel(world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.KNOCKBACK), firedFromWeapon));
@@ -85,16 +85,16 @@ public class GunAmmoEntity extends AbstractArrow implements ItemSupplier {
             this.discard();
     }
 
-    public static GunAmmoEntity shoot(Level world, LivingEntity entity, RandomSource source) {
+    public static GunAmmo shoot(Level world, LivingEntity entity, RandomSource source) {
         return shoot(world, entity, source, 100f, 5, 5);
     }
 
-    public static GunAmmoEntity shoot(Level world, LivingEntity entity, RandomSource source, float pullingPower) {
+    public static GunAmmo shoot(Level world, LivingEntity entity, RandomSource source, float pullingPower) {
         return shoot(world, entity, source, pullingPower * 100f, 5, 5);
     }
 
-    public static GunAmmoEntity shoot(Level world, LivingEntity entity, RandomSource random, float power, double damage, int knockback) {
-        GunAmmoEntity entityarrow = new GunAmmoEntity(ModEntities.GUN_AMMO.get(), entity, world, null);
+    public static GunAmmo shoot(Level world, LivingEntity entity, RandomSource random, float power, double damage, int knockback) {
+        GunAmmo entityarrow = new GunAmmo(ModEntities.GUN_AMMO.get(), entity, world, null);
         entityarrow.shoot(entity.getViewVector(1).x, entity.getViewVector(1).y, entity.getViewVector(1).z, power * 2, 0);
         entityarrow.setSilent(true);
         entityarrow.setCritArrow(true);
@@ -105,8 +105,8 @@ public class GunAmmoEntity extends AbstractArrow implements ItemSupplier {
         return entityarrow;
     }
 
-    public static GunAmmoEntity shoot(LivingEntity entity, LivingEntity target) {
-        GunAmmoEntity entityarrow = new GunAmmoEntity(ModEntities.GUN_AMMO.get(), entity, entity.level(), null);
+    public static GunAmmo shoot(LivingEntity entity, LivingEntity target) {
+        GunAmmo entityarrow = new GunAmmo(ModEntities.GUN_AMMO.get(), entity, entity.level(), null);
         double dx = target.getX() - entity.getX();
         double dy = target.getY() + target.getEyeHeight() - 1.1;
         double dz = target.getZ() - entity.getZ();

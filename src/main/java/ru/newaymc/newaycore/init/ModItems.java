@@ -8,10 +8,10 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.item.AR15SniperItem;
-import ru.newaymc.newaycore.item.AkmItem;
-import ru.newaymc.newaycore.item.M4A1Item;
-import ru.newaymc.newaycore.item.MP5Item;
+import ru.newaymc.newaycore.gun.item.AR15SniperItem;
+import ru.newaymc.newaycore.gun.item.AkmItem;
+import ru.newaymc.newaycore.gun.item.M4A1Item;
+import ru.newaymc.newaycore.gun.item.MP5Item;
 
 public class ModItems {
     public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(NewaycoreMod.MODID);

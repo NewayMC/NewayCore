@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.item;
+package ru.newaymc.newaycore.gun.item;
 
 import net.minecraft.world.item.Item;
 
