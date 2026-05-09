@@ -5,13 +5,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
+import ru.newaymc.newaycore.ai.engine.ShooterMain;
 
 import javax.annotation.Nullable;
 import java.io.File;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
-public class FactionRegister {
-    public static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(FactionRegister.class);
+public class FactionLoader {
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
@@ -30,10 +30,10 @@ public class FactionRegister {
             if (FactionFile.exists()) {
                 CheckMultiplier = CheckMultiplier + 1;
             } else if (CheckMultiplier == 0) {
-                FactionRegister.LOGGER.warn("Factions not found");
+                ShooterMain.AlsController.LOGGER.warn("Factions not found");
                 break;
             } else {
-                FactionRegister.LOGGER.info(("Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " faction's"));
+                ShooterMain.AlsController.LOGGER.info(("Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " faction's"));
                 break;
             }
         }

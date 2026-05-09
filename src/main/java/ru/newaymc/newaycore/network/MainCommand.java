@@ -10,8 +10,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import ru.newaymc.newaycore.als.faction.FactionRegister;
-import ru.newaymc.newaycore.als.outpost.OutpostRegister;
+import ru.newaymc.newaycore.als.faction.FactionLoader;
+import ru.newaymc.newaycore.als.outpost.OutpostLoader;
 import ru.newaymc.newaycore.network.command.MainCommandLogic;
 
 @EventBusSubscriber
@@ -33,7 +33,7 @@ public class MainCommand {
             if (entity != null)
                 direction = entity.getDirection();
 
-            FactionRegister.execute();
+            FactionLoader.execute();
             return 0;
         }).executes(arguments -> {
             Level world = arguments.getSource().getUnsidedLevel();
@@ -50,7 +50,7 @@ public class MainCommand {
             if (entity != null)
                 direction = entity.getDirection();
 
-            OutpostRegister.execute(world);
+            OutpostLoader.execute(world);
             return 0;
         }))).then(Commands.literal("execute").then(Commands.argument("command", MessageArgument.message()).executes(arguments -> {
             Level world = arguments.getSource().getUnsidedLevel();
