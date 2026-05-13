@@ -12,12 +12,11 @@ import java.time.Duration;
 public class HttpController {
     public static final Logger LOGGER = LogManager.getLogger(HttpController.class);
 
-    public static String GET(String url, String header) throws Exception {
+    public static String GET(String url) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header(header, "application/json")
                 .timeout(Duration.ofMinutes(2))
                 .GET()
                 .build();
@@ -27,11 +26,11 @@ public class HttpController {
         return response.body();
     }
 
-    public static String POST(String json, String url, String header) throws Exception {
+    public static String POST(String json, String url) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header(header, "application/json")
+                .timeout(Duration.ofMinutes(2))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
