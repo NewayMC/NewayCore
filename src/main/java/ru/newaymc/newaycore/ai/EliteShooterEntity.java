@@ -32,10 +32,8 @@ import ru.newaymc.newaycore.init.ModItems;
 
 public class EliteShooterEntity extends Monster implements RangedAttackMob {
     public static final EntityDataAccessor<String> DATA_ai_type = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.STRING);
-    public static final EntityDataAccessor<Integer> DATA_shoot = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_damage = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_speed = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Integer> DATA_inaccurace_accumulation = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_recoil = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_ammunation = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DATA_recovery_time = SynchedEntityData.defineId(EliteShooterEntity.class, EntityDataSerializers.INT);
@@ -44,25 +42,24 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
 
     public EliteShooterEntity(EntityType<EliteShooterEntity> type, Level world) {
         super(type, world);
-        xpReward = 0;
+        xpReward = 4;
         setNoAi(false);
         setCustomName(Component.literal("Elite Shooter Entity"));
         setCustomNameVisible(true);
         setPersistenceRequired();
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.M_4_A_1.get()));
+        refreshDimensions();
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_ai_type, "standart");
-        builder.define(DATA_shoot, 5);
-        builder.define(DATA_damage, 4);
-        builder.define(DATA_speed, 4);
-        builder.define(DATA_inaccurace_accumulation, 2);
+        builder.define(DATA_damage, 5);
+        builder.define(DATA_speed, 3);
         builder.define(DATA_recoil, 1);
         builder.define(DATA_ammunation, 30);
-        builder.define(DATA_recovery_time, 30);
+        builder.define(DATA_recovery_time, 10);
         builder.define(DATA_CanBeCommander, true);
         builder.define(DATA_CanBeInSquad, false);
     }
@@ -133,10 +130,8 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putString("Dataai_type", this.entityData.get(DATA_ai_type));
-        compound.putInt("Datashoot", this.entityData.get(DATA_shoot));
         compound.putInt("Datadamage", this.entityData.get(DATA_damage));
         compound.putInt("Dataspeed", this.entityData.get(DATA_speed));
-        compound.putInt("Datainaccurace_accumulation", this.entityData.get(DATA_inaccurace_accumulation));
         compound.putInt("Datarecoil", this.entityData.get(DATA_recoil));
         compound.putInt("Dataammunation", this.entityData.get(DATA_ammunation));
         compound.putInt("Datarecovery_time", this.entityData.get(DATA_recovery_time));
@@ -149,14 +144,10 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
         super.readAdditionalSaveData(compound);
         if (compound.contains("Dataai_type"))
             this.entityData.set(DATA_ai_type, compound.getString("Dataai_type"));
-        if (compound.contains("Datashoot"))
-            this.entityData.set(DATA_shoot, compound.getInt("Datashoot"));
         if (compound.contains("Datadamage"))
             this.entityData.set(DATA_damage, compound.getInt("Datadamage"));
         if (compound.contains("Dataspeed"))
             this.entityData.set(DATA_speed, compound.getInt("Dataspeed"));
-        if (compound.contains("Datainaccurace_accumulation"))
-            this.entityData.set(DATA_inaccurace_accumulation, compound.getInt("Datainaccurace_accumulation"));
         if (compound.contains("Datarecoil"))
             this.entityData.set(DATA_recoil, compound.getInt("Datarecoil"));
         if (compound.contains("Dataammunation"))
@@ -180,15 +171,20 @@ public class EliteShooterEntity extends Monster implements RangedAttackMob {
         GunAmmo.shoot(this, target);
     }
 
+    @Override
+    public EntityDimensions getDefaultDimensions(Pose pose) {
+        return super.getDefaultDimensions(pose).scale(1.2f);
+    }
+
     public static void init(RegisterSpawnPlacementsEvent event) {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         AttributeSupplier.Builder builder = Mob.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
-        builder = builder.add(Attributes.MAX_HEALTH, 500);
-        builder = builder.add(Attributes.ARMOR, 5);
-        builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
+        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.5);
+        builder = builder.add(Attributes.MAX_HEALTH, 250);
+        builder = builder.add(Attributes.ARMOR, 8);
+        builder = builder.add(Attributes.ATTACK_DAMAGE, 2);
         builder = builder.add(Attributes.FOLLOW_RANGE, 32);
         builder = builder.add(Attributes.STEP_HEIGHT, 0.6);
         return builder;

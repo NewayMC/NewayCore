@@ -10,7 +10,6 @@ public class GetStandartShooterEntity {
             return;
         ShooterMain.BattleAI.init(world, x, y, z, entity, entity instanceof StandartShooterEntity _datEntI ? _datEntI.getEntityData().get(StandartShooterEntity.DATA_ammunation) : 0,
                 entity instanceof StandartShooterEntity _datEntI ? _datEntI.getEntityData().get(StandartShooterEntity.DATA_damage) : 0,
-                entity instanceof StandartShooterEntity _datEntI ? _datEntI.getEntityData().get(StandartShooterEntity.DATA_inaccurace_accumulation) : 0,
                 entity instanceof StandartShooterEntity _datEntI ? _datEntI.getEntityData().get(StandartShooterEntity.DATA_recoil) : 0,
                 entity instanceof StandartShooterEntity _datEntI ? _datEntI.getEntityData().get(StandartShooterEntity.DATA_recovery_time) : 0,
                 entity instanceof StandartShooterEntity _datEntI ? _datEntI.getEntityData().get(StandartShooterEntity.DATA_speed) : 0,

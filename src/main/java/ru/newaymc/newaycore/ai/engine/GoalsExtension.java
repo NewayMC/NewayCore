@@ -20,13 +20,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class GoalsExtension {
-//    @SubscribeEvent
-//    public static void onEntityJoin(EntityJoinLevelEvent event) {
-//        if (event.getEntity() == null)
-//            return;
-//        CompoundTag data = event.getEntity().getPersistentData();
-//        data.putBoolean("simpleFormationCall", false);
-//    }
 
     public static class BorderPatrolGoal extends Goal {
         private static final String CENTER_X = "patrol_center_x";
