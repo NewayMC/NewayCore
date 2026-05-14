@@ -19,16 +19,14 @@ import ru.newaymc.newaycore.init.ModBlocks;
 import java.util.EnumSet;
 import java.util.List;
 
-@EventBusSubscriber
 public class GoalsExtension {
-    @SubscribeEvent
-    public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (event.getEntity() == null)
-            return;
-        CompoundTag data = event.getEntity().getPersistentData();
-        data.putBoolean("borderPatrolCall", false);
-        data.putBoolean("simpleFormationCall", false);
-    }
+//    @SubscribeEvent
+//    public static void onEntityJoin(EntityJoinLevelEvent event) {
+//        if (event.getEntity() == null)
+//            return;
+//        CompoundTag data = event.getEntity().getPersistentData();
+//        data.putBoolean("simpleFormationCall", false);
+//    }
 
     public static class BorderPatrolGoal extends Goal {
         private static final String CENTER_X = "patrol_center_x";
@@ -54,14 +52,14 @@ public class GoalsExtension {
 
         @Override
         public boolean canUse() {
-            return mob.getPersistentData().getBoolean("borderPatrolCanBeStopped") || mob.getPersistentData().getBoolean("borderPatrol");
+            return ShooterMain.BattleAI.canBorderPatrol;
         }
 
         @Override
         public boolean canContinueToUse() {
-            if (mob.getPersistentData().getBoolean("forceStopBorderPatrol"))
+            if (!ShooterMain.BattleAI.canBorderPatrol)
                 mob.goalSelector.removeGoal(this);
-            return mob.getPersistentData().getBoolean("borderPatrolCanBeStopped") || mob.getPersistentData().getBoolean("borderPatrol");
+            return ShooterMain.BattleAI.canBorderPatrol;
         }
 
         @Override
@@ -116,7 +114,7 @@ public class GoalsExtension {
             CompoundTag data = mob.getPersistentData();
             data.putInt(EDGE, edge);
             data.putDouble(T, t);
-            data.putBoolean("borderPatrol", false);
+            ShooterMain.BattleAI.canBorderPatrol = false;
         }
 
         private boolean isSafeTarget(double x, double y, double z) {
@@ -266,14 +264,14 @@ public class GoalsExtension {
 
         @Override
         public boolean canUse() {
-            return mob.getPersistentData().getBoolean("simpleFormationCanBeStopped") || mob.getPersistentData().getBoolean("simpleFormation");
+            return ShooterMain.BattleAI.canSimpleFormation;
         }
 
         @Override
         public boolean canContinueToUse() {
-            if (mob.getPersistentData().getBoolean("forceStopSimpleFormation"))
+            if (!ShooterMain.BattleAI.canSimpleFormation)
                 mob.goalSelector.removeGoal(this);
-            return mob.getPersistentData().getBoolean("simpleFormationCanBeStopped") || mob.getPersistentData().getBoolean("simpleFormation");
+            return ShooterMain.BattleAI.canSimpleFormation;
         }
 
         @Override
@@ -299,7 +297,7 @@ public class GoalsExtension {
 
         @Override
         public void tick() {
-            mob.getPersistentData().putBoolean("simpleFormation", false);
+            ShooterMain.BattleAI.canSimpleFormation = false;
             targetPos = findFreeSlot(targetPos);
             double dist = mob.position().distanceTo(targetPos);
             if (dist <= 0.05) {

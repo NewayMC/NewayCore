@@ -27,6 +27,8 @@ import net.minecraft.world.phys.Vec3;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.init.ModEntities;
@@ -38,6 +40,8 @@ public class ShooterMain {
     public static class BattleAI {
         public static String aiState = "";
         public static Boolean canFindCover = false;
+        public static Boolean canBorderPatrol = false;
+        public static Boolean canSimpleFormation = false;
         public static Boolean allowAttack = true;
         private static final GunSetup.GunUtils mg = null;
 
@@ -151,21 +155,20 @@ public class ShooterMain {
                             }
                         }
                     }
-                } else {
+                } else if (aiState.equals("inBattle")) {
                     GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
-
-                    aiState = "normal";
+                    aiState = "alerted";
                 }
+
+                // If alerted
                 if ((aiState).equals("alerted")) {
-                    entity.getPersistentData().putBoolean("borderPatrol", true);
-                    if (!entity.getPersistentData().getBoolean("borderPatrolCall")) {
-                        entity.getPersistentData().putBoolean("borderPatrolCall", true);
-                        entity.getPersistentData().putBoolean("borderPatrol", false);
-                        entity.getPersistentData().putBoolean("borderPatrolCanBeStopped", false);
-                        if (entity instanceof PathfinderMob mob) {
-                            mob.goalSelector.addGoal(3, new GoalsExtension.BorderPatrolGoal(mob, 8, 1, 100));
-                        }
+                    canBorderPatrol = true;
+                    if (entity instanceof PathfinderMob mob) {
+                        mob.goalSelector.addGoal(3, new GoalsExtension.BorderPatrolGoal(mob, 8, 1, 100));
                     }
+                    NewaycoreMod.queueServerWork(1200, () -> {
+                        aiState = "normal";
+                    });
                 }
                 // Types setup
                 if ((aiType).equals("standart")) {
