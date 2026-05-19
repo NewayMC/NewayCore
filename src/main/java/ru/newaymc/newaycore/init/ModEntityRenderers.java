@@ -1,8 +1,7 @@
 package ru.newaymc.newaycore.init;
 
 import net.neoforged.bus.api.SubscribeEvent;
-import ru.newaymc.newaycore.client.renderer.StandartShooterEntityRenderer;
-import ru.newaymc.newaycore.client.renderer.EliteShooterEntityRenderer;
+import ru.newaymc.newaycore.client.renderer.ShooterAiEntityRenderer;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -15,7 +14,6 @@ public class ModEntityRenderers {
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.GUN_AMMO.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(ModEntities.ELITE_SHOOTER_ENTITY.get(), EliteShooterEntityRenderer::new);
-        event.registerEntityRenderer(ModEntities.STANDART_SHOOTER_ENTITY.get(), StandartShooterEntityRenderer::new);
+        event.registerEntityRenderer(ModEntities.SHOOTER_AI_ENTITY.get(), ShooterAiEntityRenderer::new);
     }
 }

@@ -17,8 +17,7 @@ public class ModTabs {
                 tabData.accept(ModItems.MP_5.get());
                 tabData.accept(ModItems.AR_15_SNIPER.get());
                 tabData.accept(ModBlocks.COVER_MARKER_AI.get().asItem());
-                tabData.accept(ModItems.ELITE_SHOOTER_ENTITY_SPAWN_EGG.get());
-                tabData.accept(ModItems.STANDART_SHOOTER_ENTITY_SPAWN_EGG.get());
+                tabData.accept(ModItems.SHOOTER_AI_ENTITY_SPAWN_EGG.get());
             }).build());
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ALS_TAB = REGISTRY.register("als_tab",
             () -> CreativeModeTab.builder().title(Component.translatable("item_group.newaycore.als_tab")).icon(() -> new ItemStack(ModBlocks.OUTPOST_HUB.get())).displayItems((parameters, tabData) -> {
