@@ -10,7 +10,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import ru.newaymc.newaycore.ai.engine.ShooterMain;
+import ru.newaymc.newaycore.ai.engine.AlsController;
 import ru.newaymc.newaycore.init.ModBlocks;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
@@ -66,9 +66,9 @@ public class OutpostLoader {
                                 if (world instanceof Level _level)
                                     _level.sendBlockUpdated(_bp, _bs, _bs, 3);
                             }
-                            ShooterMain.AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
+                            AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
                         } else {
-                            ShooterMain.AlsController.LOGGER.warn(("[NewayCore/ALS] Creating " + ModVariables.OutpostJsonObj.get("id").getAsString()));
+                            AlsController.LOGGER.warn(("[NewayCore/ALS] Creating " + ModVariables.OutpostJsonObj.get("id").getAsString()));
                             ModVariables.MapVariables.get(world).NextOutpostID = ModVariables.MapVariables.get(world).NextOutpostID - 1;
                             ModVariables.MapVariables.get(world).markSyncDirty();
                             world.setBlock(BlockPos.containing(BlockX, BlockY, BlockZ), ModBlocks.OUTPOST_HUB.get().defaultBlockState(), 3);
@@ -84,17 +84,17 @@ public class OutpostLoader {
                                 if (world instanceof Level _level)
                                     _level.sendBlockUpdated(_bp, _bs, _bs, 3);
                             }
-                            ShooterMain.AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
+                            AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             } else if (CheckMultiplier == 0) {
-                ShooterMain.AlsController.LOGGER.warn("[NewayCore/ALS] Outposts not found");
+                AlsController.LOGGER.warn("[NewayCore/ALS] Outposts not found");
                 break;
             } else {
-                ShooterMain.AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " outpost's"));
+               AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " outpost's"));
                 break;
             }
         }
