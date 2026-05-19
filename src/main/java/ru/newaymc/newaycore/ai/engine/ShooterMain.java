@@ -27,18 +27,36 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.init.ModEntities;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class ShooterMain {
+    private static String aiType;
+    private static double ammunition;
+    private static double damage;
+    private static double recoveryTime;
+    private static double speed;
+
+    public static void setup(Class<?> _class) {
+        for(Method method : _class.getDeclaredMethods()) {
+            AiShooterSetup aiShooterSetup = method.getAnnotation(AiShooterSetup.class);
+            if (aiShooterSetup != null) {
+                aiType = aiShooterSetup.aiType();
+                ammunition = aiShooterSetup.ammunition();
+                damage = aiShooterSetup.damage();
+                recoveryTime = aiShooterSetup.recoveryTime();
+                speed = aiShooterSetup.speed();
+            }
+        }
+    }
+
     public static class BattleAI {
         public static String aiState = "";
         public static Boolean canFindCover = false;
@@ -47,7 +65,7 @@ public class ShooterMain {
         public static Boolean allowAttack = true;
         private static final GunSetup.GunUtils mg = null;
 
-        public static void init(LevelAccessor world, double x, double y, double z, Entity entity, double ammunation, double damage, double recoil, double recoveryTime, double speed, String aiType) {
+        public static void init(LevelAccessor world, double x, double y, double z, Entity entity/*, double damage, double recoveryTime, double speed*/) {
             if (entity == null || aiType == null)
                 return;
 
@@ -167,7 +185,7 @@ public class ShooterMain {
                                     return (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME);
                                 })).get() == 0) {
                                     {
-                                        mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER, ammunation);
+                                        mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER, ammunition);
                                         mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_RELOADING, true);
                                     }
                                     {
@@ -198,7 +216,7 @@ public class ShooterMain {
                     aiState = "alerted";
                 }
                 // Types setup
-                if ((aiType).equals("standart")) {
+                if ((aiType).equals("standard")) {
                     {
                         int recovery_time = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME);
                         boolean has_shooted = (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.HAS_SHOOTED);
@@ -235,7 +253,7 @@ public class ShooterMain {
                                     shoot.act(hand, shooter, 2.0);
                                     mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING, true);
                                     if (projectileLevel.isClientSide())
-                                        shooter.setXRot(shooter.getXRot() - (float) recoil);
+                                        shooter.setXRot(shooter.getXRot() - (float) 1);
                                     current_ammo--;
                                     acc_inaccuracy += 3;
                                 } else {
@@ -291,7 +309,7 @@ public class ShooterMain {
                                 mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING, true);
                                 mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.HAS_SHOOTED, true);
                                 if (projectileLevel.isClientSide())
-                                    shooter.setXRot(shooter.getXRot() - (float) recoil);
+                                    shooter.setXRot(shooter.getXRot() - (float) 1);
                                 current_ammo--;
                                 acc_inaccuracy += 3;
                                 recovery_time = (int) recoveryTime;
@@ -352,11 +370,5 @@ public class ShooterMain {
                 weapon.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.PIERCING), piercing);
             return weapon;
         }
-    }
-
-    // Not used
-    public static class AlsController {
-        public static final Logger LOGGER = LogManager.getLogger(AlsController.class);
-
     }
 }
