@@ -5,7 +5,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
-import ru.newaymc.newaycore.ai.engine.ShooterMain;
+import ru.newaymc.newaycore.ai.engine.AlsController;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -30,10 +30,10 @@ public class FactionLoader {
             if (FactionFile.exists()) {
                 CheckMultiplier = CheckMultiplier + 1;
             } else if (CheckMultiplier == 0) {
-                ShooterMain.AlsController.LOGGER.warn("Factions not found");
+                AlsController.LOGGER.warn("Factions not found");
                 break;
             } else {
-                ShooterMain.AlsController.LOGGER.info(("Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " faction's"));
+                AlsController.LOGGER.info(("Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " faction's"));
                 break;
             }
         }
