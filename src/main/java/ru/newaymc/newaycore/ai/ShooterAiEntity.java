@@ -32,8 +32,6 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         super(type, world);
         xpReward = 3;
         setNoAi(false);
-        setCustomName(Component.literal("Standart Shooter Entity"));
-        setCustomNameVisible(true);
         setPersistenceRequired();
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.AKM.get()));
         refreshDimensions();
@@ -115,7 +113,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
 
     @Override
     public EntityDimensions getDefaultDimensions(Pose pose) {
-        return super.getDefaultDimensions(pose).scale(1.2f);
+        return super.getDefaultDimensions(pose).scale(1.1f);
     }
 
     public static void init(RegisterSpawnPlacementsEvent event) {
@@ -130,8 +128,8 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         AttributeSupplier.Builder builder = Mob.createMobAttributes();
         builder = builder.add(Attributes.MOVEMENT_SPEED, 0.4);
         builder = builder.add(Attributes.MAX_HEALTH, 150);
-        builder = builder.add(Attributes.ARMOR, 6);
-        builder = builder.add(Attributes.ATTACK_DAMAGE, 2);
+        builder = builder.add(Attributes.ARMOR, 10);
+        builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
         builder = builder.add(Attributes.FOLLOW_RANGE, 32);
         return builder;
     }

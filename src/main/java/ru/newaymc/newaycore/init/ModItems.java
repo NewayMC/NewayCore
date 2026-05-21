@@ -32,7 +32,7 @@ public class ModItems {
         AR_15_SNIPER = REGISTRY.register("ar_15_sniper", AR15SniperItem::new);
         EMPTY_BLOCK = block(ModBlocks.EMPTY_BLOCK);
         OUTPOST_HUB = block(ModBlocks.OUTPOST_HUB);
-        SHOOTER_AI_ENTITY_SPAWN_EGG = REGISTRY.register("standart_shooter_entity_spawn_egg", () -> new DeferredSpawnEggItem(ModEntities.SHOOTER_AI_ENTITY, -13421773, -10066330, new Item.Properties()));
+        SHOOTER_AI_ENTITY_SPAWN_EGG = REGISTRY.register("shooter_ai_entity_spawn_egg", () -> new DeferredSpawnEggItem(ModEntities.SHOOTER_AI_ENTITY, -13421773, -10066330, new Item.Properties()));
     }
 
     private static DeferredItem<Item> block(DeferredHolder<Block, Block> block) {
