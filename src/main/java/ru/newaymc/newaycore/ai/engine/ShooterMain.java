@@ -368,4 +368,3 @@ public class ShooterMain {
             return weapon;
         }
     }
-}
