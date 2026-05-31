@@ -22,7 +22,7 @@ public class ModEntities {
             EntityType.Builder.<GunAmmo>of(GunAmmo::new, MobCategory.MISC).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(1).sized(0.5f, 0.5f));
     // Shooter Ai Entity
     public static final DeferredHolder<EntityType<?>, EntityType<ShooterAiEntity>> SHOOTER_AI_ENTITY = register("shooter_ai_entity",
-            EntityType.Builder.<ShooterAiEntity>of(ShooterAiEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3).ridingOffset(-0.6f).sized(0.6f, 1.8f));
+            EntityType.Builder.<ShooterAiEntity>of(ShooterAiEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3).ridingOffset(-0.6f).sized(0.6f, 1.8f).eyeHeight(1.6f));
 
     private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(String registryname, EntityType.Builder<T> entityTypeBuilder) {
         return REGISTRY.register(registryname, () -> (EntityType<T>) entityTypeBuilder.build(registryname));

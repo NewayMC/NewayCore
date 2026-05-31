@@ -1,7 +1,6 @@
 package ru.newaymc.newaycore.ai;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;

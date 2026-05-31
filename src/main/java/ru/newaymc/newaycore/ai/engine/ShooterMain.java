@@ -59,13 +59,14 @@ public class ShooterMain {
 
     public static class BattleAI {
         public static String aiState = "";
-        public static Boolean canFindCover = false;
-        public static Boolean canBorderPatrol = false;
-        public static Boolean canSimpleFormation = false;
-        public static Boolean allowAttack = true;
+        public static boolean canFindCover = false;
+        public static boolean canBorderPatrol = false;
+        public static boolean canSimpleFormation = false;
+        public static boolean allowAttack = true;
+
         private static final GunSetup.GunUtils mg = null;
 
-        public static void init(LevelAccessor world, double x, double y, double z, Entity entity/*, double damage, double recoveryTime, double speed*/) {
+        public static void init(LevelAccessor world, double x, double y, double z, Entity entity) {
             if (entity == null || aiType == null)
                 return;
 
@@ -150,12 +151,12 @@ public class ShooterMain {
                     return nearest;
                 })).get() instanceof Player) {
                     if (entity instanceof Mob _mob) {
-                        if (!(_mob.getTarget() instanceof LivingEntity) || !((LivingEntity) _mob.getTarget()).isAlive()) {
+                        if (!(_mob.getTarget() instanceof LivingEntity) || !_mob.getTarget().isAlive()) {
                             try {
                                 GoalSelector _targetSelector = _mob.targetSelector;
                                 NearestAttackableTargetGoal<LivingEntity> _goal = new NearestAttackableTargetGoal<>(_mob, LivingEntity.class, 10, true, false,
                                         e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("player"))) && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("no_entities"))));
-                                _targetSelector.addGoal((int) 1, _goal);
+                                _targetSelector.addGoal(1, _goal);
                             } catch (Exception ignored) {
                             }
                         }
@@ -176,34 +177,9 @@ public class ShooterMain {
 
                                 return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
                             })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
-                            // Reload
-                            if (((Supplier<Integer>) (() -> {
-                                return (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER);
-                            })).get() == 0 && ((Supplier<Integer>) (() -> {
-                                return (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME);
-                            })).get() == 0) {
-                                {
-                                    mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER, ammunition);
-                                    mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_RELOADING, true);
-                                }
-                                {
-                                    mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME, recoveryTime);
-                                }
-                            }
-                            // Sounds
-                            if (((Supplier<Boolean>) (() -> {
-                                return (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING);
-                            })).get()) {
-                                entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), 1, 1);
-                            }
-                            if (((Supplier<Boolean>) (() -> {
-                                boolean boly = (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_RELOADING);
-                                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_RELOADING, false);
-                                return boly;
-                            })).get()) {
-                                entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), 1, 1);
-                            }
+                            reload(entity);
 
+                            gunSounds(entity);
                         } else {
                             GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
                         }
@@ -326,19 +302,41 @@ public class ShooterMain {
                         mob.goalSelector.addGoal(1, new GoalsExtension.FindCover(mob, x, y, z, world));
                     }
                 }
-
-                // If alerted
-                if ((aiState).equals("alerted")) {
-                    canBorderPatrol = true;
-                    if (entity instanceof PathfinderMob mob) {
-                        mob.goalSelector.addGoal(3, new GoalsExtension.BorderPatrolGoal(mob, 8, 1, 100));
-                    }
-                    NewaycoreMod.queueServerWork(1200, () -> {
-                        aiState = "normal";
-                    });
-                }
             } else {
                 aiState = "normal";
+            }
+        }
+
+        // Reload
+        private static void reload(Entity entity) {
+            if (((Supplier<Integer>) (() -> {
+                return (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER);
+            })).get() == 0 && ((Supplier<Integer>) (() -> {
+                return (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.RECOVERY_TIME);
+            })).get() == 0) {
+                {
+                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER, ammunition);
+                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_RELOADING, true);
+                }
+                {
+                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.RECOVERY_TIME, recoveryTime);
+                }
+            }
+        }
+
+        // Sounds
+        private static void gunSounds(Entity entity) {
+            if (((Supplier<Boolean>) (() -> {
+                return (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_SHOOTING);
+            })).get()) {
+                entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), 1, 1);
+            }
+            if (((Supplier<Boolean>) (() -> {
+                boolean boly = (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_RELOADING);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_RELOADING, false);
+                return boly;
+            })).get()) {
+                entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), 1, 1);
             }
         }
 

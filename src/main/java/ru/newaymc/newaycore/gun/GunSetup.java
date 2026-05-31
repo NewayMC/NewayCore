@@ -33,7 +33,6 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class GunSetup {
-    public static final org.apache.logging.log4j.Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GunSetup.class);
 
     // The gun utils/tools
     public static class GunUtils {
@@ -101,8 +100,7 @@ public class GunSetup {
                 else if (type == Integer.class && obj instanceof Number index) 	tag.putInt(name, index.intValue());
                 else if (type == Double.class && obj instanceof Number index) 	tag.putDouble(name, index.doubleValue());
                 else if (type == Float.class && obj instanceof Number index) 	tag.putFloat(name, index.floatValue());
-                else printError(0);
-            } else printError(0);
+            }
         }
 
         private static Object getValue(CompoundTag tag, Value value) {
@@ -114,9 +112,7 @@ public class GunSetup {
                 else if (type == Integer.class) return tag.getInt(name);
                 else if (type == Double.class) 	return tag.getDouble(name);
                 else if (type == Float.class) 	return tag.getFloat(name);
-                else printError(0);
             }
-            printError(0);
             return null;
         }
     }
@@ -134,35 +130,14 @@ public class GunSetup {
         public String getName() {
             if (!VALUE_NAME.isEmpty()) return VALUE_NAME;
 
-            printError(0);
             return "";
         }
 
         public Class<?> getType() {
             if (VALUE_TYPE != null) return VALUE_TYPE;
 
-            printError(0);
             return null;
         }
-    }
-
-    public static void printError(int index) {
-
-        String errorType;
-        String errorMessage;
-
-        switch (index) {
-            case 0:
-                errorType = "INVALID_VALUE";
-                errorMessage = "The provided value is not mapped.";
-                break;
-            default:
-                errorType = "UNKNOWN_ERROR";
-                errorMessage = "Index out of bounds! No right error message was found to send.";
-                break;
-        }
-        String finalError = errorType + ": " + errorMessage;
-        GunSetup.LOGGER.error(finalError);
     }
 
     @EventBusSubscriber(modid = "${modid}")

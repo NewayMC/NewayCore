@@ -373,11 +373,11 @@ public class GoalsExtension {
         private static LevelAccessor world;
         private static Vec3 nextPos;
         private static Vec3 pos;
-        private static boolean arrived = false;
 
         public FindCover(PathfinderMob mob, double x, double y, double z, LevelAccessor world) {
             this.mob = mob;
             this.pos = new Vec3(x, y, z);
+            this.nextPos = new Vec3(x, y, z);
             this.world = world;
             this.setFlags(EnumSet.of(Flag.MOVE));
         }
@@ -396,22 +396,21 @@ public class GoalsExtension {
 
         @Override
         public void stop() {
-            ShooterMain.BattleAI.canFindCover = false;
             mob.getNavigation().stop();
+            ShooterMain.BattleAI.canFindCover = false;
             ShooterMain.BattleAI.allowAttack = true;
             nextPos = null;
         }
 
         @Override
         public void tick() {
+            nextPos = findCover();
             if (nextPos != null) {
-                double dist = mob.position().distanceTo(findCover());
+                double dist = mob.position().distanceTo(nextPos);
                 if (dist <= 0.05) {
                     mob.setPos(nextPos.x, nextPos.y, nextPos.z);
-                    arrived = true;
                     stop();
                 } else {
-                    arrived = false;
                     PathNavigation nav = mob.getNavigation();
                     if (nav.isDone()) {
                         nav.moveTo(nextPos.x, nextPos.y, nextPos.z, 2);
@@ -423,7 +422,7 @@ public class GoalsExtension {
         }
 
         public Vec3 findCover() {
-            Vec3 targetPos = new Vec3(null);
+            Vec3 targetPos = null;
             double sx = 0;
             double sy = 0;
             double sz = 0;
@@ -435,15 +434,15 @@ public class GoalsExtension {
                     sz = -3;
                     for (int index2 = 0; index2 < 16; index2++) {
                         if ((world.getBlockState(BlockPos.containing(pos.x + sx, pos.y + sy, pos.z + sz))).getBlock() == ModBlocks.COVER_MARKER_AI.get()) {
-                            nextPos = new Vec3(pos.x + sx, pos.y + sy, pos.z + sz);
+                            targetPos = new Vec3(pos.x + sx, pos.y + sy, pos.z + sz);
                             if ((mob.getDirection()) == Direction.SOUTH) {
-                                nextPos = new Vec3(nextPos.x, nextPos.y, nextPos.z - 1);
+                                targetPos = new Vec3(targetPos.x, targetPos.y, targetPos.z - 1);
                             } else if ((mob.getDirection()) == Direction.NORTH) {
-                                nextPos = new Vec3(nextPos.x, nextPos.y, nextPos.z + 1);
+                                targetPos = new Vec3(targetPos.x, targetPos.y, targetPos.z + 1);
                             } else if ((mob.getDirection()) == Direction.WEST) {
-                                nextPos = new Vec3(nextPos.x + 1, nextPos.y, nextPos.z);
+                                targetPos = new Vec3(targetPos.x + 1, targetPos.y, targetPos.z);
                             } else if ((mob.getDirection()) == Direction.EAST) {
-                                nextPos = new Vec3(nextPos.x + 1, nextPos.y, nextPos.z);
+                                targetPos = new Vec3(targetPos.x + 1, targetPos.y, targetPos.z);
                             }
                             break;
                         } else {
