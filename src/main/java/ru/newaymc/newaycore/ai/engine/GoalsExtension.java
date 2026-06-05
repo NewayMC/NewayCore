@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import ru.newaymc.newaycore.init.ModBlocks;
+import ru.newaymc.newaycore.register.ModBlocks;
 
 import java.util.EnumSet;
 import java.util.List;
