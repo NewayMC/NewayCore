@@ -15,7 +15,7 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import ru.newaymc.newaycore.init.ModBlockEntities;
+import ru.newaymc.newaycore.register.ModBlockEntities;
 
 import javax.annotation.Nullable;
 import java.util.stream.IntStream;

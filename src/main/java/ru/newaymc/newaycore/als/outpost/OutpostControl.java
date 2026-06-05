@@ -1,15 +1,8 @@
 package ru.newaymc.newaycore.als.outpost;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import ru.newaymc.newaycore.ai.ShooterAiEntity;
-import ru.newaymc.newaycore.init.ModEntities;
 
 @Deprecated(forRemoval = true)
 public class OutpostControl {

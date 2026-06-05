@@ -10,8 +10,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import ru.newaymc.newaycore.ai.engine.AlsController;
-import ru.newaymc.newaycore.init.ModBlocks;
+import ru.newaymc.newaycore.als.AlsController;
+import ru.newaymc.newaycore.register.ModBlocks;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
 import javax.annotation.Nullable;
@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @EventBusSubscriber
+@Deprecated
 public class OutpostLoader {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
@@ -37,7 +38,7 @@ public class OutpostLoader {
         double BlockZ = 0;
         double CheckMultiplier = 0;
         while (true) {
-            ModVariables.OutpostFile = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/Outposts/"), File.separator + ("outpost_id_" + new java.text.DecimalFormat("##").format(CheckMultiplier) + ".json"));
+            ModVariables.OutpostFile = new File((FMLPaths.GAMEDIR.get().toString() + "/newaycore/outposts/"), File.separator + ("outpost_id_" + new java.text.DecimalFormat("##").format(CheckMultiplier) + ".json"));
             if (ModVariables.OutpostFile.exists()) {
                 CheckMultiplier = CheckMultiplier + 1;
                 {
@@ -66,9 +67,9 @@ public class OutpostLoader {
                                 if (world instanceof Level _level)
                                     _level.sendBlockUpdated(_bp, _bs, _bs, 3);
                             }
-                            AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
+                            AlsController.LOGGER.info(("Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
                         } else {
-                            AlsController.LOGGER.warn(("[NewayCore/ALS] Creating " + ModVariables.OutpostJsonObj.get("id").getAsString()));
+                            AlsController.LOGGER.warn(("Creating " + ModVariables.OutpostJsonObj.get("id").getAsString()));
                             ModVariables.MapVariables.get(world).NextOutpostID = ModVariables.MapVariables.get(world).NextOutpostID - 1;
                             ModVariables.MapVariables.get(world).markSyncDirty();
                             world.setBlock(BlockPos.containing(BlockX, BlockY, BlockZ), ModBlocks.OUTPOST_HUB.get().defaultBlockState(), 3);
@@ -84,17 +85,17 @@ public class OutpostLoader {
                                 if (world instanceof Level _level)
                                     _level.sendBlockUpdated(_bp, _bs, _bs, 3);
                             }
-                            AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
+                            AlsController.LOGGER.info(("Loaded " + ModVariables.OutpostJsonObj.get("id").getAsString()));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             } else if (CheckMultiplier == 0) {
-                AlsController.LOGGER.warn("[NewayCore/ALS] Outposts not found");
+                AlsController.LOGGER.warn("Outposts not found");
                 break;
             } else {
-               AlsController.LOGGER.info(("[NewayCore/ALS] Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " outpost's"));
+               AlsController.LOGGER.info(("Loaded " + new java.text.DecimalFormat("##").format(CheckMultiplier) + " outpost's"));
                 break;
             }
         }

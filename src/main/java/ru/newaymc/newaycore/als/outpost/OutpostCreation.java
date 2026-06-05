@@ -8,9 +8,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Deprecated
 public class OutpostCreation {
     public static void execute(LevelAccessor world, double x, double y, double z) {
-        ModVariables.OutpostFile = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/Outposts/"),
+        ModVariables.OutpostFile = new File((FMLPaths.GAMEDIR.get().toString() + "/newaycore/outposts/"),
                 File.separator + ("outpost_id_" + new java.text.DecimalFormat("##").format(ModVariables.MapVariables.get(world).NextOutpostID) + ".json"));
         if (!ModVariables.OutpostFile.exists()) {
             try {
