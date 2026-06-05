@@ -27,7 +27,7 @@ public class NeutralFactionCreate {
         com.google.gson.JsonObject NeutralFactionJsonObj = new com.google.gson.JsonObject();
         com.google.gson.JsonArray NeutralFactionAllyArray = new com.google.gson.JsonArray();
         com.google.gson.JsonArray NeutralFactionEnemyArray = new com.google.gson.JsonArray();
-        NeutralFactionFile = new File((FMLPaths.GAMEDIR.get().toString() + "/NewayMC/Factions/"), File.separator + "faction_id_0.json");
+        NeutralFactionFile = new File((FMLPaths.GAMEDIR.get().toString() + "/newaycore/factions/"), File.separator + "faction_id_0.json");
         if (!NeutralFactionFile.exists()) {
             try {
                 NeutralFactionFile.getParentFile().mkdirs();
