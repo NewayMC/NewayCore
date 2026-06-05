@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai.engine;
+package ru.newaymc.newaycore.als;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
