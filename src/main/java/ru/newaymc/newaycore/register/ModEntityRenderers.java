@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.init;
+package ru.newaymc.newaycore.register;
 
 import net.neoforged.bus.api.SubscribeEvent;
 import ru.newaymc.newaycore.client.renderer.ShooterAiEntityRenderer;

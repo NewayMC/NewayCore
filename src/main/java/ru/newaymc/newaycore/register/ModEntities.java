@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.init;
+package ru.newaymc.newaycore.register;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;

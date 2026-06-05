@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.init;
+package ru.newaymc.newaycore.register;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;

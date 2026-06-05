@@ -23,7 +23,7 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import ru.newaymc.newaycore.ai.engine.ShooterMain;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
-import ru.newaymc.newaycore.init.ModItems;
+import ru.newaymc.newaycore.register.ModItems;
 
 public class ShooterAiEntity extends Monster implements RangedAttackMob {
 

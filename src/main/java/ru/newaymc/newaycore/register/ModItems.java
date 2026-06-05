@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.init;
+package ru.newaymc.newaycore.register;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;

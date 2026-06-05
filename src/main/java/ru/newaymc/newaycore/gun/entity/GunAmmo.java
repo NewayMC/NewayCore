@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import ru.newaymc.newaycore.init.ModEntities;
+import ru.newaymc.newaycore.register.ModEntities;
 
 import javax.annotation.Nullable;
 
@@ -73,7 +73,7 @@ public class GunAmmo extends AbstractArrow implements ItemSupplier {
             if (vec3.lengthSqr() > 0.0) {
                 livingEntity.push(vec3.x, 0.1, vec3.z);
             }
-        } else { // knockback might be set by firedFromWeapon passed into constructor
+        } else {
             super.doKnockback(livingEntity, damageSource);
         }
     }
