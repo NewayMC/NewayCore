@@ -27,11 +27,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
-import ru.newaymc.newaycore.init.ModEntities;
+import ru.newaymc.newaycore.register.ModEntities;
 
 import java.lang.reflect.Method;
 import java.util.List;
