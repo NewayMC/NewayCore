@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import ru.newaymc.newaycore.ai.ShooterAiEntity;
 import ru.newaymc.newaycore.register.ModBlocks;
 
 import java.util.EnumSet;
@@ -42,14 +43,14 @@ public class GoalsExtension {
 
         @Override
         public boolean canUse() {
-            return ShooterMain.BattleAI.canBorderPatrol;
+            return EntityData.getBooleanData(mob, ShooterAiEntity.CAN_BORDER_PATROL);
         }
 
         @Override
         public boolean canContinueToUse() {
-            if (!ShooterMain.BattleAI.canBorderPatrol)
+            if (!EntityData.getBooleanData(mob, ShooterAiEntity.CAN_BORDER_PATROL))
                 mob.goalSelector.removeGoal(this);
-            return ShooterMain.BattleAI.canBorderPatrol;
+            return EntityData.getBooleanData(mob, ShooterAiEntity.CAN_BORDER_PATROL);
         }
 
         @Override
@@ -104,7 +105,7 @@ public class GoalsExtension {
             CompoundTag data = mob.getPersistentData();
             data.putInt(EDGE, edge);
             data.putDouble(T, t);
-            ShooterMain.BattleAI.canBorderPatrol = false;
+            EntityData.setBooleanData(false, mob, ShooterAiEntity.CAN_BORDER_PATROL);
         }
 
         private boolean isSafeTarget(double x, double y, double z) {
@@ -254,14 +255,14 @@ public class GoalsExtension {
 
         @Override
         public boolean canUse() {
-            return ShooterMain.BattleAI.canSimpleFormation;
+            return EntityData.getBooleanData(mob, ShooterAiEntity.CAN_SIMPLE_FORMATION);
         }
 
         @Override
         public boolean canContinueToUse() {
-            if (!ShooterMain.BattleAI.canSimpleFormation)
+            if (!EntityData.getBooleanData(mob, ShooterAiEntity.CAN_SIMPLE_FORMATION))
                 mob.goalSelector.removeGoal(this);
-            return ShooterMain.BattleAI.canSimpleFormation;
+            return EntityData.getBooleanData(mob, ShooterAiEntity.CAN_SIMPLE_FORMATION);
         }
 
         @Override
@@ -287,7 +288,7 @@ public class GoalsExtension {
 
         @Override
         public void tick() {
-            ShooterMain.BattleAI.canSimpleFormation = false;
+            EntityData.setBooleanData(false, mob, ShooterAiEntity.CAN_SIMPLE_FORMATION);
             targetPos = findFreeSlot(targetPos);
             double dist = mob.position().distanceTo(targetPos);
             if (dist <= 0.05) {
@@ -384,21 +385,20 @@ public class GoalsExtension {
 
         @Override
         public boolean canUse() {
-            return ShooterMain.BattleAI.canFindCover;
+            return EntityData.getBooleanData(mob, ShooterAiEntity.CAN_FIND_COVER);
         }
 
         @Override
         public boolean canContinueToUse() {
-            if (!ShooterMain.BattleAI.canFindCover)
+            if (!EntityData.getBooleanData(mob, ShooterAiEntity.CAN_FIND_COVER))
                 mob.goalSelector.removeGoal(this);
-            return ShooterMain.BattleAI.canFindCover;
+            return EntityData.getBooleanData(mob, ShooterAiEntity.CAN_FIND_COVER);
         }
 
         @Override
         public void stop() {
             mob.getNavigation().stop();
-            ShooterMain.BattleAI.canFindCover = false;
-            ShooterMain.BattleAI.allowAttack = true;
+            EntityData.setBooleanData(false, mob, ShooterAiEntity.CAN_FIND_COVER);
             nextPos = null;
         }
 

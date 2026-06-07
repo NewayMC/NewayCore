@@ -27,6 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import ru.newaymc.newaycore.ai.ShooterAiEntity;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
@@ -57,18 +58,13 @@ public class ShooterMain {
     }
 
     public static class BattleAI {
-        public static String aiState = "";
-        public static boolean canFindCover = false;
-        public static boolean canBorderPatrol = false;
-        public static boolean canSimpleFormation = false;
-        public static boolean allowAttack = true;
-
+        private static Entity entity;
         private static final GunSetup.GunUtils mg = null;
 
-        public static void init(LevelAccessor world, double x, double y, double z, Entity entity) {
-            if (entity == null || aiType == null)
+        public static void init(LevelAccessor world, double x, double y, double z, Entity ent) {
+            if (ent == null || aiType == null)
                 return;
-
+            entity = ent;
             if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(128 / 2d), e -> true).isEmpty()) {
                 // Entity detection
                 if (((Supplier<Boolean>) (() -> {
@@ -161,10 +157,10 @@ public class ShooterMain {
                         }
                     }
 
-                    if (allowAttack) {
+                    if (EntityData.getBooleanData(entity, ShooterAiEntity.ALLOW_ATTACK)) {
                         if ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) instanceof LivingEntity && (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).isAlive()) {
-                            aiState = "inBattle";
                             GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
+                            setState(3);
 
                             entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX() + ((Supplier<Double>) (() -> {
                                 return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
@@ -176,16 +172,16 @@ public class ShooterMain {
 
                                 return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
                             })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
-                            reload(entity);
 
-                            gunSounds(entity);
+                            reload();
+                            gunSounds();
                         } else {
                             GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
                         }
                     }
-                } else if (aiState.equals("inBattle")) {
+                } else if (getState().equals("IN_BATTLE")) {
                     GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
-                    aiState = "alerted";
+                    setState(2);
                 }
                 // Types setup
                 if ((aiType).equals("standard")) {
@@ -295,19 +291,41 @@ public class ShooterMain {
                 }
 
                 // Cover system
-                if ((aiState).equals("inBattle")) {
+                if (getState().equals("IN_BATTLE")) {
                     if (entity instanceof PathfinderMob mob) {
-                        canFindCover = true;
+                        EntityData.setBooleanData(true, entity, ShooterAiEntity.CAN_FIND_COVER);
                         mob.goalSelector.addGoal(1, new GoalsExtension.FindCover(mob, x, y, z, world));
                     }
                 }
             } else {
-                aiState = "normal";
+                setState(1);
             }
         }
 
+        /**
+         *  <h1>Experimental features</h1>
+         *  Switch state
+         * @param state 1 = NORMAL;
+         *              2 = ALERTED;
+         *              3 = IN_BATTLE;
+         */
+        private static void setState(int state) {
+            switch (state) {
+                case 1:
+                    EntityData.setStringData("NORMAL", entity, ShooterAiEntity.AI_STATE);
+                case 2:
+                    EntityData.setStringData("ALERTED", entity, ShooterAiEntity.AI_STATE);
+                case 3:
+                    EntityData.setStringData("IN_BATTLE", entity, ShooterAiEntity.AI_STATE);
+            }
+        }
+
+        private static String getState() {
+            return EntityData.getStringData(entity, ShooterAiEntity.AI_STATE);
+        }
+
         // Reload
-        private static void reload(Entity entity) {
+        private static void reload() {
             if (((Supplier<Integer>) (() -> {
                 return (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER);
             })).get() == 0 && ((Supplier<Integer>) (() -> {
@@ -324,7 +342,7 @@ public class ShooterMain {
         }
 
         // Sounds
-        private static void gunSounds(Entity entity) {
+        private static void gunSounds() {
             if (((Supplier<Boolean>) (() -> {
                 return (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_SHOOTING);
             })).get()) {
@@ -340,7 +358,7 @@ public class ShooterMain {
         }
 
         public static Boolean getAllowAttack() {
-            return allowAttack;
+            return EntityData.getBooleanData(entity, ShooterAiEntity.ALLOW_ATTACK);
         }
     }
         private static AbstractArrow initArrowProjectile(AbstractArrow entityToSpawn, Entity shooter, float damage, boolean silent, boolean fire, boolean particles, AbstractArrow.Pickup pickup) {

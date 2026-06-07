@@ -4,9 +4,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 
@@ -26,10 +24,8 @@ public class GunSetup {
         public static final Value SHOULD_SHOOT 				= new Value("gun_setup_07", Boolean.class);
         public static final Value HAS_SHOOTED 				= new Value("gun_setup_08", Boolean.class);
 
-        private static final TagKey<Item> GUNS = ItemTags.create(ResourceLocation.fromNamespaceAndPath("neoforge", "guns"));
-
         public static boolean isGun(ItemStack stack) {
-            return stack.is(GUNS);
+            return stack.is(ItemTags.create(ResourceLocation.fromNamespaceAndPath("neoforge", "guns")));
         }
 
         public static void setValue(ItemStack stack, Value value, Object obj) {
