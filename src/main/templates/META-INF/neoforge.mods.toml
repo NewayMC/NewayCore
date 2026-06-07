@@ -1,6 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
-license = "${mod_license }"
+license = "${mod_license}"
+updateJSONURL = "https://newaymc.github.io/NewayCore/update.json"
 issueTrackerURL = "https://github.com/NewayMC/NewayCore/issues"
 
 [[mods]]
