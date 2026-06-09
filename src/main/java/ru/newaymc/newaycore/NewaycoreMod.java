@@ -1,5 +1,7 @@
 package ru.newaymc.newaycore;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -12,7 +14,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.neoforge.client.model.generators.IGeneratedBlockState;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -20,11 +25,13 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.newaymc.newaycore.network.tags.TerrainProvider;
 import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Mod("newaycore")
 public class NewaycoreMod {
@@ -68,6 +75,21 @@ public class NewaycoreMod {
     @SubscribeEvent
     public void tick(ServerTickEvent.Post event) {
 
+    }
+
+    @EventBusSubscriber
+    public static class GatherEvent {
+        @SubscribeEvent
+        public static void gatherData(GatherDataEvent event) {
+            PackOutput output = event.getGenerator().getPackOutput();
+            CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+            ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+
+            event.getGenerator().addProvider(
+                    event.includeServer(),
+                    new TerrainProvider(output, lookupProvider, existingFileHelper)
+            );
+        }
     }
 
     @EventBusSubscriber(value = {Dist.DEDICATED_SERVER})
