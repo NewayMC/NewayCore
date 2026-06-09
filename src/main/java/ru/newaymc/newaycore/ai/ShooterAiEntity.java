@@ -49,9 +49,9 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(AI_STATE, "NORMAL");
-        builder.define(ALLOW_ATTACK, true);
+        builder.define(ALLOW_ATTACK, false);
 
-        builder.define(CAN_FIND_COVER, false);
+        builder.define(CAN_FIND_COVER, true);
         builder.define(CAN_BORDER_PATROL, false);
         builder.define(CAN_SIMPLE_FORMATION, false);
     }
@@ -158,6 +158,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     }
 
     public static void init(RegisterSpawnPlacementsEvent event) {
+
     }
 
     @Override

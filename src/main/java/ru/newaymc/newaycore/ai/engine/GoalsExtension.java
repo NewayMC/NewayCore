@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -89,8 +91,7 @@ public class GoalsExtension {
                     return;
                 }
             }
-            if (!mob.getNavigation().isDone()) {
-            } else {
+            if (mob.getNavigation().isDone()) {
                 mob.getNavigation().moveTo(gx, gy, gz, speed);
             }
             Vec3 targetDir = new Vec3(gx - mob.getX(), 0, gz - mob.getZ()).normalize();
@@ -369,13 +370,13 @@ public class GoalsExtension {
         }
     }
 
-    public static class FindCover extends Goal {
+    public static class SmartCover extends Goal {
         private final PathfinderMob mob;
         private static LevelAccessor world;
         private static Vec3 nextPos;
         private static Vec3 pos;
 
-        public FindCover(PathfinderMob mob, double x, double y, double z, LevelAccessor world) {
+        public SmartCover(PathfinderMob mob, double x, double y, double z, LevelAccessor world) {
             this.mob = mob;
             this.pos = new Vec3(x, y, z);
             this.nextPos = new Vec3(x, y, z);
@@ -422,36 +423,32 @@ public class GoalsExtension {
         }
 
         public Vec3 findCover() {
-            Vec3 targetPos = null;
-            double sx = 0;
-            double sy = 0;
-            double sz = 0;
+            Vec3 coverPos = null;
+            double sX = 0;
+            double sZ = 0;
 
-            sx = -3;
+            sX = -3;
             for (int index0 = 0; index0 < 16; index0++) {
-                sy = -3;
+                sZ = -3;
                 for (int index1 = 0; index1 < 16; index1++) {
-                    sz = -3;
-                    for (int index2 = 0; index2 < 16; index2++) {
-                        if ((world.getBlockState(BlockPos.containing(pos.x + sx, pos.y + sy, pos.z + sz))).getBlock() == ModBlocks.COVER_MARKER_AI.get()) {
-                            targetPos = new Vec3(pos.x + sx, pos.y + sy, pos.z + sz);
-                            if ((mob.getDirection()) == Direction.SOUTH) {
-                                targetPos = new Vec3(targetPos.x, targetPos.y, targetPos.z - 1);
-                            } else if ((mob.getDirection()) == Direction.NORTH) {
-                                targetPos = new Vec3(targetPos.x, targetPos.y, targetPos.z + 1);
-                            } else if ((mob.getDirection()) == Direction.WEST) {
-                                targetPos = new Vec3(targetPos.x + 1, targetPos.y, targetPos.z);
-                            } else if ((mob.getDirection()) == Direction.EAST) {
-                                targetPos = new Vec3(targetPos.x + 1, targetPos.y, targetPos.z);
-                            }
-                            break;
-                        } else {
-                            stop();
+                    if (!(world.getBlockState(BlockPos.containing(pos.x + sX, pos.y, pos.z + sZ))).is(BlockTags.create(ResourceLocation.fromNamespaceAndPath("newaycore", "terrain")))) {
+                        coverPos = new Vec3(pos.x + sX, pos.y, pos.z + sZ);
+                        if ((mob.getDirection()) == Direction.SOUTH) {
+                            coverPos = new Vec3(coverPos.x, coverPos.y, coverPos.z - 1);
+                        } else if ((mob.getDirection()) == Direction.NORTH) {
+                            coverPos = new Vec3(coverPos.x, coverPos.y, coverPos.z + 1);
+                        } else if ((mob.getDirection()) == Direction.WEST) {
+                            coverPos = new Vec3(coverPos.x + 1, coverPos.y, coverPos.z);
+                        } else if ((mob.getDirection()) == Direction.EAST) {
+                            coverPos = new Vec3(coverPos.x + 1, coverPos.y, coverPos.z);
                         }
+                        break;
+                    } else {
+                        stop();
                     }
                 }
             }
-            return targetPos;
+            return coverPos;
         }
     }
 }
