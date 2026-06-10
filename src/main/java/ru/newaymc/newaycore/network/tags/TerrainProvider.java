@@ -17,7 +17,10 @@ public class TerrainProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(ModTags.TERRAIN).add(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.MYCELIUM, Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.SHORT_GRASS, Blocks.TALL_GRASS, Blocks.WATER)
+        tag(ModTags.TERRAIN).add(Blocks.AIR, Blocks.GRASS_BLOCK, Blocks.DIRT,
+                        Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.MYCELIUM,
+                        Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.SHORT_GRASS,
+                        Blocks.TALL_GRASS, Blocks.WATER)
                 .addTag(BlockTags.UNDERWATER_BONEMEALS);
     }
 }
