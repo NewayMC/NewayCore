@@ -32,6 +32,7 @@ import ru.newaymc.newaycore.register.ModItems;
 public class ShooterAiEntity extends Monster implements RangedAttackMob {
     public static final EntityDataAccessor<String> AI_STATE = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.STRING);
     public static final EntityDataAccessor<Boolean> ALLOW_ATTACK = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> SEE_TARGET = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
 
     public static final EntityDataAccessor<Boolean> CAN_FIND_COVER = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CAN_BORDER_PATROL = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
@@ -49,9 +50,10 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(AI_STATE, "NORMAL");
-        builder.define(ALLOW_ATTACK, false);
+        builder.define(ALLOW_ATTACK, true);
+        builder.define(SEE_TARGET, false);
 
-        builder.define(CAN_FIND_COVER, true);
+        builder.define(CAN_FIND_COVER, false);
         builder.define(CAN_BORDER_PATROL, false);
         builder.define(CAN_SIMPLE_FORMATION, false);
     }
@@ -61,6 +63,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         super.addAdditionalSaveData(tag);
         tag.putString("ai_state", this.entityData.get(AI_STATE));
         tag.putBoolean("allow_attack", this.entityData.get(ALLOW_ATTACK));
+        tag.putBoolean("see_target", this.entityData.get(SEE_TARGET));
 
         tag.putBoolean("can_find_cover", this.entityData.get(CAN_FIND_COVER));
         tag.putBoolean("can_border_patrol", this.entityData.get(CAN_BORDER_PATROL));
@@ -72,6 +75,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         super.readAdditionalSaveData(tag);
         this.entityData.set(AI_STATE, tag.getString("ai_state"));
         this.entityData.set(ALLOW_ATTACK, tag.getBoolean("allow_attack"));
+        this.entityData.set(SEE_TARGET, tag.getBoolean("see_target"));
 
         this.entityData.set(CAN_FIND_COVER, tag.getBoolean("can_find_cover"));
         this.entityData.set(CAN_BORDER_PATROL, tag.getBoolean("can_border_patrol"));
@@ -168,8 +172,8 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
 
     public static AttributeSupplier.Builder createAttributes() {
         AttributeSupplier.Builder builder = Mob.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.4);
-        builder = builder.add(Attributes.MAX_HEALTH, 150);
+        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
+        builder = builder.add(Attributes.MAX_HEALTH, 100);
         builder = builder.add(Attributes.ARMOR, 10);
         builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
         builder = builder.add(Attributes.FOLLOW_RANGE, 32);
