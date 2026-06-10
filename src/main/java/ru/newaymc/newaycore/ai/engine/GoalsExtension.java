@@ -14,7 +14,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import ru.newaymc.newaycore.ai.ShooterAiEntity;
-import ru.newaymc.newaycore.register.ModBlocks;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -414,7 +413,7 @@ public class GoalsExtension {
                 } else {
                     PathNavigation nav = mob.getNavigation();
                     if (nav.isDone()) {
-                        nav.moveTo(nextPos.x, nextPos.y, nextPos.z, 2);
+                        nav.moveTo(nextPos.x, nextPos.y, nextPos.z, 1.2);
                     } else {
                         nav.tick();
                     }

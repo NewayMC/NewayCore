@@ -14,7 +14,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.neoforged.neoforge.client.model.generators.IGeneratedBlockState;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;

@@ -146,6 +146,7 @@ public class ShooterMain {
                     }
                     return nearest;
                 })).get() instanceof Player) {
+                    EntityData.setBooleanData(true, entity, ShooterAiEntity.SEE_TARGET);
                     if (entity instanceof Mob _mob) {
                         if (!(_mob.getTarget() instanceof LivingEntity) || !_mob.getTarget().isAlive()) {
                             try {
@@ -160,8 +161,8 @@ public class ShooterMain {
 
                     if (EntityData.getBooleanData(entity, ShooterAiEntity.ALLOW_ATTACK)) {
                         if ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) instanceof LivingEntity && (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).isAlive()) {
-                            GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
                             setState(3);
+                            GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
 
                             entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX() + ((Supplier<Double>) (() -> {
                                 return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
@@ -180,10 +181,13 @@ public class ShooterMain {
                             GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
                         }
                     }
-                } else if (getState().equals("IN_BATTLE")) {
-                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
+                } else {
                     setState(2);
+                    EntityData.setBooleanData(false, entity, ShooterAiEntity.SEE_TARGET);
+
+                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
                 }
+
                 // Types setup
                 if ((aiType).equals("standard")) {
                     standardType();
@@ -191,6 +195,7 @@ public class ShooterMain {
                     sniperType();
                 }
 
+                // Cover
                 if (getState().equals("IN_BATTLE")) {
                     if (EntityData.getBooleanData(entity, ShooterAiEntity.CAN_FIND_COVER)) {
                         if (entity instanceof PathfinderMob mob) mob.goalSelector.addGoal(1, new GoalsExtension.SmartCover(mob, x, y, z, world));
