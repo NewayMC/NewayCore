@@ -11,6 +11,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import ru.newaymc.newaycore.ai.ShooterAiEntity;
@@ -421,7 +422,7 @@ public class GoalsExtension {
             }
         }
 
-        public Vec3 findCover() {
+        private Vec3 findCover() {
             Vec3 coverPos = null;
             double sX = 0;
             double sZ = 0;
@@ -431,23 +432,35 @@ public class GoalsExtension {
                 sZ = -3;
                 for (int index1 = 0; index1 < 16; index1++) {
                     if (!(world.getBlockState(BlockPos.containing(pos.x + sX, pos.y, pos.z + sZ))).is(BlockTags.create(ResourceLocation.fromNamespaceAndPath("newaycore", "terrain")))) {
-                        coverPos = new Vec3(pos.x + sX, pos.y, pos.z + sZ);
-                        if ((mob.getDirection()) == Direction.SOUTH) {
-                            coverPos = new Vec3(coverPos.x, coverPos.y, coverPos.z - 1);
-                        } else if ((mob.getDirection()) == Direction.NORTH) {
-                            coverPos = new Vec3(coverPos.x, coverPos.y, coverPos.z + 1);
-                        } else if ((mob.getDirection()) == Direction.WEST) {
-                            coverPos = new Vec3(coverPos.x + 1, coverPos.y, coverPos.z);
-                        } else if ((mob.getDirection()) == Direction.EAST) {
-                            coverPos = new Vec3(coverPos.x + 1, coverPos.y, coverPos.z);
-                        }
-                        break;
+                        coverPos = directionMath(new Vec3(pos.x + sX, pos.y, pos.z + sZ), mob.getDirection(), 1);
+
                     } else {
                         stop();
+                        break;
                     }
                 }
             }
+            while (coverPos !=null && !world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
+                coverPos = directionMath(coverPos, mob.getDirection(), 1);
+            }
+
             return coverPos;
+        }
+
+        private Vec3 directionMath(Vec3 vec3, Direction direction, int i) {
+            if (direction == Direction.SOUTH) {
+                vec3 = new Vec3(vec3.x, vec3.y, vec3.z - i);
+
+            } else if (direction == Direction.NORTH) {
+                vec3 = new Vec3(vec3.x, vec3.y, vec3.z + i);
+
+            } else if (direction == Direction.WEST) {
+                vec3 = new Vec3(vec3.x + i, vec3.y, vec3.z);
+
+            } else if (direction == Direction.EAST) {
+                vec3 = new Vec3(vec3.x - i, vec3.y, vec3.z);
+            }
+            return vec3;
         }
     }
 }
