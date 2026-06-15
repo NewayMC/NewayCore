@@ -11,7 +11,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import ru.newaymc.newaycore.ai.ShooterAiEntity;
@@ -433,10 +432,9 @@ public class GoalsExtension {
                 for (int index1 = 0; index1 < 16; index1++) {
                     if (!(world.getBlockState(BlockPos.containing(pos.x + sX, pos.y, pos.z + sZ))).is(BlockTags.create(ResourceLocation.fromNamespaceAndPath("newaycore", "terrain")))) {
                         coverPos = directionMath(new Vec3(pos.x + sX, pos.y, pos.z + sZ), mob.getDirection(), 1);
-
+                        break;
                     } else {
                         stop();
-                        break;
                     }
                 }
             }

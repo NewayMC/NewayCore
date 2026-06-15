@@ -31,8 +31,6 @@ import java.io.File;
 @EventBusSubscriber
 public class ModVariables {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, NewaycoreMod.MODID);
-    public static File OutpostFile = new File("");
-    public static com.google.gson.JsonObject OutpostJsonObj = new com.google.gson.JsonObject();
     public static String serverType = "";
     public static boolean firstStartup = false;
 
@@ -114,8 +112,7 @@ public class ModVariables {
 
     public static class MapVariables extends SavedData {
         public static final String DATA_NAME = "newaycore_mapvars";
-        public boolean FirstJoin = false;
-        public double NextOutpostID = 0;
+        public boolean firstJoin = false;
         boolean _syncDirty = false;
 
         public static MapVariables load(CompoundTag tag, HolderLookup.Provider lookupProvider) {
@@ -125,14 +122,12 @@ public class ModVariables {
         }
 
         public void read(CompoundTag nbt, HolderLookup.Provider lookupProvider) {
-            FirstJoin = nbt.getBoolean("FirstJoin");
-            NextOutpostID = nbt.getDouble("NextOutpostID");
+            firstJoin = nbt.getBoolean("firstJoin");
         }
 
         @Override
         public CompoundTag save(CompoundTag nbt, HolderLookup.Provider lookupProvider) {
-            nbt.putBoolean("FirstJoin", FirstJoin);
-            nbt.putDouble("NextOutpostID", NextOutpostID);
+            nbt.putBoolean("firstJoin", firstJoin);
             return nbt;
         }
 

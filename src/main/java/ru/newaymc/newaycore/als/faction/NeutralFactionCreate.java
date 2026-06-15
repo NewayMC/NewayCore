@@ -11,6 +11,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * @deprecated
+ */
+@Deprecated
 @EventBusSubscriber
 public class NeutralFactionCreate {
     @SubscribeEvent

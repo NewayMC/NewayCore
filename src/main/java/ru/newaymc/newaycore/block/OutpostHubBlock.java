@@ -12,8 +12,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
-import ru.newaymc.newaycore.als.outpost.OutpostControl;
-import ru.newaymc.newaycore.als.outpost.OutpostCreation;
 import ru.newaymc.newaycore.block.entity.OutpostHubBlockEntity;
 
 
@@ -30,13 +28,13 @@ public class OutpostHubBlock extends Block implements EntityBlock {
     @Override
     public void onPlace(BlockState blockstate, Level world, BlockPos pos, BlockState oldState, boolean moving) {
         super.onPlace(blockstate, world, pos, oldState, moving);
-        OutpostCreation.execute(world, pos.getX(), pos.getY(), pos.getZ());
+        //OutpostCreation.execute(world, pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
     public void tick(BlockState blockstate, ServerLevel world, BlockPos pos, RandomSource random) {
         super.tick(blockstate, world, pos, random);
-        OutpostControl.execute(world, pos.getX(), pos.getY(), pos.getZ());
+        //OutpostControl.execute(world, pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override

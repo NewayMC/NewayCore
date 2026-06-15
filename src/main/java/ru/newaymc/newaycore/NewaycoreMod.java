@@ -1,5 +1,6 @@
 package ru.newaymc.newaycore;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,6 +14,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -22,8 +24,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import ru.newaymc.newaycore.network.tags.TerrainProvider;
 import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.network.vars.ModVariables;
@@ -34,11 +35,10 @@ import java.util.concurrent.CompletableFuture;
 
 @Mod("newaycore")
 public class NewaycoreMod {
-    public static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.class);
+    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MODID = "newaycore";
 
     public NewaycoreMod(IEventBus modEventBus) {
-
         NeoForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::registerNetworking);
         ModSounds.REGISTRY.register(modEventBus);
@@ -71,6 +71,14 @@ public class NewaycoreMod {
         networkingRegistered = true;
     }
 
+    @EventBusSubscriber
+    public static class CommonSetup {
+        @SubscribeEvent
+        public static void setup(FMLCommonSetupEvent event) {
+
+        }
+    }
+
     @SubscribeEvent
     public void tick(ServerTickEvent.Post event) {
 
@@ -97,7 +105,6 @@ public class NewaycoreMod {
         public static void init(FMLDedicatedServerSetupEvent event) {
             if (!ModVariables.firstStartup) {
                 ModVariables.firstStartup = true;
-                NewaycoreMod.LOGGER.info(ModVariables.firstStartup);
             }
             ModVariables.serverType = "server";
             NewaycoreMod.LOGGER.info("Loaded as" + ModVariables.serverType);
@@ -126,8 +133,8 @@ public class NewaycoreMod {
 
         private static void execute(@Nullable Event event, LevelAccessor world) {
             if (ModVariables.serverType.equals("client")) {
-                if (!ModVariables.MapVariables.get(world).FirstJoin) {
-                    ModVariables.MapVariables.get(world).FirstJoin = true;
+                if (!ModVariables.MapVariables.get(world).firstJoin) {
+                    ModVariables.MapVariables.get(world).firstJoin = true;
                 }
             }
         }

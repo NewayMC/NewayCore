@@ -10,6 +10,10 @@ import ru.newaymc.newaycore.als.AlsController;
 import javax.annotation.Nullable;
 import java.io.File;
 
+/**
+ * @deprecated
+ */
+@Deprecated
 @EventBusSubscriber
 public class FactionLoader {
 
