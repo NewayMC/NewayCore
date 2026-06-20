@@ -11,19 +11,18 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.register.ModTags;
 
 import java.util.concurrent.CompletableFuture;
 
 public class TerrainProvider extends BlockTagsProvider {
-    public static final TagKey<Block> TERRAIN = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "terrain"));
-
     public TerrainProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, NewaycoreMod.MODID, existingFileHelper);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(TERRAIN).add(Blocks.AIR, Blocks.GRASS_BLOCK, Blocks.DIRT,
+        tag(ModTags.TERRAIN).add(Blocks.AIR, Blocks.GRASS_BLOCK, Blocks.DIRT,
                         Blocks.PODZOL, Blocks.COARSE_DIRT, Blocks.MYCELIUM,
                         Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.SHORT_GRASS,
                         Blocks.TALL_GRASS, Blocks.WATER)

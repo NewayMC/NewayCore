@@ -71,14 +71,6 @@ public class NewaycoreMod {
         networkingRegistered = true;
     }
 
-    @EventBusSubscriber
-    public static class CommonSetup {
-        @SubscribeEvent
-        public static void setup(FMLCommonSetupEvent event) {
-
-        }
-    }
-
     @SubscribeEvent
     public void tick(ServerTickEvent.Post event) {
 

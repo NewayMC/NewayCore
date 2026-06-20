@@ -369,6 +369,10 @@ public class GoalsExtension {
         }
     }
 
+    /**
+     * <a href="https://github.com/NewayMC/NewayCore/issues/1">Issue</a>
+     */
+    @Deprecated
     public static class SmartCover extends Goal {
         private final PathfinderMob mob;
         private static LevelAccessor world;
@@ -418,6 +422,8 @@ public class GoalsExtension {
                         nav.tick();
                     }
                 }
+            } else {
+                stop();
             }
         }
 
@@ -440,6 +446,7 @@ public class GoalsExtension {
             }
             while (coverPos !=null && !world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
                 coverPos = directionMath(coverPos, mob.getDirection(), 1);
+                break;
             }
 
             return coverPos;

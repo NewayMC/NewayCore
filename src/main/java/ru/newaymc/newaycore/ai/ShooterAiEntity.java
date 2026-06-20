@@ -53,7 +53,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         builder.define(ALLOW_ATTACK, true);
         builder.define(SEE_TARGET, false);
 
-        builder.define(CAN_FIND_COVER, true);
+        builder.define(CAN_FIND_COVER, false);
         builder.define(CAN_BORDER_PATROL, false);
         builder.define(CAN_SIMPLE_FORMATION, false);
     }
