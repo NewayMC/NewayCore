@@ -11,6 +11,7 @@ public @interface AiShooterSetup {
     String aiType() default "standard";
     double ammunition() default 30;
     double damage() default 3;
-    double recoveryTime() default 20;
     double speed() default 3;
+    double inaccuracyAccumulation() default 3;
+    int recoveryTime() default 20;
 }
