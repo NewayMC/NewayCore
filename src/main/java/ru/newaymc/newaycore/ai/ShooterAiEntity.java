@@ -1,10 +1,6 @@
 package ru.newaymc.newaycore.ai;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,56 +26,12 @@ import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModItems;
 
 public class ShooterAiEntity extends Monster implements RangedAttackMob {
-    public static final EntityDataAccessor<String> AI_STATE = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.STRING);
-    public static final EntityDataAccessor<Boolean> ALLOW_ATTACK = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> SEE_TARGET = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
-
-    public static final EntityDataAccessor<Boolean> CAN_FIND_COVER = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> CAN_BORDER_PATROL = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> CAN_SIMPLE_FORMATION = SynchedEntityData.defineId(ShooterAiEntity.class, EntityDataSerializers.BOOLEAN);
-
     public ShooterAiEntity(EntityType<ShooterAiEntity> type, Level world) {
         super(type, world);
         xpReward = 3;
         setPersistenceRequired();
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.AKM.get()));
         refreshDimensions();
-    }
-
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(AI_STATE, "NORMAL");
-        builder.define(ALLOW_ATTACK, true);
-        builder.define(SEE_TARGET, false);
-
-        builder.define(CAN_FIND_COVER, false);
-        builder.define(CAN_BORDER_PATROL, false);
-        builder.define(CAN_SIMPLE_FORMATION, false);
-    }
-
-    @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putString("ai_state", this.entityData.get(AI_STATE));
-        tag.putBoolean("allow_attack", this.entityData.get(ALLOW_ATTACK));
-        tag.putBoolean("see_target", this.entityData.get(SEE_TARGET));
-
-        tag.putBoolean("can_find_cover", this.entityData.get(CAN_FIND_COVER));
-        tag.putBoolean("can_border_patrol", this.entityData.get(CAN_BORDER_PATROL));
-        tag.putBoolean("can_simple_formation", this.entityData.get(CAN_SIMPLE_FORMATION));
-    }
-
-    @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        this.entityData.set(AI_STATE, tag.getString("ai_state"));
-        this.entityData.set(ALLOW_ATTACK, tag.getBoolean("allow_attack"));
-        this.entityData.set(SEE_TARGET, tag.getBoolean("see_target"));
-
-        this.entityData.set(CAN_FIND_COVER, tag.getBoolean("can_find_cover"));
-        this.entityData.set(CAN_BORDER_PATROL, tag.getBoolean("can_border_patrol"));
-        this.entityData.set(CAN_SIMPLE_FORMATION, tag.getBoolean("can_simple_formation"));
     }
 
     @Override
@@ -152,8 +104,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     @AiShooterSetup
     public void baseTick() {
         super.baseTick();
-        ShooterMain.setup(ShooterAiEntity.class);
-        ShooterMain.BattleAI.init(this.level(), this.getX(), this.getY(), this.getZ(), this);
+        ShooterMain.setup(this.level(), this.getX(), this.getY(), this.getZ(), this);
     }
 
     @Override

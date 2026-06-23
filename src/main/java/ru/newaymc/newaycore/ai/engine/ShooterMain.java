@@ -1,5 +1,6 @@
 package ru.newaymc.newaycore.ai.engine;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -10,7 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
@@ -26,26 +26,60 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.loading.FMLPaths;
+import org.slf4j.Logger;
 
-import ru.newaymc.newaycore.ai.ShooterAiEntity;
+import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
+import ru.newaymc.newaycore.network.DataSerializer;
 import ru.newaymc.newaycore.register.ModEntities;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class ShooterMain {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    public static AiData data = null;
+    public static File file = null;
+
     private static String aiType;
     private static double ammunition;
     private static double damage;
-    private static double recoveryTime;
+    private static int recoveryTime;
     private static double speed;
+    private static double inaccuracyAccumulation;
 
-    public static void setup(Class<?> _class) {
-        for(Method method : _class.getDeclaredMethods()) {
+    private static AbstractArrow initArrowProjectile(AbstractArrow entityToSpawn, Entity shooter, float damage, boolean silent, boolean fire, boolean particles, AbstractArrow.Pickup pickup) {
+        entityToSpawn.setOwner(shooter);
+        entityToSpawn.setBaseDamage(damage);
+        if (silent)
+            entityToSpawn.setSilent(true);
+        if (fire)
+            entityToSpawn.igniteForSeconds(100);
+        if (particles)
+            entityToSpawn.setCritArrow(true);
+        entityToSpawn.pickup = pickup;
+        return entityToSpawn;
+    }
+
+    private static ItemStack createArrowWeaponItemStack(Level level, int knockback, byte piercing) {
+        ItemStack weapon = new ItemStack(Items.ARROW);
+        if (knockback > 0)
+            weapon.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.KNOCKBACK), knockback);
+        if (piercing > 0)
+            weapon.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.PIERCING), piercing);
+        return weapon;
+    }
+
+    public static void setup(LevelAccessor world, double x, double y, double z, Entity entity) {
+        file = new File((FMLPaths.GAMEDIR.get().toString() + "/newaycore/data/ai/"), File.separator + entity.getStringUUID() + ".bin");
+        for(Method method : entity.getClass().getDeclaredMethods()) {
             AiShooterSetup aiShooterSetup = method.getAnnotation(AiShooterSetup.class);
             if (aiShooterSetup != null) {
                 aiType = aiShooterSetup.aiType();
@@ -53,8 +87,30 @@ public class ShooterMain {
                 damage = aiShooterSetup.damage();
                 recoveryTime = aiShooterSetup.recoveryTime();
                 speed = aiShooterSetup.speed();
+                inaccuracyAccumulation = aiShooterSetup.inaccuracyAccumulation();
             }
         }
+        if (!file.exists()) {
+            data = new AiData(
+                    1,
+                    true,
+                    false,
+                    false,
+                    false,
+                    false);
+            DataSerializer.serialization(data, file);
+        } else {
+            try {
+                data = (AiData) DataSerializer.deserialization(file);
+            } catch (IOException e) {
+                LOGGER.error(e.toString());
+            }
+            NewaycoreMod.queueServerWork(100, () -> {
+                DataSerializer.serialization(data, file);
+                LOGGER.debug(data.toString());
+            });
+        }
+        BattleAI.init(world, x, y, z, entity);
     }
 
     public static class BattleAI {
@@ -64,9 +120,8 @@ public class ShooterMain {
         public static void init(LevelAccessor world, double x, double y, double z, Entity ent) {
             if (ent == null || aiType == null)
                 return;
-
+            entity = ent;
             if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(128 / 2d), e -> true).isEmpty()) {
-                entity = ent;
                 // Entity detection
                 if (((Supplier<Boolean>) (() -> {
                     if (entity == null || (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
@@ -146,7 +201,7 @@ public class ShooterMain {
                     }
                     return nearest;
                 })).get() instanceof Player) {
-                    EntityData.setBooleanData(true, entity, ShooterAiEntity.SEE_TARGET);
+                    data.setSeeTarget(true);
                     if (entity instanceof Mob _mob) {
                         if (!(_mob.getTarget() instanceof LivingEntity) || !_mob.getTarget().isAlive()) {
                             try {
@@ -159,9 +214,9 @@ public class ShooterMain {
                         }
                     }
 
-                    if (EntityData.getBooleanData(entity, ShooterAiEntity.ALLOW_ATTACK)) {
+                    if (data.isAllowAttack()) {
                         if ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) instanceof LivingEntity && (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).isAlive()) {
-                            setState(3);
+                            data.setState(3);
                             GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
 
                             entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX() + ((Supplier<Double>) (() -> {
@@ -182,8 +237,8 @@ public class ShooterMain {
                         }
                     }
                 } else {
-                    setState(2);
-                    EntityData.setBooleanData(false, entity, ShooterAiEntity.SEE_TARGET);
+                    data.setState(2);
+                    data.setSeeTarget(false);
 
                     GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
                 }
@@ -196,36 +251,14 @@ public class ShooterMain {
                 }
 
                 // Cover
-                if (getState().equals("IN_BATTLE")) {
+                /*if (getState().equals("IN_BATTLE")) {
                     if (EntityData.getBooleanData(entity, ShooterAiEntity.CAN_FIND_COVER)) {
                         if (entity instanceof PathfinderMob mob) mob.goalSelector.addGoal(1, new GoalsExtension.SmartCover(mob, x, y, z, world));
                     }
-                }
+                }*/
             } else {
-                setState(1);
+                data.setState(1);
             }
-        }
-
-        /**
-         *  <h1>Experimental features</h1>
-         *  Switch state
-         * @param state 1 = NORMAL;
-         *              2 = ALERTED;
-         *              3 = IN_BATTLE;
-         */
-        private static void setState(int state) {
-            switch (state) {
-                case 1:
-                    EntityData.setStringData("NORMAL", entity, ShooterAiEntity.AI_STATE);
-                case 2:
-                    EntityData.setStringData("ALERTED", entity, ShooterAiEntity.AI_STATE);
-                case 3:
-                    EntityData.setStringData("IN_BATTLE", entity, ShooterAiEntity.AI_STATE);
-            }
-        }
-
-        private static String getState() {
-            return EntityData.getStringData(entity, ShooterAiEntity.AI_STATE);
         }
 
         private static void standardType() {
@@ -267,9 +300,9 @@ public class ShooterMain {
                             if (projectileLevel.isClientSide())
                                 shooter.setXRot(shooter.getXRot() - (float) 1);
                             current_ammo--;
-                            acc_inaccuracy += 3;
+                            acc_inaccuracy += inaccuracyAccumulation;
                         } else {
-                            recovery_time = (int) recoveryTime;
+                            recovery_time = recoveryTime;
                             shooted_ammo = 0;
                         }
                     }
@@ -324,8 +357,8 @@ public class ShooterMain {
                         if (projectileLevel.isClientSide())
                             shooter.setXRot(shooter.getXRot() - (float) 1);
                         current_ammo--;
-                        acc_inaccuracy += 3;
-                        recovery_time = (int) recoveryTime;
+                        acc_inaccuracy += inaccuracyAccumulation;
+                        recovery_time = recoveryTime;
                     }
                 }
                 mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME, recovery_time);
@@ -367,28 +400,7 @@ public class ShooterMain {
         }
 
         public static Boolean getAllowAttack() {
-            return EntityData.getBooleanData(entity, ShooterAiEntity.ALLOW_ATTACK);
+            return data.isAllowAttack();
         }
     }
-        private static AbstractArrow initArrowProjectile(AbstractArrow entityToSpawn, Entity shooter, float damage, boolean silent, boolean fire, boolean particles, AbstractArrow.Pickup pickup) {
-            entityToSpawn.setOwner(shooter);
-            entityToSpawn.setBaseDamage(damage);
-            if (silent)
-                entityToSpawn.setSilent(true);
-            if (fire)
-                entityToSpawn.igniteForSeconds(100);
-            if (particles)
-                entityToSpawn.setCritArrow(true);
-            entityToSpawn.pickup = pickup;
-            return entityToSpawn;
-        }
-
-        private static ItemStack createArrowWeaponItemStack(Level level, int knockback, byte piercing) {
-            ItemStack weapon = new ItemStack(Items.ARROW);
-            if (knockback > 0)
-                weapon.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.KNOCKBACK), knockback);
-            if (piercing > 0)
-                weapon.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.PIERCING), piercing);
-            return weapon;
-        }
-    }
+}
