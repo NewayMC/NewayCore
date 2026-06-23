@@ -13,5 +13,6 @@
   "item.newaycore.empty_block": "Пустой блок",
   "block.newaycore.outpost_hub": "Хаб аванпоста",
   "item.newaycore.shooter_ai_entity_spawn_egg": "Shooter AI Entity Spawn Egg",
-  "entity.newaycore.shooter_ai_entity": "Shooter AI Entity"
+  "entity.newaycore.shooter_ai_entity": "Shooter AI Entity",
+  "entity.newaycore.gun_ammo": ""
 }
