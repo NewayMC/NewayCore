@@ -1,12 +1,11 @@
 package ru.newaymc.newaycore;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.Event;
@@ -18,8 +17,6 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.neoforged.fml.util.thread.SidedThreadGroups;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -27,13 +24,11 @@ import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 
-import ru.newaymc.newaycore.network.tags.TerrainProvider;
 import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.network.vars.ModVariables;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Mod("newaycore")
@@ -92,21 +87,6 @@ public class NewaycoreMod {
         workQueue.removeAll(actions);
     }
 
-    @EventBusSubscriber
-    public static class GatherEvent {
-        @SubscribeEvent
-        public static void gatherData(GatherDataEvent event) {
-            PackOutput output = event.getGenerator().getPackOutput();
-            CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-            ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-
-            event.getGenerator().addProvider(
-                    event.includeServer(),
-                    new TerrainProvider(output, lookupProvider, existingFileHelper)
-            );
-        }
-    }
-
     @EventBusSubscriber(value = {Dist.DEDICATED_SERVER})
     public static class ServerEvents {
         @SubscribeEvent
@@ -132,14 +112,14 @@ public class NewaycoreMod {
     public static class PlayerLoggedIn {
         @SubscribeEvent
         public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-            execute(event, event.getEntity().level());
+            execute(event, event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), event.getEntity());
         }
 
-        public static void execute(LevelAccessor world) {
-            execute(null, world);
+        public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
+            execute(null, world, x, y, z, entity);
         }
 
-        private static void execute(@Nullable Event event, LevelAccessor world) {
+        private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
             if (ModVariables.serverType.equals("client")) {
                 if (!ModVariables.MapVariables.get(world).firstJoin) {
                     ModVariables.MapVariables.get(world).firstJoin = true;

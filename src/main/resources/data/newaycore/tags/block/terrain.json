@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:podzol",
+    "minecraft:grass_block",
+    "minecraft:dirt",
+    "minecraft:coarse_dirt",
+    "minecraft:mycelium",
+    "minecraft:rooted_dirt",
+    "minecraft:water",
+    "minecraft:air",
+    "minecraft:short_grass",
+    "minecraft:tall_grass",
+    "minecraft:mud"
+  ]
+}
