@@ -11,6 +11,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
@@ -93,7 +94,7 @@ public class ShooterMain {
         if (!file.exists()) {
             data = new AiData(
                     1,
-                    true,
+                    false,
                     false,
                     false,
                     false,
@@ -110,154 +111,170 @@ public class ShooterMain {
                 LOGGER.debug(data.toString());
             });
         }
-        BattleAI.init(world, x, y, z, entity);
+        if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(64 / 2d), e -> true).isEmpty()) {
+            BattleAI.init(world, x, y, z, entity);
+        } else {
+            data.setState(1);
+        }
+
     }
 
     public static class BattleAI {
-        private static Entity entity;
         private static final GunSetup.GunUtils mg = null;
+        private static Entity entity;
 
         public static void init(LevelAccessor world, double x, double y, double z, Entity ent) {
-            if (ent == null || aiType == null)
+            if (ent == null || aiType == null) {
                 return;
-            entity = ent;
-            if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(128 / 2d), e -> true).isEmpty()) {
-                // Entity detection
-                if (((Supplier<Boolean>) (() -> {
-                    if (entity == null || (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
-                        return false;
-                    Level level = entity.level();
-                    if (level == null)
-                        return false;
-                    Vec3 start = entity.getEyePosition(1f);
-                    Vec3 end = (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getEyePosition(1f);
-                    ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity);
-                    BlockHitResult hit = level.clip(context);
-                    if (hit.getType() == HitResult.Type.MISS)
-                        return true;
-                    return hit.getLocation().distanceToSqr(start) >= end.distanceToSqr(start);
-                })).get() && ((Supplier<Entity>) (() -> {
-                    if (entity == null || entity.level() == null)
-                        return null;
-                    Entity source = entity;
-                    Level level = source.level();
-                    double maxDistance = 16;
-                    double projectileRadius = 2;
-                    Vec3 start = source.getEyePosition(1f);
-                    Vec3 look = source.getViewVector(1f).normalize();
-                    Entity nearest = null;
-                    double nearestForward = Double.POSITIVE_INFINITY;
-                    List<Entity> candidates = level.getEntities(source, source.getBoundingBox().inflate(maxDistance));
-                    for (Entity candidate : candidates) {
-                        if (candidate == source)
-                            continue;
-                        if (!candidate.isPickable())
-                            continue;
-                        AABB box = candidate.getBoundingBox();
-                        Vec3 boxCenter = new Vec3((box.minX + box.maxX) / 2.0, (box.minY + box.maxY) / 2.0, (box.minZ + box.maxZ) / 2.0);
-                        Vec3 toCenter = boxCenter.subtract(start);
-                        double forwardProj = toCenter.dot(look);
-                        if (forwardProj <= 0)
-                            continue;
-                        if (forwardProj > maxDistance)
-                            continue;
-                        Vec3 pointOnLine = start.add(look.scale(forwardProj));
-                        double cx = Math.max(box.minX, Math.min(box.maxX, pointOnLine.x));
-                        double cy = Math.max(box.minY, Math.min(box.maxY, pointOnLine.y));
-                        double cz = Math.max(box.minZ, Math.min(box.maxZ, pointOnLine.z));
-                        Vec3 closestPointOnBox = new Vec3(cx, cy, cz);
-                        double lateralDist = closestPointOnBox.subtract(pointOnLine).length();
-                        if (lateralDist <= projectileRadius) {
-                            double forwardForCandidate = forwardProj;
-                            if (forwardForCandidate < nearestForward) {
-                                nearestForward = forwardForCandidate;
-                                nearest = candidate;
-                            }
-                        } else {
-                            double tMin = Math.max(0.0, forwardProj - 1.0);
-                            double tMax = Math.min(maxDistance, forwardProj + 1.0);
-                            boolean intersects = false;
-                            int samples = 5;
-                            for (int i = 0; i <= samples; i++) {
-                                double t = tMin + (tMax - tMin) * i / (double) samples;
-                                Vec3 p = start.add(look.scale(t));
-                                double px = Math.max(box.minX, Math.min(box.maxX, p.x));
-                                double py = Math.max(box.minY, Math.min(box.maxY, p.y));
-                                double pz = Math.max(box.minZ, Math.min(box.maxZ, p.z));
-                                Vec3 cp = new Vec3(px, py, pz);
-                                double lat = cp.subtract(p).length();
-                                if (lat <= projectileRadius) {
-                                    intersects = true;
-                                    if (t < nearestForward) {
-                                        nearestForward = t;
-                                        nearest = candidate;
-                                    }
-                                    break;
+            } else {
+                entity = ent;
+            }
+            entityDetection();
+            allowAttack();
+
+            // Types setup
+            if ((aiType).equals("standard")) {
+                standardType();
+            } else if ((aiType).equals("sniper")) {
+                sniperType();
+            }
+
+            state(data.getState());
+            reload();
+            gunSounds();
+            smartCover(world, x, y, z);
+        }
+
+        private static void state(int state) {
+            switch (state) {
+                case 1:
+                    data.setCanSimpleFormation(true);
+                case 2:
+                    data.setCanFindCover(false);
+                    data.setCanBorderPatrol(true);
+                case 3:
+                    data.setCanFindCover(true);
+                    data.setCanSimpleFormation(false);
+            }
+        }
+
+        private static void entityDetection() {
+            if (((Supplier<Boolean>) (() -> {
+                if (entity == null || (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
+                    return false;
+                Level level = entity.level();
+                if (level == null)
+                    return false;
+                Vec3 start = entity.getEyePosition(1f);
+                Vec3 end = (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getEyePosition(1f);
+                ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity);
+                BlockHitResult hit = level.clip(context);
+                if (hit.getType() == HitResult.Type.MISS)
+                    return true;
+                return hit.getLocation().distanceToSqr(start) >= end.distanceToSqr(start);
+            })).get() && ((Supplier<Entity>) (() -> {
+                if (entity == null || entity.level() == null)
+                    return null;
+                Entity source = entity;
+                Level level = source.level();
+                double maxDistance = 16;
+                double projectileRadius = 2;
+                Vec3 start = source.getEyePosition(1f);
+                Vec3 look = source.getViewVector(1f).normalize();
+                Entity nearest = null;
+                double nearestForward = Double.POSITIVE_INFINITY;
+                List<Entity> candidates = level.getEntities(source, source.getBoundingBox().inflate(maxDistance));
+                for (Entity candidate : candidates) {
+                    if (candidate == source)
+                        continue;
+                    if (!candidate.isPickable())
+                        continue;
+                    AABB box = candidate.getBoundingBox();
+                    Vec3 boxCenter = new Vec3((box.minX + box.maxX) / 2.0, (box.minY + box.maxY) / 2.0, (box.minZ + box.maxZ) / 2.0);
+                    Vec3 toCenter = boxCenter.subtract(start);
+                    double forwardProj = toCenter.dot(look);
+                    if (forwardProj <= 0)
+                        continue;
+                    if (forwardProj > maxDistance)
+                        continue;
+                    Vec3 pointOnLine = start.add(look.scale(forwardProj));
+                    double cx = Math.max(box.minX, Math.min(box.maxX, pointOnLine.x));
+                    double cy = Math.max(box.minY, Math.min(box.maxY, pointOnLine.y));
+                    double cz = Math.max(box.minZ, Math.min(box.maxZ, pointOnLine.z));
+                    Vec3 closestPointOnBox = new Vec3(cx, cy, cz);
+                    double lateralDist = closestPointOnBox.subtract(pointOnLine).length();
+                    if (lateralDist <= projectileRadius) {
+                        double forwardForCandidate = forwardProj;
+                        if (forwardForCandidate < nearestForward) {
+                            nearestForward = forwardForCandidate;
+                            nearest = candidate;
+                        }
+                    } else {
+                        double tMin = Math.max(0.0, forwardProj - 1.0);
+                        double tMax = Math.min(maxDistance, forwardProj + 1.0);
+                        boolean intersects = false;
+                        int samples = 5;
+                        for (int i = 0; i <= samples; i++) {
+                            double t = tMin + (tMax - tMin) * i / (double) samples;
+                            Vec3 p = start.add(look.scale(t));
+                            double px = Math.max(box.minX, Math.min(box.maxX, p.x));
+                            double py = Math.max(box.minY, Math.min(box.maxY, p.y));
+                            double pz = Math.max(box.minZ, Math.min(box.maxZ, p.z));
+                            Vec3 cp = new Vec3(px, py, pz);
+                            double lat = cp.subtract(p).length();
+                            if (lat <= projectileRadius) {
+                                intersects = true;
+                                if (t < nearestForward) {
+                                    nearestForward = t;
+                                    nearest = candidate;
                                 }
-                            }
-                            if (intersects)
-                                continue;
-                        }
-                    }
-                    return nearest;
-                })).get() instanceof Player) {
-                    data.setSeeTarget(true);
-                    if (entity instanceof Mob _mob) {
-                        if (!(_mob.getTarget() instanceof LivingEntity) || !_mob.getTarget().isAlive()) {
-                            try {
-                                GoalSelector _targetSelector = _mob.targetSelector;
-                                NearestAttackableTargetGoal<LivingEntity> _goal = new NearestAttackableTargetGoal<>(_mob, LivingEntity.class, 10, true, false,
-                                        e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("player"))) && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("no_entities"))));
-                                _targetSelector.addGoal(1, _goal);
-                            } catch (Exception ignored) {
+                                break;
                             }
                         }
+                        if (intersects)
+                            continue;
                     }
-
-                    if (data.isAllowAttack()) {
-                        if ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) instanceof LivingEntity && (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).isAlive()) {
-                            data.setState(3);
-                            GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
-
-                            entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX() + ((Supplier<Double>) (() -> {
-                                return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
-                            })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
-                                    ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75 + ((Supplier<Double>) (() -> {
-
-                                        return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
-                                    })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)), ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getZ() + ((Supplier<Double>) (() -> {
-
-                                return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
-                            })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
-
-                            reload();
-                            gunSounds();
-                        } else {
-                            GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
+                }
+                return nearest;
+            })).get() instanceof Player) {
+                data.setSeeTarget(true);
+                if (entity instanceof Mob _mob) {
+                    if (!(_mob.getTarget() instanceof LivingEntity) || !_mob.getTarget().isAlive()) {
+                        try {
+                            GoalSelector _targetSelector = _mob.targetSelector;
+                            NearestAttackableTargetGoal<LivingEntity> _goal = new NearestAttackableTargetGoal<>(_mob, LivingEntity.class, 10, true, false,
+                                    e -> e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("player"))) && !e.getType().is(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.withDefaultNamespace("no_entities"))));
+                            _targetSelector.addGoal(1, _goal);
+                        } catch (Exception ignored) {
                         }
                     }
+                }
+            } else {
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
+                data.setState(2);
+                data.setSeeTarget(false);
+            }
+        }
+
+        private static void allowAttack() {
+            if (data.isSeeTarget() && data.isAllowAttack()) {
+                if ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) instanceof LivingEntity && (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).isAlive()) {
+                    data.setState(3);
+                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
+
+                    entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX() + ((Supplier<Double>) (() -> {
+                        return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                    })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
+                            ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75 + ((Supplier<Double>) (() -> {
+
+                                return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                            })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)), ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getZ() + ((Supplier<Double>) (() -> {
+
+                        return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                    })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
                 } else {
-                    data.setState(2);
-                    data.setSeeTarget(false);
-
                     GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
                 }
-
-                // Types setup
-                if ((aiType).equals("standard")) {
-                    standardType();
-                } else if ((aiType).equals("sniper")) {
-                    sniperType();
-                }
-
-                // Cover
-                /*if (getState().equals("IN_BATTLE")) {
-                    if (EntityData.getBooleanData(entity, ShooterAiEntity.CAN_FIND_COVER)) {
-                        if (entity instanceof PathfinderMob mob) mob.goalSelector.addGoal(1, new GoalsExtension.SmartCover(mob, x, y, z, world));
-                    }
-                }*/
-            } else {
-                data.setState(1);
             }
         }
 
@@ -396,6 +413,12 @@ public class ShooterMain {
                 return boly;
             })).get()) {
                 entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), 1, 1);
+            }
+        }
+
+        private static void smartCover(LevelAccessor world, double x, double y, double z) {
+            if (entity instanceof PathfinderMob mob) {
+                SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
             }
         }
 

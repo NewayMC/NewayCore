@@ -4,8 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -13,6 +11,9 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import net.neoforged.fml.common.Mod;
+import ru.newaymc.newaycore.register.ModTags;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -367,11 +368,10 @@ public class GoalsExtension {
             return mob.getY();
         }
     }
-
     /**
-     * <a href="https://github.com/NewayMC/NewayCore/issues/1">Issue</a>
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "26.4.6", forRemoval = true)
     public static class SmartCover extends Goal {
         private final PathfinderMob mob;
         private static LevelAccessor world;
@@ -435,7 +435,7 @@ public class GoalsExtension {
             for (int index0 = 0; index0 < 16; index0++) {
                 sZ = -3;
                 for (int index1 = 0; index1 < 16; index1++) {
-                    if (!(world.getBlockState(BlockPos.containing(pos.x + sX, pos.y, pos.z + sZ))).is(BlockTags.create(ResourceLocation.fromNamespaceAndPath("newaycore", "terrain")))) {
+                    if (!(world.getBlockState(BlockPos.containing(pos.x + sX, pos.y, pos.z + sZ))).is(ModTags.TERRAIN)) {
                         coverPos = directionMath(new Vec3(pos.x + sX, pos.y, pos.z + sZ), mob.getDirection(), 1);
                         break;
                     } else {

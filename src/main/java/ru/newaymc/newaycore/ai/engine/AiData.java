@@ -2,12 +2,14 @@ package ru.newaymc.newaycore.ai.engine;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
 @Setter
+@ToString
 public class AiData implements Serializable {
     @Serial
     private static final long serialVersionUID = -3774946055521111215L;
@@ -35,17 +37,5 @@ public class AiData implements Serializable {
         this.canFindCover = canFindCover;
         this.canBorderPatrol = canBorderPatrol;
         this.canSimpleFormation = canSimpleFormation;
-    }
-
-    @Override
-    public String toString() {
-        return "AiData {" +
-                "state=" + state +
-                ", allowAttack=" + allowAttack +
-                ", seeTarget=" + seeTarget +
-                ", canFindCover=" + canFindCover +
-                ", canBorderPatrol=" + canBorderPatrol +
-                ", canSimpleFormation=" + canSimpleFormation +
-                '}';
     }
 }
