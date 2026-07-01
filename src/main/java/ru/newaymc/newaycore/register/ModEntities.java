@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.ai.ShooterAiEntity;
+import ru.newaymc.newaycore.ai.entity.ShooterAiEntity;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 
 @EventBusSubscriber

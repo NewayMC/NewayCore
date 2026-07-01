@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
-import ru.newaymc.newaycore.ai.ShooterAiEntity;
+import ru.newaymc.newaycore.ai.entity.ShooterAiEntity;
 
 public class ShooterAiEntityRenderer extends HumanoidMobRenderer<ShooterAiEntity, HumanoidModel<ShooterAiEntity>> {
     public ShooterAiEntityRenderer(EntityRendererProvider.Context context) {

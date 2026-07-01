@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai;
+package ru.newaymc.newaycore.ai.entity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,15 +18,15 @@ import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
-import ru.newaymc.newaycore.ai.engine.ShooterMain;
+
+import ru.newaymc.newaycore.ai.ShooterMain;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModItems;
 
 public class ShooterAiEntity extends Monster implements RangedAttackMob {
-    public ShooterAiEntity(EntityType<ShooterAiEntity> type, Level world) {
+    public ShooterAiEntity(EntityType<? extends ShooterAiEntity>  type, Level world) {
         super(type, world);
         xpReward = 3;
         setPersistenceRequired();
@@ -54,7 +54,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
                 double z = ShooterAiEntity.this.getZ();
                 Entity entity = ShooterAiEntity.this;
                 Level world = ShooterAiEntity.this.level();
-                return super.canUse() &&  ShooterMain.BattleAI.getAllowAttack();
+                return super.canUse() &&  ShooterMain.Ai.getAllowAttack();
             }
 
             @Override
@@ -64,7 +64,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
                 double z = ShooterAiEntity.this.getZ();
                 Entity entity = ShooterAiEntity.this;
                 Level world = ShooterAiEntity.this.level();
-                return super.canContinueToUse() && ShooterMain.BattleAI.getAllowAttack();
+                return super.canContinueToUse() && ShooterMain.Ai.getAllowAttack();
             }
         });
         this.goalSelector.addGoal(2, new RangedAttackGoal(this, 1.25, 1024, 10f) {
@@ -81,11 +81,6 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     }
 
     @Override
-    public Vec3 getPassengerRidingPosition(Entity entity) {
-        return super.getPassengerRidingPosition(entity).add(0, -0.35F, 0);
-    }
-
-    @Override
     public SoundEvent getHurtSound(DamageSource ds) {
         return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
     }
@@ -94,6 +89,19 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     public SoundEvent getDeathSound() {
         return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
     }
+
+//    @Override
+//    public void die(DamageSource ds) {
+//        super.die(ds);
+//        File file = ShooterMain.file;
+//        if (file.exists()) {
+//            try {
+//                boolean delete = file.delete();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//    }
 
     @Override
     public boolean shouldDropLoot() {

@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai.engine;
+package ru.newaymc.newaycore.ai;
 
 import lombok.Getter;
 import lombok.Setter;

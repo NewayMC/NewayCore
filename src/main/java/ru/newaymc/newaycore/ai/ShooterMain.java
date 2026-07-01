@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai.engine;
+package ru.newaymc.newaycore.ai;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -31,6 +31,7 @@ import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.ai.goals.SmartCover;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
@@ -45,6 +46,7 @@ import java.util.function.Supplier;
 
 public class ShooterMain {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final boolean debug = true;
 
     public static AiData data = null;
     public static File file = null;
@@ -92,9 +94,10 @@ public class ShooterMain {
             }
         }
         if (!file.exists()) {
+            // Base values
             data = new AiData(
                     1,
-                    false,
+                    true,
                     false,
                     false,
                     false,
@@ -108,18 +111,18 @@ public class ShooterMain {
             }
             NewaycoreMod.queueServerWork(100, () -> {
                 DataSerializer.serialization(data, file);
-                LOGGER.debug(data.toString());
+                if (debug) LOGGER.debug(data.toString());
             });
         }
         if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(64 / 2d), e -> true).isEmpty()) {
-            BattleAI.init(world, x, y, z, entity);
+            Ai.init(world, x, y, z, entity);
         } else {
             data.setState(1);
         }
 
     }
 
-    public static class BattleAI {
+    public static class Ai {
         private static final GunSetup.GunUtils mg = null;
         private static Entity entity;
 
@@ -140,21 +143,32 @@ public class ShooterMain {
             }
 
             state(data.getState());
+            goals(world, x, y, z);
             reload();
             gunSounds();
-            smartCover(world, x, y, z);
         }
 
         private static void state(int state) {
             switch (state) {
                 case 1:
+                    data.setCanFindCover(false);
+                    data.setCanBorderPatrol(false);
                     data.setCanSimpleFormation(true);
                 case 2:
                     data.setCanFindCover(false);
                     data.setCanBorderPatrol(true);
+                    data.setCanSimpleFormation(false);
                 case 3:
                     data.setCanFindCover(true);
+                    data.setCanBorderPatrol(false);
                     data.setCanSimpleFormation(false);
+            }
+        }
+
+        private static void goals(LevelAccessor world, double x, double y, double z) {
+            if (entity instanceof PathfinderMob mob) {
+                SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
+                //mob.goalSelector.addGoal(1, new GoalsExtension.BorderPatrolGoal(mob, 16, 1, 60));
             }
         }
 
@@ -251,7 +265,9 @@ public class ShooterMain {
                 }
             } else {
                 GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
-                data.setState(2);
+                if (data.getState() == 3) {
+                    data.setState(2);
+                }
                 data.setSeeTarget(false);
             }
         }
@@ -413,12 +429,6 @@ public class ShooterMain {
                 return boly;
             })).get()) {
                 entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), 1, 1);
-            }
-        }
-
-        private static void smartCover(LevelAccessor world, double x, double y, double z) {
-            if (entity instanceof PathfinderMob mob) {
-                SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
             }
         }
 
