@@ -36,7 +36,7 @@ public class SmartCover {
         if (_target == null) {
             return;
         }
-        if (ShooterMain.data.isCanFindCover()) {
+        if (ShooterMain.data.isFindCover()) {
             world = _world;
             x = pos.x();
             y = pos.y();

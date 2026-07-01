@@ -34,14 +34,14 @@ public class SimpleFormation extends Goal {
 
     @Override
     public boolean canUse() {
-        return ShooterMain.data.isCanSimpleFormation();
+        return ShooterMain.data.isSimpleFormation();
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (!ShooterMain.data.isCanSimpleFormation())
+        if (!ShooterMain.data.isSimpleFormation())
             mob.goalSelector.removeGoal(this);
-        return ShooterMain.data.isCanSimpleFormation();
+        return ShooterMain.data.isSimpleFormation();
     }
 
     @Override
@@ -67,7 +67,7 @@ public class SimpleFormation extends Goal {
 
     @Override
     public void tick() {
-        ShooterMain.data.setCanSimpleFormation(false);
+        ShooterMain.data.setSimpleFormation(false);
         targetPos = findFreeSlot(targetPos);
         double dist = mob.position().distanceTo(targetPos);
         if (dist <= 0.05) {

@@ -18,24 +18,26 @@ public class AiData implements Serializable {
     private boolean allowAttack;
     private boolean seeTarget;
 
-    private boolean canFindCover;
-    private boolean canBorderPatrol;
-    private boolean canSimpleFormation;
+    private boolean baseMovement;
+    private boolean findCover;
+    private boolean borderPatrol;
+    private boolean simpleFormation;
+
     /**
-     *
      * @param state 1 = NORMAL; 2 = ALERTED; 3 = IN BATTLE;
      * @param allowAttack
      * @param seeTarget
-     * @param canFindCover
-     * @param canBorderPatrol
-     * @param canSimpleFormation
+     * @param findCover
+     * @param borderPatrol
+     * @param simpleFormation
      */
-    public AiData(int state, boolean allowAttack, boolean seeTarget, boolean canFindCover, boolean canBorderPatrol, boolean canSimpleFormation) {
+    public AiData(int state, boolean allowAttack, boolean seeTarget, boolean baseMovement, boolean findCover, boolean borderPatrol, boolean simpleFormation) {
         this.state = state;
         this.allowAttack = allowAttack;
         this.seeTarget = seeTarget;
-        this.canFindCover = canFindCover;
-        this.canBorderPatrol = canBorderPatrol;
-        this.canSimpleFormation = canSimpleFormation;
+        this.baseMovement = baseMovement;
+        this.findCover = findCover;
+        this.borderPatrol = borderPatrol;
+        this.simpleFormation = simpleFormation;
     }
 }

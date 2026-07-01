@@ -36,14 +36,14 @@ public class BorderPatrol extends Goal {
 
     @Override
     public boolean canUse() {
-        return ShooterMain.data.isCanBorderPatrol();
+        return ShooterMain.data.isBorderPatrol();
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (!ShooterMain.data.isCanBorderPatrol())
+        if (!ShooterMain.data.isBorderPatrol())
             mob.goalSelector.removeGoal(this);
-        return ShooterMain.data.isCanBorderPatrol();
+        return ShooterMain.data.isBorderPatrol();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class BorderPatrol extends Goal {
         CompoundTag data = mob.getPersistentData();
         data.putInt(EDGE, edge);
         data.putDouble(T, t);
-        ShooterMain.data.setCanBorderPatrol(false);
+        ShooterMain.data.setBorderPatrol(false);
     }
 
     private boolean isSafeTarget(double x, double y, double z) {
