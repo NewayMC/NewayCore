@@ -31,6 +31,9 @@ import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.ai.goals.BaseMovement;
+import ru.newaymc.newaycore.ai.goals.BorderPatrol;
+import ru.newaymc.newaycore.ai.goals.SimpleFormation;
 import ru.newaymc.newaycore.ai.goals.SmartCover;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
@@ -99,6 +102,7 @@ public class ShooterMain {
                     1,
                     true,
                     false,
+                    true,
                     false,
                     false,
                     false);
@@ -151,24 +155,27 @@ public class ShooterMain {
         private static void state(int state) {
             switch (state) {
                 case 1:
-                    data.setCanFindCover(false);
-                    data.setCanBorderPatrol(false);
-                    data.setCanSimpleFormation(true);
+                    data.setFindCover(false);
+                    data.setBorderPatrol(false);
+                    data.setSimpleFormation(true);
                 case 2:
-                    data.setCanFindCover(false);
-                    data.setCanBorderPatrol(true);
-                    data.setCanSimpleFormation(false);
+                    data.setFindCover(false);
+                    data.setBorderPatrol(true);
+                    data.setSimpleFormation(false);
                 case 3:
-                    data.setCanFindCover(true);
-                    data.setCanBorderPatrol(false);
-                    data.setCanSimpleFormation(false);
+                    data.setFindCover(true);
+                    data.setBorderPatrol(false);
+                    data.setSimpleFormation(false);
             }
         }
 
         private static void goals(LevelAccessor world, double x, double y, double z) {
             if (entity instanceof PathfinderMob mob) {
-                SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
-                //mob.goalSelector.addGoal(1, new GoalsExtension.BorderPatrolGoal(mob, 16, 1, 60));
+                boolean smartCover = SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
+                if (!smartCover){
+                    mob.goalSelector.addGoal(1, new BaseMovement(mob, x, y, z, 5));
+                }
+                mob.goalSelector.addGoal(1, new BorderPatrol(mob, 16, 1, 60));
             }
         }
 
