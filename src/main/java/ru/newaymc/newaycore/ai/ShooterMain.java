@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.goals.BaseMovement;
 import ru.newaymc.newaycore.ai.goals.BorderPatrol;
-import ru.newaymc.newaycore.ai.goals.SimpleFormation;
 import ru.newaymc.newaycore.ai.goals.SmartCover;
 import ru.newaymc.newaycore.annotation.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
@@ -136,7 +135,7 @@ public class ShooterMain {
             } else {
                 entity = ent;
             }
-            entityDetection();
+            targetDetection();
             allowAttack();
 
             // Types setup
@@ -172,14 +171,14 @@ public class ShooterMain {
         private static void goals(LevelAccessor world, double x, double y, double z) {
             if (entity instanceof PathfinderMob mob) {
                 boolean smartCover = SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
-                if (!smartCover){
-                    mob.goalSelector.addGoal(1, new BaseMovement(mob, x, y, z, 5));
+                if (data.isFindCover() && !smartCover){
+                    mob.goalSelector.addGoal(1, new BaseMovement(mob, x, y, z));
                 }
                 mob.goalSelector.addGoal(1, new BorderPatrol(mob, 16, 1, 60));
             }
         }
 
-        private static void entityDetection() {
+        private static void targetDetection() {
             if (((Supplier<Boolean>) (() -> {
                 if (entity == null || (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
                     return false;

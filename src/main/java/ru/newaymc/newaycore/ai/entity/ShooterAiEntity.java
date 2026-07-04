@@ -46,7 +46,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(5, new FloatGoal(this));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true, false) {
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true) {
             @Override
             public boolean canUse() {
                 double x = ShooterAiEntity.this.getX();
@@ -89,19 +89,6 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     public SoundEvent getDeathSound() {
         return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
     }
-
-//    @Override
-//    public void die(DamageSource ds) {
-//        super.die(ds);
-//        File file = ShooterMain.file;
-//        if (file.exists()) {
-//            try {
-//                boolean delete = file.delete();
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//    }
 
     @Override
     public boolean shouldDropLoot() {

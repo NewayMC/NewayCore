@@ -33,7 +33,6 @@ public class SmartCover {
     private static Vec3 targetPos;
 
     public static boolean init(LevelAccessor _world, Vec3 pos, PathfinderMob _entity, Entity _target) {
-        boolean init = false;
         if (_target == null) {
             return false;
         }
@@ -55,12 +54,10 @@ public class SmartCover {
                 } else {
                     nav.moveTo(bestCover.getVec3().x(), bestCover.getVec3().y(), bestCover.getVec3().z(), 1.1);
                 }
-                init = true;
+                return true;
             }
-        } else {
-            init = false;
         }
-        return init;
+        return false;
     }
     /**
      * For test covers search algorithm
