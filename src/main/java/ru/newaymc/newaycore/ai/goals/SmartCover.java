@@ -59,13 +59,14 @@ public class SmartCover {
         }
         return false;
     }
+
     /**
      * For test covers search algorithm
      */
     private static void debug() {
         if (ShooterMain.debug) {
             if (!covers.isEmpty()) {
-                LOGGER.debug("Size {} ,Covers: {}", covers.size(), covers.toString());
+                LOGGER.debug("Size {} ,Covers: {}", covers.size(), covers);
             } else {
                 LOGGER.debug("Null");
             }

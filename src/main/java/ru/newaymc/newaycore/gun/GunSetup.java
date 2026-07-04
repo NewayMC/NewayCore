@@ -13,16 +13,16 @@ public class GunSetup {
     // The gun utils/tools
     public static class GunUtils {
         // Numeric values representing gun properties
-        public static final Value AMMO_NUMBER 				= new Value("gun_setup_01", Integer.class);
-        public static final Value RECOVERY_TIME 			= new Value("gun_setup_02", Integer.class);
-        public static final Value SHOOTED_ROUNDS 			= new Value("gun_setup_03", Integer.class);
-        public static final Value ACCUMULATED_INACCURACY 	= new Value("gun_setup_04",  Double.class);
+        public static final Value AMMO_NUMBER = new Value("gun_setup_01", Integer.class);
+        public static final Value RECOVERY_TIME = new Value("gun_setup_02", Integer.class);
+        public static final Value SHOOTED_ROUNDS = new Value("gun_setup_03", Integer.class);
+        public static final Value ACCUMULATED_INACCURACY = new Value("gun_setup_04", Double.class);
 
         // Boolean values representing gun states
-        public static final Value IS_SHOOTING		 		= new Value("gun_setup_05", Boolean.class);
-        public static final Value IS_RELOADING		 		= new Value("gun_setup_06", Boolean.class);
-        public static final Value SHOULD_SHOOT 				= new Value("gun_setup_07", Boolean.class);
-        public static final Value HAS_SHOOTED 				= new Value("gun_setup_08", Boolean.class);
+        public static final Value IS_SHOOTING = new Value("gun_setup_05", Boolean.class);
+        public static final Value IS_RELOADING = new Value("gun_setup_06", Boolean.class);
+        public static final Value SHOULD_SHOOT = new Value("gun_setup_07", Boolean.class);
+        public static final Value HAS_SHOOTED = new Value("gun_setup_08", Boolean.class);
 
         public static boolean isGun(ItemStack stack) {
             return stack.is(ItemTags.create(ResourceLocation.fromNamespaceAndPath("neoforge", "guns")));
@@ -60,26 +60,26 @@ public class GunSetup {
         }
 
         private static void setValue(CompoundTag tag, Value value, Object obj) {
-            String name 	= value.getName();
-            Class<?> type 	= value.getType();
+            String name = value.getName();
+            Class<?> type = value.getType();
 
             if (!name.isEmpty()) {
-                if (type == Boolean.class  && obj instanceof Boolean data) tag.putBoolean(name, data.booleanValue());
-                else if (type == Integer.class && obj instanceof Number index) 	tag.putInt(name, index.intValue());
-                else if (type == Double.class && obj instanceof Number index) 	tag.putDouble(name, index.doubleValue());
-                else if (type == Float.class && obj instanceof Number index) 	tag.putFloat(name, index.floatValue());
+                if (type == Boolean.class && obj instanceof Boolean data) tag.putBoolean(name, data.booleanValue());
+                else if (type == Integer.class && obj instanceof Number index) tag.putInt(name, index.intValue());
+                else if (type == Double.class && obj instanceof Number index) tag.putDouble(name, index.doubleValue());
+                else if (type == Float.class && obj instanceof Number index) tag.putFloat(name, index.floatValue());
             }
         }
 
         private static Object getValue(CompoundTag tag, Value value) {
-            String name 	= value.getName();
-            Class<?> type 	= value.getType();
+            String name = value.getName();
+            Class<?> type = value.getType();
 
             if (!name.isEmpty()) {
                 if (type == Boolean.class) return tag.getBoolean(name);
                 else if (type == Integer.class) return tag.getInt(name);
-                else if (type == Double.class) 	return tag.getDouble(name);
-                else if (type == Float.class) 	return tag.getFloat(name);
+                else if (type == Double.class) return tag.getDouble(name);
+                else if (type == Float.class) return tag.getFloat(name);
             }
             return null;
         }
@@ -102,9 +102,7 @@ public class GunSetup {
         }
 
         public Class<?> getType() {
-            if (VALUE_TYPE != null) return VALUE_TYPE;
-
-            return null;
+            return VALUE_TYPE;
         }
     }
 }
