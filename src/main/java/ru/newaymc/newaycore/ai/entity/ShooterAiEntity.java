@@ -26,12 +26,26 @@ import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModItems;
 
 public class ShooterAiEntity extends Monster implements RangedAttackMob {
-    public ShooterAiEntity(EntityType<? extends ShooterAiEntity>  type, Level world) {
+    public ShooterAiEntity(EntityType<? extends ShooterAiEntity> type, Level world) {
         super(type, world);
         xpReward = 3;
         setPersistenceRequired();
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.AKM.get()));
         refreshDimensions();
+    }
+
+    public static void init(RegisterSpawnPlacementsEvent event) {
+
+    }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        AttributeSupplier.Builder builder = Mob.createMobAttributes();
+        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
+        builder = builder.add(Attributes.MAX_HEALTH, 100);
+        builder = builder.add(Attributes.ARMOR, 10);
+        builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
+        builder = builder.add(Attributes.FOLLOW_RANGE, 32);
+        return builder;
     }
 
     @Override
@@ -54,7 +68,7 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
                 double z = ShooterAiEntity.this.getZ();
                 Entity entity = ShooterAiEntity.this;
                 Level world = ShooterAiEntity.this.level();
-                return super.canUse() &&  ShooterMain.Ai.getAllowAttack();
+                return super.canUse() && ShooterMain.Ai.getAllowAttack();
             }
 
             @Override
@@ -107,22 +121,8 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
         return super.getDefaultDimensions(pose).scale(1.1f);
     }
 
-    public static void init(RegisterSpawnPlacementsEvent event) {
-
-    }
-
     @Override
     public void performRangedAttack(LivingEntity target, float flval) {
         GunAmmo.shoot(this, target);
-    }
-
-    public static AttributeSupplier.Builder createAttributes() {
-        AttributeSupplier.Builder builder = Mob.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.3);
-        builder = builder.add(Attributes.MAX_HEALTH, 100);
-        builder = builder.add(Attributes.ARMOR, 10);
-        builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
-        builder = builder.add(Attributes.FOLLOW_RANGE, 32);
-        return builder;
     }
 }

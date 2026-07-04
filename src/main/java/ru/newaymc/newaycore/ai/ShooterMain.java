@@ -47,9 +47,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class ShooterMain {
-    private static final Logger LOGGER = LogUtils.getLogger();
     public static final boolean debug = true;
-
+    private static final Logger LOGGER = LogUtils.getLogger();
     public static AiData data = null;
     public static File file = null;
 
@@ -84,7 +83,7 @@ public class ShooterMain {
 
     public static void setup(LevelAccessor world, double x, double y, double z, Entity entity) {
         file = new File((FMLPaths.GAMEDIR.get().toString() + "/newaycore/data/ai/"), File.separator + entity.getStringUUID() + ".bin");
-        for(Method method : entity.getClass().getDeclaredMethods()) {
+        for (Method method : entity.getClass().getDeclaredMethods()) {
             AiShooterSetup aiShooterSetup = method.getAnnotation(AiShooterSetup.class);
             if (aiShooterSetup != null) {
                 aiType = aiShooterSetup.aiType();
@@ -126,7 +125,6 @@ public class ShooterMain {
     }
 
     public static class Ai {
-        private static final GunSetup.GunUtils mg = null;
         private static Entity entity;
 
         public static void init(LevelAccessor world, double x, double y, double z, Entity ent) {
@@ -171,7 +169,7 @@ public class ShooterMain {
         private static void goals(LevelAccessor world, double x, double y, double z) {
             if (entity instanceof PathfinderMob mob) {
                 boolean smartCover = SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
-                if (data.isFindCover() && !smartCover){
+                if (data.isFindCover() && !smartCover) {
                     mob.goalSelector.addGoal(1, new BaseMovement(mob, x, y, z));
                 }
                 mob.goalSelector.addGoal(1, new BorderPatrol(mob, 16, 1, 60));
@@ -285,14 +283,14 @@ public class ShooterMain {
                     GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, true);
 
                     entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getX() + ((Supplier<Double>) (() -> {
-                        return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                        return (double) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY);
                     })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
                             ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getY() + (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getBbHeight() * 0.75 + ((Supplier<Double>) (() -> {
 
-                                return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                                return (double) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY);
                             })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)), ((entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getZ() + ((Supplier<Double>) (() -> {
 
-                        return (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                        return (double) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY);
                     })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
                 } else {
                     GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT, false);
@@ -302,22 +300,22 @@ public class ShooterMain {
 
         private static void standardType() {
             {
-                int recovery_time = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME);
-                boolean has_shooted = (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.HAS_SHOOTED);
+                int recovery_time = (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.RECOVERY_TIME);
+                boolean has_shooted = (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.HAS_SHOOTED);
                 if (recovery_time > 0)
                     recovery_time--;
-                double acc_inaccuracy = (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                double acc_inaccuracy = (double) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY);
                 if (acc_inaccuracy > 0.0) {
                     acc_inaccuracy -= acc_inaccuracy * 0.75;
                     if (acc_inaccuracy < 0.0)
                         acc_inaccuracy = 0.0;
                 }
                 ItemStack hand = entity instanceof LivingEntity living ? living.getMainHandItem() : ItemStack.EMPTY;
-                int current_ammo = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER);
-                int shooted_ammo = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.SHOOTED_ROUNDS);
-                boolean should_shoot = (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.SHOULD_SHOOT);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING, false);
-                if (hand == (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY) && mg.isGun((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY))) {
+                int current_ammo = (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER);
+                int shooted_ammo = (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOOTED_ROUNDS);
+                boolean should_shoot = (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_SHOOTING, false);
+                if (hand == (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY) && GunSetup.GunUtils.isGun((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY))) {
                     if (current_ammo > 0 && recovery_time <= 0 && (should_shoot || shooted_ammo != 0)) {
                         Entity shooter = entity;
                         Level projectileLevel = shooter.level();
@@ -335,7 +333,7 @@ public class ShooterMain {
                         if (shooted_ammo < 1) {
                             shooted_ammo++;
                             shoot.act(hand, shooter, 2.0);
-                            mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING, true);
+                            GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_SHOOTING, true);
                             if (projectileLevel.isClientSide())
                                 shooter.setXRot(shooter.getXRot() - (float) 1);
                             current_ammo--;
@@ -346,35 +344,35 @@ public class ShooterMain {
                         }
                     }
                 }
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME, recovery_time);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY, acc_inaccuracy);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER, current_ammo);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.SHOOTED_ROUNDS, shooted_ammo);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.RECOVERY_TIME, recovery_time);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY, acc_inaccuracy);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER, current_ammo);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
             }
         }
 
         private static void sniperType() {
             {
-                int recovery_time = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME);
-                boolean has_shooted = (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.HAS_SHOOTED);
+                int recovery_time = (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.RECOVERY_TIME);
+                boolean has_shooted = (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.HAS_SHOOTED);
                 if (recovery_time > 0)
                     recovery_time--;
-                double acc_inaccuracy = (double) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY);
+                double acc_inaccuracy = (double) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY);
                 if (acc_inaccuracy > 0.0) {
                     acc_inaccuracy -= acc_inaccuracy * 0.75;
                     if (acc_inaccuracy < 0.0)
                         acc_inaccuracy = 0.0;
                 }
                 ItemStack hand = entity instanceof LivingEntity living ? living.getMainHandItem() : ItemStack.EMPTY;
-                int current_ammo = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER);
-                int shooted_ammo = (int) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.SHOOTED_ROUNDS);
-                boolean should_shoot = (boolean) mg.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.SHOULD_SHOOT);
+                int current_ammo = (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER);
+                int shooted_ammo = (int) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOOTED_ROUNDS);
+                boolean should_shoot = (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOULD_SHOOT);
                 if (!should_shoot && has_shooted) {
-                    mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.HAS_SHOOTED, false);
+                    GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.HAS_SHOOTED, false);
                     has_shooted = false;
                 }
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING, false);
-                if (hand == (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY) && mg.isGun((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY))) {
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_SHOOTING, false);
+                if (hand == (entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY) && GunSetup.GunUtils.isGun((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY))) {
                     if (current_ammo > 0 && recovery_time <= 0 && should_shoot && !has_shooted) {
                         Entity shooter = entity;
                         Level projectileLevel = shooter.level();
@@ -391,8 +389,8 @@ public class ShooterMain {
                             }
                         };
                         shoot.act(hand, shooter, 1.0);
-                        mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.IS_SHOOTING, true);
-                        mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.HAS_SHOOTED, true);
+                        GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_SHOOTING, true);
+                        GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.HAS_SHOOTED, true);
                         if (projectileLevel.isClientSide())
                             shooter.setXRot(shooter.getXRot() - (float) 1);
                         current_ammo--;
@@ -400,10 +398,10 @@ public class ShooterMain {
                         recovery_time = recoveryTime;
                     }
                 }
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.RECOVERY_TIME, recovery_time);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.ACCUMULATED_INACCURACY, acc_inaccuracy);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.AMMO_NUMBER, current_ammo);
-                mg.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), mg.SHOOTED_ROUNDS, shooted_ammo);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.RECOVERY_TIME, recovery_time);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.ACCUMULATED_INACCURACY, acc_inaccuracy);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.AMMO_NUMBER, current_ammo);
+                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
             }
         }
 
