@@ -8,26 +8,20 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import ru.newaymc.newaycore.ai.ShooterMain;
 
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Beta
 public class BaseMovement extends Goal {
-    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private final long cd;
 
     private final PathfinderMob mob;
     private final double x;
     private final double y;
     private final double z;
 
-    public BaseMovement(PathfinderMob mob, double x, double y, double z, int cooldown) {
+    public BaseMovement(PathfinderMob mob, double x, double y, double z) {
         this.mob = mob;
         this.x = x;
         this.y = y;
         this.z = z;
-        this.cd = cooldown;
     }
 
     @Override
@@ -44,32 +38,34 @@ public class BaseMovement extends Goal {
     }
 
     @Override
-    public void stop() {
-        scheduler.shutdown();
-        mob.getNavigation().stop();
-    }
-
-    @Override
-    public void tick() {
+    public void start() {
         PathNavigation nav = mob.getNavigation();
         int rnd = new Random().nextInt(1, 4);
         int move = new Random().nextInt(3, 5);
 
-        scheduler.scheduleAtFixedRate(() -> {
-            switch (rnd) {
-                // SOUTH
-                case 1:
-                    nav.moveTo(x, y, z - move, 1.2);
-                    // NORTH
-                case 2:
-                    nav.moveTo(x, y, z + move, 1.2);
-                    // WEST
-                case 3:
-                    nav.moveTo(x + move, y, z, 1.2);
-                    // EAST
-                case 4:
-                    nav.moveTo(x - move, y, z, 1.2);
-            }
-        }, 0, cd, TimeUnit.SECONDS);
+        switch (rnd) {
+            // SOUTH
+            case 1:
+                nav.moveTo(x, y, z - move, 1);
+                stop();
+                // NORTH
+            case 2:
+                nav.moveTo(x, y, z + move, 1);
+                stop();
+                // WEST
+            case 3:
+                nav.moveTo(x + move, y, z, 1);
+                stop();
+                // EAST
+            case 4:
+                nav.moveTo(x - move, y, z, 1);
+                stop();
+        }
+    }
+
+    @Override
+    public void stop() {
+        mob.getNavigation().stop();
+        ShooterMain.data.setBaseMovement(false);
     }
 }

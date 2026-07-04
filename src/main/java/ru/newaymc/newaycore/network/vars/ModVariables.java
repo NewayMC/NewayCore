@@ -78,12 +78,21 @@ public class ModVariables {
 
     public static class WorldVariables extends SavedData {
         public static final String DATA_NAME = "newaycore_worldvars";
+        static WorldVariables clientSide = new WorldVariables();
         boolean _syncDirty = false;
 
         public static WorldVariables load(CompoundTag tag, HolderLookup.Provider lookupProvider) {
             WorldVariables data = new WorldVariables();
             data.read(tag, lookupProvider);
             return data;
+        }
+
+        public static WorldVariables get(LevelAccessor world) {
+            if (world instanceof ServerLevel level) {
+                return level.getDataStorage().computeIfAbsent(new Factory<>(WorldVariables::new, WorldVariables::load), DATA_NAME);
+            } else {
+                return clientSide;
+            }
         }
 
         public void read(CompoundTag nbt, HolderLookup.Provider lookupProvider) {
@@ -98,20 +107,11 @@ public class ModVariables {
             this.setDirty();
             this._syncDirty = true;
         }
-
-        static WorldVariables clientSide = new WorldVariables();
-
-        public static WorldVariables get(LevelAccessor world) {
-            if (world instanceof ServerLevel level) {
-                return level.getDataStorage().computeIfAbsent(new Factory<>(WorldVariables::new, WorldVariables::load), DATA_NAME);
-            } else {
-                return clientSide;
-            }
-        }
     }
 
     public static class MapVariables extends SavedData {
         public static final String DATA_NAME = "newaycore_mapvars";
+        static MapVariables clientSide = new MapVariables();
         public boolean firstJoin = false;
         boolean _syncDirty = false;
 
@@ -119,6 +119,14 @@ public class ModVariables {
             MapVariables data = new MapVariables();
             data.read(tag, lookupProvider);
             return data;
+        }
+
+        public static MapVariables get(LevelAccessor world) {
+            if (world instanceof ServerLevelAccessor serverLevelAcc) {
+                return serverLevelAcc.getLevel().getServer().getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(new Factory<>(MapVariables::new, MapVariables::load), DATA_NAME);
+            } else {
+                return clientSide;
+            }
         }
 
         public void read(CompoundTag nbt, HolderLookup.Provider lookupProvider) {
@@ -134,16 +142,6 @@ public class ModVariables {
         public void markSyncDirty() {
             this.setDirty();
             _syncDirty = true;
-        }
-
-        static MapVariables clientSide = new MapVariables();
-
-        public static MapVariables get(LevelAccessor world) {
-            if (world instanceof ServerLevelAccessor serverLevelAcc) {
-                return serverLevelAcc.getLevel().getServer().getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(new Factory<>(MapVariables::new, MapVariables::load), DATA_NAME);
-            } else {
-                return clientSide;
-            }
         }
     }
 
@@ -167,11 +165,6 @@ public class ModVariables {
             return new SavedDataSyncMessage(dataType, data);
         });
 
-        @Override
-        public Type<SavedDataSyncMessage> type() {
-            return TYPE;
-        }
-
         public static void handleData(final SavedDataSyncMessage message, final IPayloadContext context) {
             if (context.flow() == PacketFlow.CLIENTBOUND && message.data != null) {
                 context.enqueueWork(() -> {
@@ -184,6 +177,11 @@ public class ModVariables {
                     return null;
                 });
             }
+        }
+
+        @Override
+        public Type<SavedDataSyncMessage> type() {
+            return TYPE;
         }
     }
 }
