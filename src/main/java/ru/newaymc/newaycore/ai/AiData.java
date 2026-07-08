@@ -22,6 +22,7 @@ public class AiData implements Serializable {
     private boolean findCover;
     private boolean borderPatrol;
     private boolean simpleFormation;
+
     /**
      * @param state 1 = NORMAL; 2 = ALERTED; 3 = IN BATTLE;
      * @param allowAttack
