@@ -35,10 +35,16 @@ public class DataSerializer {
 
     public static Object deserialization(File file) throws IOException {
         Object obj = null;
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
-            obj = inputStream.readObject();
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Deserialization error {}", e.toString());
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            while (true) {
+                try {
+                    obj = ois.readObject();
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            LOGGER.error("Deserialization error: {}", e.toString());
         }
         return obj;
     }
