@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.annotation;
+package ru.newaymc.newaycore.ai.utils;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
