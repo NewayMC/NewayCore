@@ -11,7 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
@@ -31,10 +30,8 @@ import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.ai.goals.BaseMovement;
-import ru.newaymc.newaycore.ai.goals.BorderPatrol;
-import ru.newaymc.newaycore.ai.goals.SmartCover;
-import ru.newaymc.newaycore.annotation.AiShooterSetup;
+import ru.newaymc.newaycore.ai.objects.AiData;
+import ru.newaymc.newaycore.ai.utils.AiShooterSetup;
 import ru.newaymc.newaycore.gun.GunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.network.DataSerializer;
@@ -50,9 +47,16 @@ public class ShooterMain {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final boolean debug = true;
 
-    public static AiData data = null;
     public static File file = null;
+    public static AiData data = new AiData(
+            1,
+            true,
+            false,
+            false,
+            false,
+            false);
 
+    private static Entity entity;
     private static String aiType;
     private static double ammunition;
     private static double damage;
@@ -82,7 +86,8 @@ public class ShooterMain {
         return weapon;
     }
 
-    public static void setup(LevelAccessor world, double x, double y, double z, Entity entity) {
+    public static void setup(Entity _entity) {
+        entity = _entity;
         file = new File((FMLPaths.GAMEDIR.get().toString() + "/newaycore/data/ai/"), File.separator + entity.getStringUUID() + ".bin");
         for(Method method : entity.getClass().getDeclaredMethods()) {
             AiShooterSetup aiShooterSetup = method.getAnnotation(AiShooterSetup.class);
@@ -96,15 +101,6 @@ public class ShooterMain {
             }
         }
         if (!file.exists()) {
-            // Base values
-            data = new AiData(
-                    1,
-                    true,
-                    false,
-                    true,
-                    false,
-                    false,
-                    false);
             DataSerializer.serialization(data, file);
         } else {
             try {
@@ -117,8 +113,9 @@ public class ShooterMain {
                 if (debug) LOGGER.debug(data.toString());
             });
         }
-        if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(new Vec3(x, y, z)).inflate(64 / 2d), e -> true).isEmpty()) {
-            Ai.init(world, x, y, z, entity);
+        LevelAccessor world = entity.level();
+        if (!world.getEntitiesOfClass(Player.class, new AABB(Vec3.ZERO, Vec3.ZERO).move(entity.position()).inflate(64 / 2d), e -> true).isEmpty()) {
+            Ai.init();
         } else {
             data.setState(1);
         }
@@ -127,14 +124,8 @@ public class ShooterMain {
 
     public static class Ai {
         private static final GunSetup.GunUtils mg = null;
-        private static Entity entity;
 
-        public static void init(LevelAccessor world, double x, double y, double z, Entity ent) {
-            if (ent == null || aiType == null) {
-                return;
-            } else {
-                entity = ent;
-            }
+        private static void init() {
             targetDetection();
             allowAttack();
 
@@ -146,7 +137,6 @@ public class ShooterMain {
             }
 
             state(data.getState());
-            goals(world, x, y, z);
             reload();
             gunSounds();
         }
@@ -157,25 +147,31 @@ public class ShooterMain {
                     data.setFindCover(false);
                     data.setBorderPatrol(false);
                     data.setSimpleFormation(true);
+                    break;
                 case 2:
                     data.setFindCover(false);
                     data.setBorderPatrol(true);
                     data.setSimpleFormation(false);
+                    break;
                 case 3:
                     data.setFindCover(true);
                     data.setBorderPatrol(false);
                     data.setSimpleFormation(false);
+                    break;
             }
-        }
-
-        private static void goals(LevelAccessor world, double x, double y, double z) {
-            if (entity instanceof PathfinderMob mob) {
-                boolean smartCover = SmartCover.init(world, new Vec3(x, y, z), mob, mob.getTarget());
-                if (data.isFindCover() && !smartCover){
-                    mob.goalSelector.addGoal(1, new BaseMovement(mob, x, y, z));
-                }
-                mob.goalSelector.addGoal(1, new BorderPatrol(mob, 16, 1, 60));
-            }
+            /*if (state == 1) {
+                data.setFindCover(false);
+                data.setBorderPatrol(false);
+                data.setSimpleFormation(true);
+            } else if (state == 2) {
+                data.setFindCover(false);
+                data.setBorderPatrol(true);
+                data.setSimpleFormation(false);
+            } else if (state == 3) {
+                data.setFindCover(true);
+                data.setBorderPatrol(false);
+                data.setSimpleFormation(false);
+            }*/
         }
 
         private static void targetDetection() {
@@ -436,10 +432,6 @@ public class ShooterMain {
             })).get()) {
                 entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_reload")), 1, 1);
             }
-        }
-
-        public static Boolean getAllowAttack() {
-            return data.isAllowAttack();
         }
     }
 }

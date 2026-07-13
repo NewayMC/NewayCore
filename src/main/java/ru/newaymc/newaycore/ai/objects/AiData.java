@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai;
+package ru.newaymc.newaycore.ai.objects;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +18,6 @@ public class AiData implements Serializable {
     private boolean allowAttack;
     private boolean seeTarget;
 
-    private boolean baseMovement;
     private boolean findCover;
     private boolean borderPatrol;
     private boolean simpleFormation;
@@ -31,11 +30,10 @@ public class AiData implements Serializable {
      * @param borderPatrol
      * @param simpleFormation
      */
-    public AiData(int state, boolean allowAttack, boolean seeTarget, boolean baseMovement, boolean findCover, boolean borderPatrol, boolean simpleFormation) {
+    public AiData(int state, boolean allowAttack, boolean seeTarget, boolean findCover, boolean borderPatrol, boolean simpleFormation) {
         this.state = state;
         this.allowAttack = allowAttack;
         this.seeTarget = seeTarget;
-        this.baseMovement = baseMovement;
         this.findCover = findCover;
         this.borderPatrol = borderPatrol;
         this.simpleFormation = simpleFormation;

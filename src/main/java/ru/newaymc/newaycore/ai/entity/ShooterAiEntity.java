@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
@@ -21,11 +22,18 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
 import ru.newaymc.newaycore.ai.ShooterMain;
-import ru.newaymc.newaycore.annotation.AiShooterSetup;
+import ru.newaymc.newaycore.ai.goals.BorderPatrol;
+import ru.newaymc.newaycore.ai.goals.SmartCover;
+import ru.newaymc.newaycore.ai.utils.AiShooterSetup;
+import ru.newaymc.newaycore.ai.utils.IShooterSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModItems;
 
-public class ShooterAiEntity extends Monster implements RangedAttackMob {
+import java.util.Random;
+
+public class ShooterAiEntity extends Monster implements IShooterSetup {
+    private final PathNavigation nav = this.getNavigation();
+
     public ShooterAiEntity(EntityType<? extends ShooterAiEntity>  type, Level world) {
         super(type, world);
         xpReward = 3;
@@ -37,34 +45,19 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1, false) {
-            @Override
-            protected boolean canPerformAttack(LivingEntity entity) {
-                return this.isTimeToAttack() && this.mob.distanceToSqr(entity) < (this.mob.getBbWidth() * this.mob.getBbWidth() + entity.getBbWidth()) && this.mob.getSensing().hasLineOfSight(entity);
-            }
-        });
+        this.goalSelector.addGoal(1, new BorderPatrol(this, 16, 1, 100));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(5, new FloatGoal(this));
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal(this, Player.class, true) {
             @Override
             public boolean canUse() {
-                double x = ShooterAiEntity.this.getX();
-                double y = ShooterAiEntity.this.getY();
-                double z = ShooterAiEntity.this.getZ();
-                Entity entity = ShooterAiEntity.this;
-                Level world = ShooterAiEntity.this.level();
-                return super.canUse() &&  ShooterMain.Ai.getAllowAttack();
+                return super.canUse() && getAllowAttack();
             }
 
             @Override
             public boolean canContinueToUse() {
-                double x = ShooterAiEntity.this.getX();
-                double y = ShooterAiEntity.this.getY();
-                double z = ShooterAiEntity.this.getZ();
-                Entity entity = ShooterAiEntity.this;
-                Level world = ShooterAiEntity.this.level();
-                return super.canContinueToUse() && ShooterMain.Ai.getAllowAttack();
+                return super.canContinueToUse() && getAllowAttack();
             }
         });
         this.goalSelector.addGoal(2, new RangedAttackGoal(this, 1.25, 1024, 10f) {
@@ -97,9 +90,40 @@ public class ShooterAiEntity extends Monster implements RangedAttackMob {
 
     @Override
     @AiShooterSetup
+    public void aiSetup(Entity entity) {
+        IShooterSetup.super.aiSetup(entity);
+    }
+
+    @Override
     public void baseTick() {
         super.baseTick();
-        ShooterMain.setup(this.level(), this.getX(), this.getY(), this.getZ(), this);
+        aiSetup(this);
+        tickingGoals(this.tickCount);
+    }
+
+    @Override
+    public void tickingGoals(int ticks) {
+        SmartCover.init(this, this.position(), this.getTarget());
+
+        if (ShooterMain.data.getState() == 3 && !SmartCover.getStatus() && ticks % 40 == 0) {
+            int rnd = new Random().nextInt(1, 4);
+            int move = new Random().nextInt(3, 5);
+
+            switch (rnd) {
+                case 1:
+                    nav.moveTo(this.getX(), this.getY(), this.getZ() - move, 1);
+                    break;
+                case 2:
+                    nav.moveTo(this.getX(), this.getY(), this.getZ() + move, 1);
+                    break;
+                case 3:
+                    nav.moveTo(this.getX() + move, this.getY(), this.getZ(), 1);
+                    break;
+                case 4:
+                    nav.moveTo(this.getX() - move, this.getY(), this.getZ() + move, 1);
+                    break;
+            }
+        }
     }
 
     @Override

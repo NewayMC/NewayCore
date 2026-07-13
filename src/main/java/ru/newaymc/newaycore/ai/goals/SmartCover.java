@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 import ru.newaymc.newaycore.ai.ShooterMain;
+import ru.newaymc.newaycore.ai.objects.Cover;
 import ru.newaymc.newaycore.register.ModTags;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class SmartCover {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static boolean status;
 
     private static List<Cover> covers = new ArrayList<>();
 
@@ -32,21 +34,23 @@ public class SmartCover {
 
     private static Vec3 targetPos;
 
-    public static boolean init(LevelAccessor _world, Vec3 pos, PathfinderMob _entity, Entity _target) {
+    public static void init(PathfinderMob mob, Vec3 pos, Entity _target) {
         if (_target == null) {
-            return false;
+            status = false;
+            return;
         }
         if (ShooterMain.data.isFindCover()) {
-            world = _world;
+            world = mob.level();
             x = pos.x();
             y = pos.y();
             z = pos.z();
-            entity = _entity;
+            entity = mob;
             targetPos = _target.position();
 
             Cover bestCover = CoverEvaluator.findBestCover();
 
             if (bestCover != null) {
+                status = true;
                 PathNavigation nav = entity.getNavigation();
                 double dist = bestCover.getDistance();
                 if (dist <= 0.1) {
@@ -54,14 +58,10 @@ public class SmartCover {
                 } else {
                     nav.moveTo(bestCover.getVec3().x(), bestCover.getVec3().y(), bestCover.getVec3().z(), 1.1);
                 }
-                return true;
             }
         }
-        return false;
+        status = false;
     }
-    /**
-     * For test covers search algorithm
-     */
     private static void debug() {
         if (ShooterMain.debug) {
             if (!covers.isEmpty()) {
@@ -70,6 +70,10 @@ public class SmartCover {
                 LOGGER.debug("Null");
             }
         }
+    }
+
+    public static boolean getStatus() {
+        return status;
     }
 
     private static class CoverEvaluator {
@@ -166,23 +170,6 @@ public class SmartCover {
                 vec3 = new Vec3(vec3.x - 1, vec3.y, vec3.z);
             }
             return vec3;
-        }
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @EqualsAndHashCode
-    @AllArgsConstructor
-    public static class Cover {
-        private Vec3 vec3;
-        private double score;
-        private double distance;
-
-        public Cover(Vec3 vec3, double distance) {
-            this.vec3 = vec3;
-            this.distance = distance;
-            this.score = 0;
         }
     }
 }
