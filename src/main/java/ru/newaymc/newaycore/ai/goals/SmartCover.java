@@ -7,12 +7,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
-import ru.newaymc.newaycore.ai.ShooterMain;
+import ru.newaymc.newaycore.ai.ShooterCore;
 import ru.newaymc.newaycore.ai.objects.Cover;
 import ru.newaymc.newaycore.register.ModTags;
 
@@ -24,6 +23,8 @@ public class SmartCover {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static boolean status;
 
+    @Getter
+    private static Cover bestCover;
     private static List<Cover> covers = new ArrayList<>();
 
     private static LevelAccessor world;
@@ -39,31 +40,21 @@ public class SmartCover {
             status = false;
             return;
         }
-        if (ShooterMain.data.isFindCover()) {
-            world = mob.level();
-            x = pos.x();
-            y = pos.y();
-            z = pos.z();
-            entity = mob;
-            targetPos = _target.position();
+        world = mob.level();
+        x = pos.x();
+        y = pos.y();
+        z = pos.z();
+        entity = mob;
+        targetPos = _target.position();
 
-            Cover bestCover = CoverEvaluator.findBestCover();
+        bestCover = CoverEvaluator.findBestCover();
 
-            if (bestCover != null) {
-                status = true;
-                PathNavigation nav = entity.getNavigation();
-                double dist = bestCover.getDistance();
-                if (dist <= 0.1) {
-                    entity.setPos(bestCover.getVec3());
-                } else {
-                    nav.moveTo(bestCover.getVec3().x(), bestCover.getVec3().y(), bestCover.getVec3().z(), 1.1);
-                }
-            }
-        }
-        status = false;
+        status = bestCover != null;
+
     }
+
     private static void debug() {
-        if (ShooterMain.debug) {
+        if (ShooterCore.debug) {
             if (!covers.isEmpty()) {
                 LOGGER.debug("Size {} ,Covers: {}", covers.size(), covers.toString());
             } else {

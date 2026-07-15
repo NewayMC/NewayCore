@@ -43,6 +43,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Deprecated(since = "26.5-EXPERIMENT")
 public class ShooterMain {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final boolean debug = true;
@@ -92,7 +93,7 @@ public class ShooterMain {
         for(Method method : entity.getClass().getDeclaredMethods()) {
             AiShooterSetup aiShooterSetup = method.getAnnotation(AiShooterSetup.class);
             if (aiShooterSetup != null) {
-                aiType = aiShooterSetup.aiType();
+                //aiType = aiShooterSetup.aiType()type();
                 ammunition = aiShooterSetup.ammunition();
                 damage = aiShooterSetup.damage();
                 recoveryTime = aiShooterSetup.recoveryTime();
@@ -159,19 +160,6 @@ public class ShooterMain {
                     data.setSimpleFormation(false);
                     break;
             }
-            /*if (state == 1) {
-                data.setFindCover(false);
-                data.setBorderPatrol(false);
-                data.setSimpleFormation(true);
-            } else if (state == 2) {
-                data.setFindCover(false);
-                data.setBorderPatrol(true);
-                data.setSimpleFormation(false);
-            } else if (state == 3) {
-                data.setFindCover(true);
-                data.setBorderPatrol(false);
-                data.setSimpleFormation(false);
-            }*/
         }
 
         private static void targetDetection() {

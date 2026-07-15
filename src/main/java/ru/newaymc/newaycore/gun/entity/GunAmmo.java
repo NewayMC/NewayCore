@@ -1,10 +1,6 @@
 package ru.newaymc.newaycore.gun.entity;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -85,26 +81,6 @@ public class GunAmmo extends AbstractArrow implements ItemSupplier {
             this.discard();
     }
 
-    public static GunAmmo shoot(Level world, LivingEntity entity, RandomSource source) {
-        return shoot(world, entity, source, 100f, 5, 5);
-    }
-
-    public static GunAmmo shoot(Level world, LivingEntity entity, RandomSource source, float pullingPower) {
-        return shoot(world, entity, source, pullingPower * 100f, 5, 5);
-    }
-
-    public static GunAmmo shoot(Level world, LivingEntity entity, RandomSource random, float power, double damage, int knockback) {
-        GunAmmo entityarrow = new GunAmmo(ModEntities.GUN_AMMO.get(), entity, world, null);
-        entityarrow.shoot(entity.getViewVector(1).x, entity.getViewVector(1).y, entity.getViewVector(1).z, power * 2, 0);
-        entityarrow.setSilent(true);
-        entityarrow.setCritArrow(true);
-        entityarrow.setBaseDamage(damage);
-        entityarrow.setKnockback(knockback);
-        world.addFreshEntity(entityarrow);
-        world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.arrow.shoot")), SoundSource.PLAYERS, 1, 1f / (random.nextFloat() * 0.5f + 1) + (power / 2));
-        return entityarrow;
-    }
-
     public static GunAmmo shoot(LivingEntity entity, LivingEntity target) {
         GunAmmo entityarrow = new GunAmmo(ModEntities.GUN_AMMO.get(), entity, entity.level(), null);
         double dx = target.getX() - entity.getX();
@@ -116,7 +92,6 @@ public class GunAmmo extends AbstractArrow implements ItemSupplier {
         entityarrow.setKnockback(5);
         entityarrow.setCritArrow(true);
         entity.level().addFreshEntity(entityarrow);
-        entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.arrow.shoot")), SoundSource.PLAYERS, 1, 1f / (RandomSource.create().nextFloat() * 0.5f + 1));
         return entityarrow;
     }
 }
