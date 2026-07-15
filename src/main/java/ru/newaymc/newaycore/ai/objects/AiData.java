@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@Deprecated
 public class AiData implements Serializable {
     @Serial
     private static final long serialVersionUID = -3774946055521111215L;
@@ -21,7 +22,6 @@ public class AiData implements Serializable {
     private boolean findCover;
     private boolean borderPatrol;
     private boolean simpleFormation;
-
     /**
      * @param state 1 = NORMAL; 2 = ALERTED; 3 = IN BATTLE;
      * @param allowAttack
