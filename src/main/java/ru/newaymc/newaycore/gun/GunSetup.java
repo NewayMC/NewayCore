@@ -85,6 +85,12 @@ public class GunSetup {
         }
     }
 
+    public enum Type {
+        MACHINEGUN,
+        SNIPER,
+        SHOTGUN // not use
+    }
+
     private static class Value {
 
         private final String VALUE_NAME;
