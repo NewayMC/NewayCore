@@ -8,7 +8,9 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import ru.newaymc.newaycore.ai.ShooterMain;
+
+import ru.newaymc.newaycore.ai.ShooterCore;
+import ru.newaymc.newaycore.ai.objects.Memory;
 
 import java.util.EnumSet;
 
@@ -36,14 +38,14 @@ public class BorderPatrol extends Goal {
 
     @Override
     public boolean canUse() {
-        return ShooterMain.data.isBorderPatrol();
+        return ShooterCore.memory.isBorderPatrol();
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (!ShooterMain.data.isBorderPatrol())
+        if (!ShooterCore.memory.isBorderPatrol())
             mob.goalSelector.removeGoal(this);
-        return ShooterMain.data.isBorderPatrol();
+        return ShooterCore.memory.isBorderPatrol();
     }
 
     @Override
@@ -63,6 +65,10 @@ public class BorderPatrol extends Goal {
 
     @Override
     public void tick() {
+        Memory memory = ShooterCore.memory;
+        if (memory.isSeeTarget()) {
+            memory.setBorderPatrol(false);
+        }
         t += 1.0 / stepTicks;
         if (t >= 1.0) {
             t = 0.0;
@@ -97,7 +103,8 @@ public class BorderPatrol extends Goal {
         CompoundTag data = mob.getPersistentData();
         data.putInt(EDGE, edge);
         data.putDouble(T, t);
-        ShooterMain.data.setBorderPatrol(false);
+
+        ShooterCore.memory.setBorderPatrol(false);
     }
 
     private boolean isSafeTarget(double x, double y, double z) {
