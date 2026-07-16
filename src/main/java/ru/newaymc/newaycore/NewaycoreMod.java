@@ -87,28 +87,8 @@ public class NewaycoreMod {
         workQueue.removeAll(actions);
     }
 
-    @EventBusSubscriber(value = {Dist.DEDICATED_SERVER})
-    public static class ServerEvents {
-        @SubscribeEvent
-        public static void init(FMLDedicatedServerSetupEvent event) {
-            if (!ModVariables.firstStartup) {
-                ModVariables.firstStartup = true;
-            }
-            ModVariables.serverType = "server";
-            NewaycoreMod.LOGGER.info("Loaded as" + ModVariables.serverType);
-        }
-    }
-
-    @EventBusSubscriber(value = Dist.CLIENT)
-    public static class ClientEvents {
-        @SubscribeEvent
-        public static void init(FMLClientSetupEvent event) {
-            ModVariables.serverType = "client";
-            NewaycoreMod.LOGGER.info("Loaded as " + ModVariables.serverType);
-        }
-    }
-
     @EventBusSubscriber
+    // For some test btw
     public static class PlayerLoggedIn {
         @SubscribeEvent
         public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
@@ -120,10 +100,8 @@ public class NewaycoreMod {
         }
 
         private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
-            if (ModVariables.serverType.equals("client")) {
-                if (!ModVariables.MapVariables.get(world).firstJoin) {
-                    ModVariables.MapVariables.get(world).firstJoin = true;
-                }
+            if (!ModVariables.MapVariables.get(world).firstJoin) {
+                ModVariables.MapVariables.get(world).firstJoin = true;
             }
         }
     }

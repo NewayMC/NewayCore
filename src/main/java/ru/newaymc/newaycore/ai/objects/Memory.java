@@ -15,7 +15,7 @@ public class Memory {
     private PathfinderMob mob;
     private Cover currentCover = null;
     private boolean coverStatus = false;
-    private boolean borderPatrol = true;
+    private boolean borderPatrol = false;
     private GunSetup.Type type;
     // -- Target --
     private LivingEntity target = null;

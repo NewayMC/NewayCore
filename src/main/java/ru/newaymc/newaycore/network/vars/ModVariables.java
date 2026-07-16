@@ -31,8 +31,6 @@ import java.io.File;
 @EventBusSubscriber
 public class ModVariables {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, NewaycoreMod.MODID);
-    public static String serverType = "";
-    public static boolean firstStartup = false;
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
