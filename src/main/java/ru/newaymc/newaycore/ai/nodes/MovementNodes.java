@@ -16,40 +16,6 @@ import ru.newaymc.newaycore.ai.utils.Status;
 import java.util.Random;
 
 public class MovementNodes {
-    public static class StrayNode extends Node {
-
-        @Override
-        public Status tick(Memory memory) {
-            if (ShooterCore.debug) {
-                ShooterCore.LOGGER.debug("Current node: {}", this.getClass().getName());
-            }
-            PathfinderMob mob = memory.getMob();
-            PathNavigation nav = mob.getNavigation();
-            if (!memory.isCoverStatus() && memory.getTicks() % 40 == 0) {
-                int rnd = new Random().nextInt(1, 4);
-                int move = new Random().nextInt(3, 5);
-
-                switch (rnd) {
-                    case 1:
-                        nav.moveTo(mob.getX(), mob.getY(), mob.getZ() - move, 1);
-                        break;
-                    case 2:
-                        nav.moveTo(mob.getX(), mob.getY(), mob.getZ() + move, 1);
-                        break;
-                    case 3:
-                        nav.moveTo(mob.getX() + move, mob.getY(), mob.getZ(), 1);
-                        break;
-                    case 4:
-                        nav.moveTo(mob.getX() - move, mob.getY(), mob.getZ() + move, 1);
-                        break;
-                }
-            } else {
-                 return Status.FAILURE;
-            }
-            return Status.RUNNING;
-        }
-    }
-
     public static class MoveToCoverNode extends Node {
         private boolean pathFound = false;
 
@@ -109,4 +75,38 @@ public class MovementNodes {
             mob.goalSelector.removeGoal(goal);
         }
     }
+
+    /*public static class StrayNode extends Node {
+
+        @Override
+        public Status tick(Memory memory) {
+            if (ShooterCore.debug) {
+                ShooterCore.LOGGER.debug("Current node: {}", this.getClass().getName());
+            }
+            PathfinderMob mob = memory.getMob();
+            PathNavigation nav = mob.getNavigation();
+            if (!memory.isCoverStatus() && memory.getTicks() % 40 == 0) {
+                int rnd = new Random().nextInt(1, 4);
+                int move = new Random().nextInt(3, 5);
+
+                switch (rnd) {
+                    case 1:
+                        nav.moveTo(mob.getX(), mob.getY(), mob.getZ() - move, 1);
+                        break;
+                    case 2:
+                        nav.moveTo(mob.getX(), mob.getY(), mob.getZ() + move, 1);
+                        break;
+                    case 3:
+                        nav.moveTo(mob.getX() + move, mob.getY(), mob.getZ(), 1);
+                        break;
+                    case 4:
+                        nav.moveTo(mob.getX() - move, mob.getY(), mob.getZ() + move, 1);
+                        break;
+                }
+            } else {
+                 return Status.FAILURE;
+            }
+            return Status.RUNNING;
+        }
+    }*/
 }

@@ -17,15 +17,18 @@ public class BattleNodes {
 
         @Override
         public Status tick(Memory memory) {
+            ShooterCore.targetDetection();
             if (ShooterCore.debug) {
                 ShooterCore.LOGGER.debug("Current node: {}", this.getClass().getName());
-                ShooterCore.LOGGER.debug("Target: {}, see target {}", memory.getTarget(), memory.isSeeTarget());
             }
-            PathfinderMob mob = memory.getMob();
-            LivingEntity target = memory.getTarget();
 
-            if (target == null) return Status.FAILURE;
-            return memory.isSeeTarget() ? Status.SUCCESS : Status.FAILURE;
+            if (memory.isSeeTarget()) {
+                memory.setLastTargetPos(memory.getTarget().position());
+                memory.setLastSeenTime(System.currentTimeMillis());
+                return Status.SUCCESS;
+            } else {
+                return Status.FAILURE;
+            }
         }
     }
 

@@ -65,10 +65,6 @@ public class BorderPatrol extends Goal {
 
     @Override
     public void tick() {
-        Memory memory = ShooterCore.memory;
-        if (memory.isSeeTarget()) {
-            memory.setBorderPatrol(false);
-        }
         t += 1.0 / stepTicks;
         if (t >= 1.0) {
             t = 0.0;

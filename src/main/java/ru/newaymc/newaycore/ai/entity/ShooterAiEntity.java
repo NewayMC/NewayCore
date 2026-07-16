@@ -26,8 +26,12 @@ import ru.newaymc.newaycore.ai.utils.IShooterSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModItems;
 
+import java.util.Random;
+
 
 public class ShooterAiEntity extends Monster implements IShooterSetup {
+    private final PathNavigation nav = this.getNavigation();
+
     public ShooterAiEntity(EntityType<? extends ShooterAiEntity>  type, Level world) {
         super(type, world);
         xpReward = 3;
@@ -39,12 +43,12 @@ public class ShooterAiEntity extends Monster implements IShooterSetup {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(1, new BorderPatrol(this, 16, 1, 100));
+        this.goalSelector.addGoal(2, new BorderPatrol(this, 16, 1, 100));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(5, new FloatGoal(this));
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.goalSelector.addGoal(2, new RangedAttackGoal(this, 1.25, 1024, 10f) {
+        this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.3, 1024, 10f) {
             @Override
             public boolean canContinueToUse() {
                 return this.canUse();
@@ -76,18 +80,40 @@ public class ShooterAiEntity extends Monster implements IShooterSetup {
     public void baseTick() {
         super.baseTick();
         buildAi(this);
-        tickUpdate(this.tickCount);
+        if (ShooterCore.memory != null) {
+            tickUpdate(this.tickCount);
+            tickingGoals();
+        }
     }
 
     @Override
-    @AiShooterSetup
+    @AiShooterSetup(speed = 9)
     public void buildAi(PathfinderMob mob) {
         IShooterSetup.super.buildAi(mob);
     }
 
     @Override
-    public void tickUpdate(int ticks) {
-        ShooterCore.memory.setTicks(ticks);
+    public void tickingGoals() {
+        // Stray
+        /*if (ShooterCore.memory.getTarget() != null && this.tickCount % 40 == 0) {
+            int rnd = new Random().nextInt(1, 4);
+            int move = new Random().nextInt(3, 5);
+
+            switch (rnd) {
+                case 1:
+                    nav.moveTo(this.getX(), this.getY(), this.getZ() - move, 1);
+                    break;
+                case 2:
+                    nav.moveTo(this.getX(), this.getY(), this.getZ() + move, 1);
+                    break;
+                case 3:
+                    nav.moveTo(this.getX() + move, this.getY(), this.getZ(), 1);
+                    break;
+                case 4:
+                    nav.moveTo(this.getX() - move, this.getY(), this.getZ() + move, 1);
+                    break;
+            }
+        }*/
     }
 
     @Override
