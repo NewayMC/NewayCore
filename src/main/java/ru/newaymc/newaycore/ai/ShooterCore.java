@@ -108,8 +108,6 @@ public class ShooterCore {
             if (entity == null || (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null) == null)
                 return false;
             Level level = entity.level();
-            if (level == null)
-                return false;
             Vec3 start = entity.getEyePosition(1f);
             Vec3 end = (entity instanceof Mob _mobEnt ? (Entity) _mobEnt.getTarget() : null).getEyePosition(1f);
             ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity);
@@ -118,8 +116,6 @@ public class ShooterCore {
                 return true;
             return hit.getLocation().distanceToSqr(start) >= end.distanceToSqr(start);
         })).get() && ((Supplier<Entity>) (() -> {
-            if (entity == null || entity.level() == null)
-                return null;
             Entity source = entity;
             Level level = source.level();
             double maxDistance = 16;
@@ -149,9 +145,8 @@ public class ShooterCore {
                 Vec3 closestPointOnBox = new Vec3(cx, cy, cz);
                 double lateralDist = closestPointOnBox.subtract(pointOnLine).length();
                 if (lateralDist <= projectileRadius) {
-                    double forwardForCandidate = forwardProj;
-                    if (forwardForCandidate < nearestForward) {
-                        nearestForward = forwardForCandidate;
+                    if (forwardProj < nearestForward) {
+                        nearestForward = forwardProj;
                         nearest = candidate;
                     }
                 } else {
@@ -209,14 +204,10 @@ public class ShooterCore {
             if (memory.getTarget()instanceof LivingEntity && memory.getTarget().isAlive()) {
                 GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOULD_SHOOT, true);
 
-                entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3((memory.getTarget().getX() + ((Supplier<Double>) (() -> {
-                    return (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY);
-                })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
-                        (memory.getTarget().getY() + memory.getTarget().getBbHeight() * 0.75 + ((Supplier<Double>) (() -> {
-                            return (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY);
-                        })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)), (memory.getTarget().getZ() + ((Supplier<Double>) (() -> {
-                            return (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY);
-                        })).get() * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
+                entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(
+                        (memory.getTarget().getX() + (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
+                        (memory.getTarget().getY() + memory.getTarget().getBbHeight() * 0.75 + (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
+                        (memory.getTarget().getZ() + (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
             }
         } else {
             GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOULD_SHOOT, false);
@@ -226,7 +217,6 @@ public class ShooterCore {
     public static void machineGun() {
         {
             int recovery_time = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.RECOVERY_TIME);
-            boolean has_shooted = (boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.HAS_SHOOTED);
             if (recovery_time > 0)
                 recovery_time--;
             double acc_inaccuracy = (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY);
@@ -245,7 +235,7 @@ public class ShooterCore {
                     Level projectileLevel = shooter.level();
                     final float final_acc_inaccuracy = (float) acc_inaccuracy;
                     var shoot = new Object() {
-                        public void act(ItemStack s, Entity e, double a) {
+                        public void act(double a) {
                             if (projectileLevel.isClientSide)
                                 return;
                             Projectile projectile = initArrowProjectile(new GunAmmo(ModEntities.GUN_AMMO.get(), projectileLevel), null, (float) damage, true, false, false, AbstractArrow.Pickup.DISALLOWED);
@@ -256,7 +246,7 @@ public class ShooterCore {
                     };
                     if (shooted_ammo < 1) {
                         shooted_ammo++;
-                        shoot.act(gun, shooter, 2.0);
+                        shoot.act(2.0);
                         GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_SHOOTING, true);
                         if (projectileLevel.isClientSide())
                             shooter.setXRot(shooter.getXRot() - (float) 1);
@@ -301,7 +291,7 @@ public class ShooterCore {
                     Level projectileLevel = shooter.level();
                     final float final_acc_inaccuracy = (float) acc_inaccuracy;
                     var shoot = new Object() {
-                        public void act(ItemStack s, Entity e, double a) {
+                        public void act(double a) {
                             if (projectileLevel.isClientSide)
                                 return;
                             Projectile projectile = initArrowProjectile(new GunAmmo(ModEntities.GUN_AMMO.get(), 0, 0, 0, projectileLevel, createArrowWeaponItemStack(projectileLevel, 1, (byte) 2)), null, (float) damage, true,
@@ -311,7 +301,7 @@ public class ShooterCore {
                             projectileLevel.addFreshEntity(projectile);
                         }
                     };
-                    shoot.act(gun, shooter, 1.0);
+                    shoot.act(1.0);
                     GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_SHOOTING, true);
                     GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.HAS_SHOOTED, true);
                     if (projectileLevel.isClientSide())
@@ -329,11 +319,8 @@ public class ShooterCore {
     }
 
     public static void reload() {
-        if (((Supplier<Integer>) (() -> {
-            return (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER);
-        })).get() == 0 && ((Supplier<Integer>) (() -> {
-            return (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.RECOVERY_TIME);
-        })).get() == 0) {
+        if ((int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER) == 0
+                && (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.RECOVERY_TIME) == 0) {
             {
                 GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.AMMO_NUMBER, ammunition);
                 GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_RELOADING, true);
@@ -345,22 +332,13 @@ public class ShooterCore {
     }
 
     public static void gunSounds() {
-        if (((Supplier<Boolean>) (() -> {
-            return (boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.IS_SHOOTING);
-        })).get()) {
-            entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), 1, 1);
-        }
-        if (((Supplier<Boolean>) (() -> {
-            return (boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.IS_SHOOTING);
-        })).get()) {
+        if ((boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.IS_SHOOTING)) {
             entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), 1, 1);
         }
     }
 
     public static double getAmmo() {
-        return ((Supplier<Integer>) (() -> {
-            return (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER);
-        })).get();
+        return (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER);
     }
 
     private static AbstractArrow initArrowProjectile(AbstractArrow entityToSpawn, Entity shooter, float damage, boolean silent, boolean fire, boolean particles, AbstractArrow.Pickup pickup) {
