@@ -17,10 +17,14 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.capabilities.EntityCapability;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.ShooterCore;
 import ru.newaymc.newaycore.ai.goals.BorderPatrol;
+import ru.newaymc.newaycore.ai.objects.Memory;
 import ru.newaymc.newaycore.ai.utils.AiShooterSetup;
 import ru.newaymc.newaycore.ai.utils.IShooterSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
@@ -89,7 +93,8 @@ public class ShooterAiEntity extends Monster implements IShooterSetup {
     @Override
     @AiShooterSetup(speed = 9)
     public void buildAi(PathfinderMob mob) {
-        IShooterSetup.super.buildAi(mob);
+        Memory memory = new Memory(mob);
+        ShooterCore.setup(memory);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package ru.newaymc.newaycore.ai.utils;
 
-import ru.newaymc.newaycore.gun.GunSetup;
+import ru.newaymc.newaycore.gun.DGunSetup;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AiShooterSetup {
-    GunSetup.Type aiType() default GunSetup.Type.MACHINEGUN;
+    DGunSetup.Type aiType() default DGunSetup.Type.MACHINEGUN;
     double ammunition() default 30;
     double damage() default 3;
     double speed() default 3;
