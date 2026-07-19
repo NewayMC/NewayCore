@@ -35,7 +35,7 @@ import ru.newaymc.newaycore.ai.nodes.MovementNodes;
 import ru.newaymc.newaycore.ai.objects.Memory;
 import ru.newaymc.newaycore.ai.utils.AiShooterSetup;
 import ru.newaymc.newaycore.ai.utils.Node;
-import ru.newaymc.newaycore.gun.GunSetup;
+import ru.newaymc.newaycore.gun.DGunSetup;
 import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModEntities;
 
@@ -73,10 +73,10 @@ public class ShooterCore {
             }
         }
 
-        GunSetup.Type type = memory.getType();
-        if (type == GunSetup.Type.MACHINEGUN) {
+        DGunSetup.Type type = memory.getType();
+        if (type == DGunSetup.Type.MACHINEGUN) {
             ShooterCore.machineGun();
-        } else if (type == GunSetup.Type.SNIPER) {
+        } else if (type == DGunSetup.Type.SNIPER) {
             ShooterCore.sniper();
         }
         gunSounds();
@@ -192,7 +192,7 @@ public class ShooterCore {
                 }
             }
         } else {
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOULD_SHOOT, false);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOULD_SHOOT, false);
             memory.setBorderPatrol(false);
             memory.setSeeTarget(false);
             memory.setTarget(null);
@@ -202,34 +202,34 @@ public class ShooterCore {
     public static void allowAttack() {
         if (memory.isSeeTarget()) {
             if (memory.getTarget()instanceof LivingEntity && memory.getTarget().isAlive()) {
-                GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOULD_SHOOT, true);
+                DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOULD_SHOOT, true);
 
                 entity.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(
-                        (memory.getTarget().getX() + (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
-                        (memory.getTarget().getY() + memory.getTarget().getBbHeight() * 0.75 + (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
-                        (memory.getTarget().getZ() + (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
+                        (memory.getTarget().getX() + (double) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
+                        (memory.getTarget().getY() + memory.getTarget().getBbHeight() * 0.75 + (double) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25)),
+                        (memory.getTarget().getZ() + (double) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY) * Mth.nextDouble(RandomSource.create(), -0.25, 0.25))));
             }
         } else {
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOULD_SHOOT, false);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOULD_SHOOT, false);
         }
     }
 
     public static void machineGun() {
         {
-            int recovery_time = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.RECOVERY_TIME);
+            int recovery_time = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.RECOVERY_TIME);
             if (recovery_time > 0)
                 recovery_time--;
-            double acc_inaccuracy = (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY);
+            double acc_inaccuracy = (double) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY);
             if (acc_inaccuracy > 0.0) {
                 acc_inaccuracy -= acc_inaccuracy * 0.75;
                 if (acc_inaccuracy < 0.0)
                     acc_inaccuracy = 0.0;
             }
-            int current_ammo = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER);
-            int shooted_ammo = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.SHOOTED_ROUNDS);
-            boolean should_shoot = (boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.SHOULD_SHOOT);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_SHOOTING, false);
-            if (GunSetup.GunUtils.isGun(gun)) {
+            int current_ammo = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.AMMO_NUMBER);
+            int shooted_ammo = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.SHOOTED_ROUNDS);
+            boolean should_shoot = (boolean) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.SHOULD_SHOOT);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.IS_SHOOTING, false);
+            if (DGunSetup.GunUtils.isGun(gun)) {
                 if (current_ammo > 0 && recovery_time <= 0 && (should_shoot || shooted_ammo != 0)) {
                     Entity shooter = entity;
                     Level projectileLevel = shooter.level();
@@ -247,7 +247,7 @@ public class ShooterCore {
                     if (shooted_ammo < 1) {
                         shooted_ammo++;
                         shoot.act(2.0);
-                        GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_SHOOTING, true);
+                        DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.IS_SHOOTING, true);
                         if (projectileLevel.isClientSide())
                             shooter.setXRot(shooter.getXRot() - (float) 1);
                         current_ammo--;
@@ -258,34 +258,34 @@ public class ShooterCore {
                     }
                 }
             }
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.RECOVERY_TIME, recovery_time);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY, acc_inaccuracy);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.AMMO_NUMBER, current_ammo);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.RECOVERY_TIME, recovery_time);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY, acc_inaccuracy);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.AMMO_NUMBER, current_ammo);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
         }
     }
 
     public static void sniper() {
         {
-            int recovery_time = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.RECOVERY_TIME);
-            boolean has_shooted = (boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.HAS_SHOOTED);
+            int recovery_time = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.RECOVERY_TIME);
+            boolean has_shooted = (boolean) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.HAS_SHOOTED);
             if (recovery_time > 0)
                 recovery_time--;
-            double acc_inaccuracy = (double) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY);
+            double acc_inaccuracy = (double) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY);
             if (acc_inaccuracy > 0.0) {
                 acc_inaccuracy -= acc_inaccuracy * 0.75;
                 if (acc_inaccuracy < 0.0)
                     acc_inaccuracy = 0.0;
             }
-            int current_ammo = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER);
-            int shooted_ammo = (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.SHOOTED_ROUNDS);
-            boolean should_shoot = (boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.SHOULD_SHOOT);
+            int current_ammo = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.AMMO_NUMBER);
+            int shooted_ammo = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.SHOOTED_ROUNDS);
+            boolean should_shoot = (boolean) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.SHOULD_SHOOT);
             if (!should_shoot && has_shooted) {
-                GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.HAS_SHOOTED, false);
+                DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.HAS_SHOOTED, false);
                 has_shooted = false;
             }
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_SHOOTING, false);
-            if (GunSetup.GunUtils.isGun(gun)) {
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.IS_SHOOTING, false);
+            if (DGunSetup.GunUtils.isGun(gun)) {
                 if (current_ammo > 0 && recovery_time <= 0 && should_shoot && !has_shooted) {
                     Entity shooter = entity;
                     Level projectileLevel = shooter.level();
@@ -302,8 +302,8 @@ public class ShooterCore {
                         }
                     };
                     shoot.act(1.0);
-                    GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_SHOOTING, true);
-                    GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.HAS_SHOOTED, true);
+                    DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.IS_SHOOTING, true);
+                    DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.HAS_SHOOTED, true);
                     if (projectileLevel.isClientSide())
                         shooter.setXRot(shooter.getXRot() - (float) 1);
                     current_ammo--;
@@ -311,34 +311,34 @@ public class ShooterCore {
                     recovery_time = recoveryTime;
                 }
             }
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.RECOVERY_TIME, recovery_time);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.ACCUMULATED_INACCURACY, acc_inaccuracy);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.AMMO_NUMBER, current_ammo);
-            GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.RECOVERY_TIME, recovery_time);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.ACCUMULATED_INACCURACY, acc_inaccuracy);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.AMMO_NUMBER, current_ammo);
+            DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
         }
     }
 
     public static void reload() {
-        if ((int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER) == 0
-                && (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.RECOVERY_TIME) == 0) {
+        if ((int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.AMMO_NUMBER) == 0
+                && (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.RECOVERY_TIME) == 0) {
             {
-                GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.AMMO_NUMBER, ammunition);
-                GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.IS_RELOADING, true);
+                DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.AMMO_NUMBER, ammunition);
+                DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.IS_RELOADING, true);
             }
             {
-                GunSetup.GunUtils.setValue(gun, GunSetup.GunUtils.RECOVERY_TIME, recoveryTime);
+                DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.RECOVERY_TIME, recoveryTime);
             }
         }
     }
 
     public static void gunSounds() {
-        if ((boolean) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.IS_SHOOTING)) {
+        if ((boolean) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.IS_SHOOTING)) {
             entity.playSound(BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("newaycore:ak47_fire")), 1, 1);
         }
     }
 
     public static double getAmmo() {
-        return (int) GunSetup.GunUtils.getValue(gun, GunSetup.GunUtils.AMMO_NUMBER);
+        return (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.AMMO_NUMBER);
     }
 
     private static AbstractArrow initArrowProjectile(AbstractArrow entityToSpawn, Entity shooter, float damage, boolean silent, boolean fire, boolean particles, AbstractArrow.Pickup pickup) {

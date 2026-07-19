@@ -5,7 +5,7 @@ import lombok.Setter;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.phys.Vec3;
-import ru.newaymc.newaycore.gun.GunSetup;
+import ru.newaymc.newaycore.gun.DGunSetup;
 
 @Getter
 @Setter
@@ -16,7 +16,7 @@ public class Memory {
     private Cover currentCover = null;
     private boolean coverStatus = false;
     private boolean borderPatrol = false;
-    private GunSetup.Type type;
+    private DGunSetup.Type type;
     // -- Target --
     private LivingEntity target = null;
     private Vec3 lastTargetPos = null;

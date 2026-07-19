@@ -7,10 +7,7 @@ import ru.newaymc.newaycore.ai.objects.Memory;
 
 public interface IShooterSetup extends RangedAttackMob {
 
-    default void buildAi(PathfinderMob mob) {
-        Memory memory = new Memory(mob);
-        ShooterCore.setup(memory);
-    }
+    void buildAi(PathfinderMob mob);
 
     default void tickUpdate(int ticks) {
         ShooterCore.memory.setTicks(ticks);

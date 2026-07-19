@@ -1,116 +1,107 @@
 package ru.newaymc.newaycore.gun;
 
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
+import com.mojang.logging.LogUtils;
+import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
+import com.tacz.guns.api.item.builder.GunItemBuilder;
+import com.tacz.guns.api.item.gun.FireMode;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import org.slf4j.Logger;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
+@EventBusSubscriber
 public class GunSetup {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static HolderLookup.Provider provider;
 
-    // The gun utils/tools
-    public static class GunUtils {
-        // Numeric values representing gun properties
-        public static final Value AMMO_NUMBER 				= new Value("gun_setup_01", Integer.class);
-        public static final Value RECOVERY_TIME 			= new Value("gun_setup_02", Integer.class);
-        public static final Value SHOOTED_ROUNDS 			= new Value("gun_setup_03", Integer.class);
-        public static final Value ACCUMULATED_INACCURACY 	= new Value("gun_setup_04",  Double.class);
+    private static String gun;
+    private static String fireMode;
+    private static String scope, muzzle, grip;
+    private static int maxAmmo;
 
-        // Boolean values representing gun states
-        public static final Value IS_SHOOTING		 		= new Value("gun_setup_05", Boolean.class);
-        public static final Value IS_RELOADING		 		= new Value("gun_setup_06", Boolean.class);
-        public static final Value SHOULD_SHOOT 				= new Value("gun_setup_07", Boolean.class);
-        public static final Value HAS_SHOOTED 				= new Value("gun_setup_08", Boolean.class);
+    public static void setGun(LivingEntity entity, String _gun, String _fireMode, int _maxAmmo, String _scope, String _muzzle, String _grip) {
+        gun = _gun;
+        fireMode = _fireMode;
+        maxAmmo = _maxAmmo;
+        scope = _scope;
+        muzzle = _muzzle;
+        grip = _grip;
 
-        public static boolean isGun(ItemStack stack) {
-            return stack.is(ItemTags.create(ResourceLocation.fromNamespaceAndPath("neoforge", "guns")));
+        GunSettings settings = buildSettings();
+        ItemStack gunStack = GunItemBuilder.create()
+                .setId(settings.gunId)
+                .setAmmoCount(settings.maxAmmo)
+                .setFireMode(getFireMode(settings.fireMode))
+                .setCount(1)
+                .build(provider);
+
+        IGun iGun = IGun.getIGunOrNull(gunStack);
+        if (iGun == null) {
+            LOGGER.error("{}: Null", GunSetup.class.getName());
         }
 
-        public static void setValue(ItemStack stack, Value value, Object obj) {
-            CompoundTag tag = getCompoundTag(stack);
-            setValue(tag, value, obj);
-            setCompoundTag(stack, tag);
-        }
+        assert iGun != null;
+        settings.scopeId.ifPresent(scopeId -> {
+            ItemStack scopeStack = AttachmentItemBuilder.create().setId(scopeId).build();
+            iGun.installAttachment(provider, gunStack, scopeStack);
+        });
 
-        public static Object getValue(ItemStack stack, Value value) {
-            return getValue(getCompoundTag(stack), value);
-        }
+        settings.muzzleId.ifPresent(muzzleId -> {
+            ItemStack muzzleStack = AttachmentItemBuilder.create().setId(muzzleId).build();
+            iGun.installAttachment(provider, gunStack, muzzleStack);
+        });
 
-        private static CompoundTag getCompoundTag(ItemStack stack) {
-            CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-            return customData.copyTag();
-        }
-
-        private static void setCompoundTag(ItemStack stack, CompoundTag tag) {
-            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
-        }
-
-        public static void setValue(Entity entity, Value value, Object obj) {
-            setValue(getCompoundTag(entity), value, obj);
-        }
-
-        public static Object getValue(Entity entity, Value value) {
-            return getValue(getCompoundTag(entity), value);
-        }
-
-        private static CompoundTag getCompoundTag(Entity entity) {
-            return entity.getPersistentData();
-        }
-
-        private static void setValue(CompoundTag tag, Value value, Object obj) {
-            String name 	= value.getName();
-            Class<?> type 	= value.getType();
-
-            if (!name.isEmpty()) {
-                if (type == Boolean.class  && obj instanceof Boolean data) tag.putBoolean(name, data.booleanValue());
-                else if (type == Integer.class && obj instanceof Number index) 	tag.putInt(name, index.intValue());
-                else if (type == Double.class && obj instanceof Number index) 	tag.putDouble(name, index.doubleValue());
-                else if (type == Float.class && obj instanceof Number index) 	tag.putFloat(name, index.floatValue());
-            }
-        }
-
-        private static Object getValue(CompoundTag tag, Value value) {
-            String name 	= value.getName();
-            Class<?> type 	= value.getType();
-
-            if (!name.isEmpty()) {
-                if (type == Boolean.class) return tag.getBoolean(name);
-                else if (type == Integer.class) return tag.getInt(name);
-                else if (type == Double.class) 	return tag.getDouble(name);
-                else if (type == Float.class) 	return tag.getFloat(name);
-            }
-            return null;
-        }
+        settings.gripId.ifPresent(gripId -> {
+            ItemStack gripStack = AttachmentItemBuilder.create().setId(gripId).build();
+            iGun.installAttachment(provider, gunStack, gripStack);
+        });
     }
 
-    public enum Type {
-        MACHINEGUN,
-        SNIPER,
-        SHOTGUN // not use
+    private static GunSettings buildSettings() {
+        ResourceLocation gunId = ResourceLocation.parse("tacz:" + gun);
+        ResourceLocation scopeId = ResourceLocation.parse("tacz:" + scope);
+        ResourceLocation muzzleId = ResourceLocation.parse("tacz:" + muzzle);
+        ResourceLocation gripId = ResourceLocation.parse("tacz:" + grip);
+        return new GunSettings(gunId, fireMode, maxAmmo, scopeId, muzzleId, gripId);
     }
 
-    private static class Value {
-
-        private final String VALUE_NAME;
-        private final Class<?> VALUE_TYPE;
-
-        public Value(String valueName, Class<?> valueType) {
-            this.VALUE_NAME = valueName;
-            this.VALUE_TYPE = valueType;
+    private static FireMode getFireMode(String fireMode) {
+        if ("AUTO".equalsIgnoreCase(fireMode)) {
+            return FireMode.AUTO;
         }
+        return FireMode.SEMI;
+    }
 
-        public String getName() {
-            if (!VALUE_NAME.isEmpty()) return VALUE_NAME;
+    @SubscribeEvent
+    private static void getProvider(@Nullable AddReloadListenerEvent event) {
+        provider = event.getServerResources().getRegistryLookup();
+    }
 
-            return "";
-        }
+    private static class GunSettings {
+        public final ResourceLocation gunId;
+        public final int maxAmmo;
+        public final String fireMode;
 
-        public Class<?> getType() {
-            if (VALUE_TYPE != null) return VALUE_TYPE;
+        public final Optional<ResourceLocation> scopeId;
+        public final Optional<ResourceLocation> muzzleId;
+        public final Optional<ResourceLocation> gripId;
 
-            return null;
+        public GunSettings(ResourceLocation gunId,String fireMode, int maxAmmo,  @Nullable ResourceLocation scopeId, @Nullable ResourceLocation muzzleId, @Nullable ResourceLocation gripId) {
+            this.gunId = gunId;
+            this.maxAmmo = maxAmmo;
+            this.fireMode = fireMode;
+
+            this.scopeId = Optional.ofNullable(scopeId);
+            this.muzzleId = Optional.ofNullable(muzzleId);
+            this.gripId = Optional.ofNullable(gripId);
         }
     }
 }

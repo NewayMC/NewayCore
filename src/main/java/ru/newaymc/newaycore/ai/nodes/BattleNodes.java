@@ -8,7 +8,7 @@ import ru.newaymc.newaycore.ai.ShooterCore;
 import ru.newaymc.newaycore.ai.objects.Memory;
 import ru.newaymc.newaycore.ai.utils.Node;
 import ru.newaymc.newaycore.ai.utils.Status;
-import ru.newaymc.newaycore.gun.GunSetup;
+import ru.newaymc.newaycore.gun.DGunSetup;
 
 import java.util.function.Supplier;
 
@@ -65,8 +65,8 @@ public class BattleNodes {
             }
             PathfinderMob entity = memory.getMob();
             if (((Supplier<Boolean>) (() -> {
-                boolean boly = (boolean) GunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_RELOADING);
-                GunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), GunSetup.GunUtils.IS_RELOADING, false);
+                boolean boly = (boolean) DGunSetup.GunUtils.getValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), DGunSetup.GunUtils.IS_RELOADING);
+                DGunSetup.GunUtils.setValue((entity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY), DGunSetup.GunUtils.IS_RELOADING, false);
                 return boly;
             })).get()) {
                 return Status.RUNNING;

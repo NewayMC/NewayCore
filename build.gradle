@@ -20,7 +20,16 @@ sourceSets.main.resources {
 }
 
 repositories {
-
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 base {
@@ -80,9 +89,10 @@ configurations {
 }
 
 dependencies {
+    implementation "curse.maven:tacz-1353462:8387838"
+
     compileOnly("org.projectlombok:lombok:1.18.46")
     annotationProcessor("org.projectlombok:lombok:1.18.46")
-
     testCompileOnly("org.projectlombok:lombok:1.18.46")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.46")
 }
