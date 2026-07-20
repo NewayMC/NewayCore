@@ -11,7 +11,7 @@ import ru.newaymc.newaycore.NewaycoreMod;
 public class ModTabs {
     public static final DeferredRegister<CreativeModeTab> REGISTRY = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, NewaycoreMod.MODID);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> AI_TAB = REGISTRY.register("ai_tab",
-            () -> CreativeModeTab.builder().title(Component.translatable("item_group.newaycore.guns")).icon(() -> new ItemStack(ModItems.AKM.get())).displayItems((parameters, tabData) -> {
+            () -> CreativeModeTab.builder().title(Component.translatable("item_group.newaycore.guns")).icon(() -> new ItemStack(ModItems.COVER_MARKER_AI.get())).displayItems((parameters, tabData) -> {
                 tabData.accept(ModBlocks.COVER_MARKER_AI.get().asItem());
                 tabData.accept(ModItems.SHOOTER_AI_ENTITY_SPAWN_EGG.get());
             }).build());
