@@ -36,7 +36,6 @@ import ru.newaymc.newaycore.ai.objects.Memory;
 import ru.newaymc.newaycore.ai.utils.AiShooterSetup;
 import ru.newaymc.newaycore.ai.utils.Node;
 import ru.newaymc.newaycore.gun.DGunSetup;
-import ru.newaymc.newaycore.gun.entity.GunAmmo;
 import ru.newaymc.newaycore.register.ModEntities;
 
 import java.lang.reflect.Method;
@@ -73,13 +72,13 @@ public class ShooterCore {
             }
         }
 
-        DGunSetup.Type type = memory.getType();
+        /*DGunSetup.Type type = memory.getType();
         if (type == DGunSetup.Type.MACHINEGUN) {
             ShooterCore.machineGun();
         } else if (type == DGunSetup.Type.SNIPER) {
             ShooterCore.sniper();
         }
-        gunSounds();
+        gunSounds();*/
 
         buildTree().tick(memory);
     }
@@ -214,7 +213,7 @@ public class ShooterCore {
         }
     }
 
-    public static void machineGun() {
+   /* public static void machineGun() {
         {
             int recovery_time = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.RECOVERY_TIME);
             if (recovery_time > 0)
@@ -263,9 +262,9 @@ public class ShooterCore {
             DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.AMMO_NUMBER, current_ammo);
             DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
         }
-    }
+    }*/
 
-    public static void sniper() {
+    /*public static void sniper() {
         {
             int recovery_time = (int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.RECOVERY_TIME);
             boolean has_shooted = (boolean) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.HAS_SHOOTED);
@@ -316,7 +315,7 @@ public class ShooterCore {
             DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.AMMO_NUMBER, current_ammo);
             DGunSetup.GunUtils.setValue(gun, DGunSetup.GunUtils.SHOOTED_ROUNDS, shooted_ammo);
         }
-    }
+    }*/
 
     public static void reload() {
         if ((int) DGunSetup.GunUtils.getValue(gun, DGunSetup.GunUtils.AMMO_NUMBER) == 0

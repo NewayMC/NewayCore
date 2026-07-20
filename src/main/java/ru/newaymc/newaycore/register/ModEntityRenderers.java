@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 public class ModEntityRenderers {
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.GUN_AMMO.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.SHOOTER_AI_ENTITY.get(), ShooterAiEntityRenderer::new);
     }
 }

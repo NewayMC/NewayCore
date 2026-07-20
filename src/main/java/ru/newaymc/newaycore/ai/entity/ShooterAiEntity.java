@@ -12,45 +12,31 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.EntityCapability;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.ShooterCore;
-import ru.newaymc.newaycore.ai.goals.BorderPatrol;
-import ru.newaymc.newaycore.ai.objects.Memory;
-import ru.newaymc.newaycore.ai.utils.AiShooterSetup;
 import ru.newaymc.newaycore.ai.utils.IShooterSetup;
-import ru.newaymc.newaycore.gun.entity.GunAmmo;
-import ru.newaymc.newaycore.register.ModItems;
-
-import java.util.Random;
 
 
-public class ShooterAiEntity extends Monster implements IShooterSetup {
-    private final PathNavigation nav = this.getNavigation();
+public class ShooterAiEntity extends AbstractShooter implements IShooterSetup {
 
     public ShooterAiEntity(EntityType<? extends ShooterAiEntity>  type, Level world) {
         super(type, world);
         xpReward = 3;
         setPersistenceRequired();
-        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.AKM.get()));
         refreshDimensions();
+        //this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.AKM.get()));
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(2, new BorderPatrol(this, 16, 1, 100));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
         this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(5, new FloatGoal(this));
+
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.3, 1024, 10f) {
             @Override
@@ -91,14 +77,8 @@ public class ShooterAiEntity extends Monster implements IShooterSetup {
     }
 
     @Override
-    @AiShooterSetup(speed = 9)
-    public void buildAi(PathfinderMob mob) {
-        Memory memory = new Memory(mob);
-        ShooterCore.setup(memory);
-    }
-
-    @Override
     public void tickingGoals() {
+        //this.goalSelector.addGoal(2, new BorderPatrol(this, 16, 1, 100));
         // Stray
         /*if (ShooterCore.memory.getTarget() != null && this.tickCount % 40 == 0) {
             int rnd = new Random().nextInt(1, 4);
@@ -132,7 +112,7 @@ public class ShooterAiEntity extends Monster implements IShooterSetup {
 
     @Override
     public void performRangedAttack(LivingEntity target, float flval) {
-        GunAmmo.shoot(this, target);
+        //GunAmmo.shoot(this, target);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
