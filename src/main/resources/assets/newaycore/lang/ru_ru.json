@@ -1,18 +1,13 @@
 {
   "subtitles.ak47_fire": "",
   "subtitles.ak47_reload": "",
-  "item.newaycore.akm": "AKM",
-  "item.newaycore.mp_5": "MP5",
-  "item.newaycore.ar_15_sniper": "АР-15",
   "block.newaycore.empty_block": "Empty Block",
   "item_group.newaycore.guns": "NewayCore - ИИ",
   "item_group.newaycore.als_tab": "NewayCore - ALS",
   "block.newaycore.cover_marker_ai": "Маркер укрытия",
-  "item.newaycore.m_4_a_1": "M4A1",
   "item.newaycore.cover_marker_ai": "Маркер укрытия",
   "item.newaycore.empty_block": "Пустой блок",
   "block.newaycore.outpost_hub": "Хаб аванпоста",
   "item.newaycore.shooter_ai_entity_spawn_egg": "Shooter AI Entity Spawn Egg",
-  "entity.newaycore.shooter_ai_entity": "Shooter AI Entity",
-  "entity.newaycore.gun_ammo": ""
+  "entity.newaycore.shooter_ai_entity": "Shooter AI Entity"
 }

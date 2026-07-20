@@ -1,31 +1,31 @@
 package ru.newaymc.newaycore;
 
-import com.mojang.logging.LogUtils;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.neoforged.fml.util.thread.SidedThreadGroups;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.slf4j.Logger;
 
 import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.network.vars.ModVariables;
+import ru.newaymc.newaycore.register.utils.IRegisterShooter;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -33,8 +33,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Mod("newaycore")
 public class NewaycoreMod {
-    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MODID = "newaycore";
+    public static HolderLookup.Provider provider;
 
     public NewaycoreMod(IEventBus modEventBus) {
         NeoForge.EVENT_BUS.register(this);
@@ -87,8 +87,13 @@ public class NewaycoreMod {
         workQueue.removeAll(actions);
     }
 
-    @EventBusSubscriber
+    @SubscribeEvent
+    public void onAddReloadListeners(AddReloadListenerEvent event) {
+        provider = event.getServerResources().getRegistryLookup();
+    }
+
     // For some test btw
+    @EventBusSubscriber
     public static class PlayerLoggedIn {
         @SubscribeEvent
         public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {

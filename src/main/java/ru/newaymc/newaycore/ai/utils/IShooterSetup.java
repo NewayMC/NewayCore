@@ -9,6 +9,8 @@ public interface IShooterSetup extends RangedAttackMob {
 
     void buildAi(PathfinderMob mob);
 
+    void equipGun();
+
     default void tickUpdate(int ticks) {
         ShooterCore.memory.setTicks(ticks);
     }

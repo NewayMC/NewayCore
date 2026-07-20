@@ -1,7 +1,0 @@
-{
-  "parent": "newaycore:custom/mp5",
-  "textures": {
-    "1": "newaycore:block/mp5",
-    "particle": "newaycore:item/mp5"
-  }
-}

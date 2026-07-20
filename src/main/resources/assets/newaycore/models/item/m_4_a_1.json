@@ -1,7 +1,0 @@
-{
-  "parent": "newaycore:custom/m4a1",
-  "textures": {
-    "0": "newaycore:block/m4a1",
-    "particle": "newaycore:item/m4a1"
-  }
-}

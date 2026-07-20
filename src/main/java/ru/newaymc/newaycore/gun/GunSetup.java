@@ -1,26 +1,24 @@
 package ru.newaymc.newaycore.gun;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import org.slf4j.Logger;
+
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import org.slf4j.Logger;
+
+import ru.newaymc.newaycore.NewaycoreMod;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-@EventBusSubscriber
 public class GunSetup {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static HolderLookup.Provider provider;
 
     private static String gun;
     private static String fireMode;
@@ -41,28 +39,30 @@ public class GunSetup {
                 .setAmmoCount(settings.maxAmmo)
                 .setFireMode(getFireMode(settings.fireMode))
                 .setCount(1)
-                .build(provider);
+                .build(NewaycoreMod.provider);
 
         IGun iGun = IGun.getIGunOrNull(gunStack);
-        if (iGun == null) {
-            LOGGER.error("{}: Null", GunSetup.class.getName());
-        }
-
         assert iGun != null;
+
         settings.scopeId.ifPresent(scopeId -> {
             ItemStack scopeStack = AttachmentItemBuilder.create().setId(scopeId).build();
-            iGun.installAttachment(provider, gunStack, scopeStack);
+            iGun.installAttachment(NewaycoreMod.provider, gunStack, scopeStack);
         });
 
         settings.muzzleId.ifPresent(muzzleId -> {
             ItemStack muzzleStack = AttachmentItemBuilder.create().setId(muzzleId).build();
-            iGun.installAttachment(provider, gunStack, muzzleStack);
+            iGun.installAttachment(NewaycoreMod.provider, gunStack, muzzleStack);
         });
 
         settings.gripId.ifPresent(gripId -> {
             ItemStack gripStack = AttachmentItemBuilder.create().setId(gripId).build();
-            iGun.installAttachment(provider, gunStack, gripStack);
+            iGun.installAttachment(NewaycoreMod.provider, gunStack, gripStack);
         });
+
+        iGun.setMaxDummyAmmoAmount(gunStack, Integer.MAX_VALUE);
+        iGun.setDummyAmmoAmount(gunStack, 9999);
+
+        entity.setItemInHand(InteractionHand.MAIN_HAND, gunStack);
     }
 
     private static GunSettings buildSettings() {
@@ -80,12 +80,7 @@ public class GunSetup {
         return FireMode.SEMI;
     }
 
-    @SubscribeEvent
-    private static void getProvider(@Nullable AddReloadListenerEvent event) {
-        provider = event.getServerResources().getRegistryLookup();
-    }
-
-    private static class GunSettings {
+    public static class GunSettings {
         public final ResourceLocation gunId;
         public final int maxAmmo;
         public final String fireMode;
