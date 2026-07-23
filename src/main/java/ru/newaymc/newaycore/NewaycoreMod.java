@@ -102,7 +102,7 @@ public class NewaycoreMod {
         }
 
         private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
-            if (!ModVariables.MapVariables.get(world).firstJoin) {
+            if (!ModVariables.MapVariables.get(world).firstJoin && world.isClientSide()) {
                 ModVariables.MapVariables.get(world).firstJoin = true;
             }
         }
