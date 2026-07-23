@@ -7,43 +7,29 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
-import ru.newaymc.newaycore.ai.ShooterCore;
-import ru.newaymc.newaycore.ai.utils.IShooterSetup;
 
-
-public class ShooterAiEntity extends AbstractShooter implements IShooterSetup {
+public class ShooterAiEntity extends AbstractShooter {
 
     public ShooterAiEntity(EntityType<? extends ShooterAiEntity>  type, Level world) {
         super(type, world);
         xpReward = 3;
         setPersistenceRequired();
         refreshDimensions();
-        //this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(ModItems.AKM.get()));
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
-        this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(5, new FloatGoal(this));
+        setTargets(Player.class);
+    }
 
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.goalSelector.addGoal(1, new RangedAttackGoal(this, 1.3, 1024, 10f) {
-            @Override
-            public boolean canContinueToUse() {
-                return this.canUse();
-            }
-        });
+    @Override
+    public void equipGun(String gun, String fireMode, int maxAmmo, String scope, String muzzle, String grip) {
+        super.equipGun("ak47", "auto", 31, null, null, null);
     }
 
     @Override
@@ -66,40 +52,28 @@ public class ShooterAiEntity extends AbstractShooter implements IShooterSetup {
         return false;
     }
 
-    @Override
-    public void baseTick() {
-        super.baseTick();
-        buildAi(this);
-        if (ShooterCore.memory != null) {
-            tickUpdate(this.tickCount);
-            tickingGoals();
-        }
-    }
+//        this.goalSelector.addGoal(2, new BorderPatrol(this, 16, 1, 100));
+// Stray
+//        if (ShooterCore.memory.getTarget() != null && this.tickCount % 40 == 0) {
+//            int rnd = new Random().nextInt(1, 4);
+//            int move = new Random().nextInt(3, 5);
+//
+//            switch (rnd) {
+//                case 1:
+//                    nav.moveTo(this.getX(), this.getY(), this.getZ() - move, 1);
+//                    break;
+//                case 2:
+//                    nav.moveTo(this.getX(), this.getY(), this.getZ() + move, 1);
+//                    break;
+//                case 3:
+//                    nav.moveTo(this.getX() + move, this.getY(), this.getZ(), 1);
+//                    break;
+//                case 4:
+//                    nav.moveTo(this.getX() - move, this.getY(), this.getZ() + move, 1);
+//                    break;
+//            }
+//        }
 
-    @Override
-    public void tickingGoals() {
-        //this.goalSelector.addGoal(2, new BorderPatrol(this, 16, 1, 100));
-        // Stray
-        /*if (ShooterCore.memory.getTarget() != null && this.tickCount % 40 == 0) {
-            int rnd = new Random().nextInt(1, 4);
-            int move = new Random().nextInt(3, 5);
-
-            switch (rnd) {
-                case 1:
-                    nav.moveTo(this.getX(), this.getY(), this.getZ() - move, 1);
-                    break;
-                case 2:
-                    nav.moveTo(this.getX(), this.getY(), this.getZ() + move, 1);
-                    break;
-                case 3:
-                    nav.moveTo(this.getX() + move, this.getY(), this.getZ(), 1);
-                    break;
-                case 4:
-                    nav.moveTo(this.getX() - move, this.getY(), this.getZ() + move, 1);
-                    break;
-            }
-        }*/
-    }
 
     @Override
     public EntityDimensions getDefaultDimensions(Pose pose) {
@@ -108,11 +82,6 @@ public class ShooterAiEntity extends AbstractShooter implements IShooterSetup {
 
     public static void init(RegisterSpawnPlacementsEvent event) {
 
-    }
-
-    @Override
-    public void performRangedAttack(LivingEntity target, float flval) {
-        //GunAmmo.shoot(this, target);
     }
 
     public static AttributeSupplier.Builder createAttributes() {

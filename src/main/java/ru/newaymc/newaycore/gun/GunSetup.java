@@ -1,24 +1,25 @@
 package ru.newaymc.newaycore.gun;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
 
+import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.NewaycoreMod;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class GunSetup {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/GunSetup");
 
     private static String gun;
     private static String fireMode;
@@ -78,6 +79,15 @@ public class GunSetup {
             return FireMode.AUTO;
         }
         return FireMode.SEMI;
+    }
+
+    public static class GunUtils {
+        public static float calculateSpread(float idealAngle, float distance, float baseSpread, float spreadIncreasePerBlock, RandomSource random) {
+            float spread = baseSpread + Math.max(0, distance - 5.0f) * spreadIncreasePerBlock;
+            spread = Math.min(spread, 2.2f);
+
+            return idealAngle + (random.nextFloat() - 0.5f) * 2.0f * spread;
+        }
     }
 
     public static class GunSettings {

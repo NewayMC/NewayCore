@@ -19,11 +19,12 @@ public class ConditionNodes {
         }
     }
 
+    @Deprecated
     public static class HasAmmoNode extends Node {
 
         @Override
         public Status tick(Memory memory) {
-            return ShooterCore.getAmmo() > 5 ? Status.SUCCESS : Status.FAILURE;
+            return Status.FAILURE; //ShooterCore.getAmmo() > 5 ? Status.SUCCESS : Status.FAILURE;
         }
     }
 
