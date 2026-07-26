@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.gun;
+package ru.newaymc.newaycore.ai;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;

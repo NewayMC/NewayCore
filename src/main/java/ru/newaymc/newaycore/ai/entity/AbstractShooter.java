@@ -1,8 +1,7 @@
 package ru.newaymc.newaycore.ai.entity;
 
+import lombok.Getter;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.DifficultyInstance;
@@ -15,44 +14,43 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-import ru.newaymc.newaycore.ai.ShooterCore;
+import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.ai.goals.BorderPatrol;
 import ru.newaymc.newaycore.ai.goals.GunAttack;
+import ru.newaymc.newaycore.ai.goals.SmartCover;
 import ru.newaymc.newaycore.ai.objects.Memory;
-import ru.newaymc.newaycore.gun.GunSetup;
+import ru.newaymc.newaycore.ai.GunSetup;
 
+@Getter
 public abstract class AbstractShooter extends Monster {
-    private static Memory memory;
+    private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/AbstractShooter");
+    private final Memory memory = new Memory(this);
+    public enum State {
+        BATTLE,
+        SEEK,
+        CALM
+    }
 
     protected AbstractShooter(EntityType<? extends Monster> type, Level level) {
         super(type, level);
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-    }
-
-    @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-    }
-
-    @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-    }
-
-    @Override
     public void baseTick() {
         super.baseTick();
-        buildAi(this);
+        syncMemory(memory);
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        this.goalSelector.addGoal(0, new SmartCover(this, this.position()));
+        this.goalSelector.addGoal(1, new BorderPatrol(this, 32, 1.2, 40));
+
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this){
             @Override
             public boolean canUse() {
@@ -74,18 +72,22 @@ public abstract class AbstractShooter extends Monster {
     }
 
     public void syncMemory(Memory memory) {
-        memory.setTicks(this.tickCount);
-    }
+        if (this.getTarget() != null) {
+            memory.setState(State.BATTLE);
+            memory.setLastTargetPos(this.getTarget().position());
+            memory.setLastSeenTime(System.currentTimeMillis());
+        } else if (memory.getState() == State.BATTLE && this.getTarget() == null) {
+            memory.setState(State.SEEK);
+        }
 
-    public Memory getMemory() {
-        return memory;
-    }
-
-    public void buildAi(PathfinderMob mob) {
-        memory = new Memory(mob);
-        syncMemory(memory);
-
-        ShooterCore.setup(memory);
+        if (memory.getState() == State.SEEK) {
+            memory.setBorderPatrol(true);
+            if (this.tickCount % 1200 == 0) {
+                memory.setState(State.CALM);
+            }
+        } else {
+            memory.setBorderPatrol(false);
+        }
     }
 
     public void equipGun(String gun, String fireMode, int maxAmmo, String scope, String muzzle, String grip) {
@@ -95,15 +97,9 @@ public abstract class AbstractShooter extends Monster {
     @Override
     @SuppressWarnings("deprecation")
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, MobSpawnType p_21436_, @Nullable SpawnGroupData p_21437_) {
-        equipGun("ak47", "SEMI", 31, null, null, null);
+        this.goalSelector.addGoal(2, new GunAttack(this, 75, 1.4f, 0.012f, 3, 5, 10 , 15));
 
-        this.goalSelector.addGoal(1, new GunAttack(this, 90, 1.4f, 0.012f, 3, 5, 10 , 15));
         return super.finalizeSpawn(p_21434_, p_21435_, p_21436_, p_21437_);
-    }
-
-    @Override
-    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
-        return false;
     }
 
     @Override
@@ -118,6 +114,11 @@ public abstract class AbstractShooter extends Monster {
 
     @Override
     public boolean shouldDropLoot() {
+        return false;
+    }
+
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
         return false;
     }
 }
