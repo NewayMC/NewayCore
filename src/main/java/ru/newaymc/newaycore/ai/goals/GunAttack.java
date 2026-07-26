@@ -7,7 +7,6 @@ import com.tacz.guns.api.item.gun.AbstractGunItem;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -15,12 +14,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import ru.newaymc.newaycore.gun.GunSetup;
+import ru.newaymc.newaycore.ai.GunSetup;
+import ru.newaymc.newaycore.ai.entity.AbstractShooter;
 
 import java.util.EnumSet;
 
 public class GunAttack extends Goal {
-    private final Mob mob;
+    private final AbstractShooter mob;
     private LivingEntity target;
 
     private final IGunOperator operator;
@@ -50,7 +50,7 @@ public class GunAttack extends Goal {
     private int attackDelay = 0;
     private boolean cachedHasLoS = false;
 
-    public GunAttack(Mob mob, float maxShootDistance, float baseSpread, float spreadIncrease, int minBurst, int maxBurst, int minBurstCooldown, int maxBurstCooldown) {
+    public GunAttack(AbstractShooter mob, float maxShootDistance, float baseSpread, float spreadIncrease, int minBurst, int maxBurst, int minBurstCooldown, int maxBurstCooldown) {
         this.mob = mob;
         this.operator = IGunOperator.fromLivingEntity(mob);
         this.gunStack = this.mob.getMainHandItem();
@@ -71,6 +71,10 @@ public class GunAttack extends Goal {
     public boolean canUse() {
         LivingEntity currentTarget = this.mob.getTarget();
 
+        if (mob.getMemory().getState() != AbstractShooter.State.BATTLE) {
+            return false;
+        }
+
         if (currentTarget == null || !currentTarget.isAlive()) {
             return false;
         }
@@ -88,8 +92,7 @@ public class GunAttack extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return this.mob.getTarget() != null && this.mob.getTarget().isAlive() &&
-                this.mob.getMainHandItem().getItem() instanceof AbstractGunItem;
+        return this.mob.getTarget() != null && this.mob.getTarget().isAlive() && this.mob.getMainHandItem().getItem() instanceof AbstractGunItem;
     }
 
     @Override

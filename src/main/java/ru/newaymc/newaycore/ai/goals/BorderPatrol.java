@@ -4,23 +4,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import ru.newaymc.newaycore.ai.ShooterCore;
-import ru.newaymc.newaycore.ai.objects.Memory;
+import ru.newaymc.newaycore.ai.entity.AbstractShooter;
 
 import java.util.EnumSet;
 
+@Deprecated
 public class BorderPatrol extends Goal {
     private static final String CENTER_X = "patrol_center_x";
     private static final String CENTER_Y = "patrol_center_y";
     private static final String CENTER_Z = "patrol_center_z";
     private static final String EDGE = "patrol_edge";
     private static final String T = "patrol_t";
-    private final PathfinderMob mob;
+    private final AbstractShooter mob;
     private final double radius;
     private final double speed;
     private final int stepTicks;
@@ -28,8 +27,8 @@ public class BorderPatrol extends Goal {
     private int edge = 0;
     private double t = 0;
 
-    public BorderPatrol(PathfinderMob mob, double radius, double speed, int stepTicks) {
-        this.mob = mob;
+    public BorderPatrol(AbstractShooter shooter, double radius, double speed, int stepTicks) {
+        this.mob = shooter;
         this.radius = radius;
         this.speed = speed;
         this.stepTicks = Math.max(1, stepTicks);
@@ -38,14 +37,14 @@ public class BorderPatrol extends Goal {
 
     @Override
     public boolean canUse() {
-        return ShooterCore.memory.isBorderPatrol();
+        return mob.getMemory().isBorderPatrol();
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (!ShooterCore.memory.isBorderPatrol())
-            mob.goalSelector.removeGoal(this);
-        return ShooterCore.memory.isBorderPatrol();
+        if (!mob.getMemory().isBorderPatrol()) mob.goalSelector.removeGoal(this);
+
+        return mob.getMemory().isBorderPatrol();
     }
 
     @Override
@@ -100,7 +99,14 @@ public class BorderPatrol extends Goal {
         data.putInt(EDGE, edge);
         data.putDouble(T, t);
 
-        ShooterCore.memory.setBorderPatrol(false);
+        if (mob instanceof AbstractShooter shooter) {
+            shooter.getMemory().setBorderPatrol(false);
+        }
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
     }
 
     private boolean isSafeTarget(double x, double y, double z) {

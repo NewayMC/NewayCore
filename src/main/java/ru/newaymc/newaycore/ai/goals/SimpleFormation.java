@@ -1,5 +1,14 @@
 package ru.newaymc.newaycore.ai.goals;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.EnumSet;
+import java.util.List;
+
 public class SimpleFormation /*extends Goal*/ {
     /*private final PathfinderMob mob;
     private final PathfinderMob commander;

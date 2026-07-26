@@ -1,16 +1,15 @@
 package ru.newaymc.newaycore.ai.entity;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
-
+import org.jetbrains.annotations.Nullable;
+import ru.newaymc.newaycore.ai.GunSetup;
 
 public class ShooterAiEntity extends AbstractShooter {
 
@@ -28,56 +27,9 @@ public class ShooterAiEntity extends AbstractShooter {
     }
 
     @Override
-    public void equipGun(String gun, String fireMode, int maxAmmo, String scope, String muzzle, String grip) {
-        super.equipGun("ak47", "auto", 31, null, null, null);
-    }
-
-    @Override
-    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
-        return false;
-    }
-
-    @Override
-    public SoundEvent getHurtSound(DamageSource ds) {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.death"));
-    }
-
-    @Override
-    public SoundEvent getDeathSound() {
-        return BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("entity.generic.hurt"));
-    }
-
-    @Override
-    public boolean shouldDropLoot() {
-        return false;
-    }
-
-//        this.goalSelector.addGoal(2, new BorderPatrol(this, 16, 1, 100));
-// Stray
-//        if (ShooterCore.memory.getTarget() != null && this.tickCount % 40 == 0) {
-//            int rnd = new Random().nextInt(1, 4);
-//            int move = new Random().nextInt(3, 5);
-//
-//            switch (rnd) {
-//                case 1:
-//                    nav.moveTo(this.getX(), this.getY(), this.getZ() - move, 1);
-//                    break;
-//                case 2:
-//                    nav.moveTo(this.getX(), this.getY(), this.getZ() + move, 1);
-//                    break;
-//                case 3:
-//                    nav.moveTo(this.getX() + move, this.getY(), this.getZ(), 1);
-//                    break;
-//                case 4:
-//                    nav.moveTo(this.getX() - move, this.getY(), this.getZ() + move, 1);
-//                    break;
-//            }
-//        }
-
-
-    @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return super.getDefaultDimensions(pose).scale(1.1f);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, MobSpawnType p_21436_, @Nullable SpawnGroupData p_21437_) {
+        equipGun("ak47", "auto", 31, null, null, null);
+        return super.finalizeSpawn(p_21434_, p_21435_, p_21436_, p_21437_);
     }
 
     public static void init(RegisterSpawnPlacementsEvent event) {
