@@ -11,15 +11,11 @@ import ru.newaymc.newaycore.NewaycoreMod;
 
 public class ModItems {
     public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(NewaycoreMod.MODID);
-    public static final DeferredItem<Item> COVER_MARKER_AI;
     public static final DeferredItem<Item> EMPTY_BLOCK;
-    public static final DeferredItem<Item> OUTPOST_HUB;
     public static final DeferredItem<Item> SHOOTER_AI_ENTITY_SPAWN_EGG;
 
     static {
-        COVER_MARKER_AI = block(ModBlocks.COVER_MARKER_AI);
         EMPTY_BLOCK = block(ModBlocks.EMPTY_BLOCK);
-        OUTPOST_HUB = block(ModBlocks.OUTPOST_HUB);
         SHOOTER_AI_ENTITY_SPAWN_EGG = REGISTRY.register("shooter_ai_entity_spawn_egg", () -> new DeferredSpawnEggItem(ModEntities.SHOOTER_AI_ENTITY, -13421773, -10066330, new Item.Properties()));
     }
 

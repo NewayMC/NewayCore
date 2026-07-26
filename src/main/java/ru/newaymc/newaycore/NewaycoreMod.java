@@ -36,12 +36,9 @@ public class NewaycoreMod {
     public NewaycoreMod(IEventBus modEventBus) {
         NeoForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::registerNetworking);
-        ModSounds.REGISTRY.register(modEventBus);
         ModBlocks.REGISTRY.register(modEventBus);
-        ModBlockEntities.REGISTRY.register(modEventBus);
         ModItems.REGISTRY.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
-        ModTabs.REGISTRY.register(modEventBus);
         ModVariables.ATTACHMENT_TYPES.register(modEventBus);
     }
 
