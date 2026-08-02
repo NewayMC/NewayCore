@@ -71,7 +71,7 @@ public class GunAttack extends Goal {
     public boolean canUse() {
         LivingEntity currentTarget = this.mob.getTarget();
 
-        if (mob.getMemory().getState() != AbstractShooter.State.BATTLE) {
+        if (!mob.getMemory().isAllowAttack()) {
             return false;
         }
 
@@ -87,12 +87,18 @@ public class GunAttack extends Goal {
             return false;
         }
 
-        return this.mob.getSensing().hasLineOfSight(currentTarget);
+        return mob.getMemory().isAllowAttack() && this.mob.getSensing().hasLineOfSight(currentTarget);
     }
 
     @Override
     public boolean canContinueToUse() {
-        return this.mob.getTarget() != null && this.mob.getTarget().isAlive() && this.mob.getMainHandItem().getItem() instanceof AbstractGunItem;
+        return mob.getMemory().isAllowAttack() && this.mob.getTarget() != null
+                && this.mob.getTarget().isAlive() && this.mob.getMainHandItem().getItem() instanceof AbstractGunItem;
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
     }
 
     @Override

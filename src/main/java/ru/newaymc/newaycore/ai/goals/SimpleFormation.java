@@ -9,6 +9,10 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * @deprecated
+ */
+@Deprecated
 public class SimpleFormation /*extends Goal*/ {
     /*private final PathfinderMob mob;
     private final PathfinderMob commander;

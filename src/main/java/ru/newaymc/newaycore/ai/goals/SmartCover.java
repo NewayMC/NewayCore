@@ -1,6 +1,5 @@
 package ru.newaymc.newaycore.ai.goals;
 
-import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,8 +24,6 @@ public class SmartCover extends Goal {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/SmartCover");
     private static final boolean debug = false;
 
-    @Getter
-    private static Cover bestCover;
     private static List<Cover> covers = new ArrayList<>();
 
     private static final double MAX_SEARCH_RADIUS = 17;
@@ -53,44 +50,57 @@ public class SmartCover extends Goal {
 
     @Override
     public boolean canUse() {
+        if (shooter.getMemory().getState() != AbstractShooter.State.BATTLE) {
+            return false;
+        }
+
         return shooter.getHealth() <= 30;
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (shooter.getHealth() > 30) {
-            shooter.goalSelector.removeGoal(this);
-        }
-        return shooter.getHealth() <= 30;
+        return shooter.getMemory().getState() != AbstractShooter.State.BATTLE && shooter.getHealth() <= 30;
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
     }
 
     @Override
     public void tick() {
-        if (shooter.getTarget() != null) {
-            targetPos = shooter.getTarget().position();
-        } else {
-            shooter.getMemory().setCoverStatus(false);
-            return;
+        if (shooter.getTarget() == null) {
+            LOGGER.error("Unexpected error with SmartCover. Entity type: {}, UUID: {}", shooter.getType(), shooter.getUUID());
+            stop();
         }
+
+        targetPos = shooter.getTarget().position();
         Cover bestCover = findBestCover();
 
         if (bestCover != null) {
             PathNavigation nav = shooter.getNavigation();
             double dist = bestCover.getDistance();
-            if (dist <= 0.1) {
+            if (dist <= 0.05) {
                 shooter.setPos(bestCover.getVec3());
+                shooter.getMemory().setCurrentCover(bestCover);
+                shooter.getMemory().setAllowAttack(true);
             } else {
                 nav.moveTo(bestCover.getVec3().x(), bestCover.getVec3().y(), bestCover.getVec3().z(), 1.1);
-                shooter.getMemory().setCurrentCover(bestCover);
                 shooter.getMemory().setCoverStatus(true);
             }
         } else {
-            shooter.getMemory().setCoverStatus(false);
+            stop();
         }
     }
 
     @Override
+    public void start() {
+        shooter.getMemory().setAllowAttack(false);
+    }
+
+    @Override
     public void stop() {
+        shooter.getMemory().setAllowAttack(true);
         shooter.getMemory().setCurrentCover(null);
         shooter.getMemory().setCoverStatus(false);
     }
