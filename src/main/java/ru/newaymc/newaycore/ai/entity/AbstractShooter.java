@@ -67,6 +67,7 @@ public abstract class AbstractShooter extends Monster {
         }
     }
 
+    // TODO [HIGH]: More tests for goals, possible bugs
     @Override
     protected void registerGoals() {
         super.registerGoals();
