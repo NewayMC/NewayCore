@@ -24,7 +24,7 @@ public class ShooterAiEntity extends AbstractShooter {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true).setUnseenMemoryTicks(500));
+        setTargets(Player.class);
     }
 
     @Override

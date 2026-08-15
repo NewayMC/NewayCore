@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -69,7 +70,6 @@ public abstract class AbstractShooter extends Monster {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(1, new GunAttack(this, 75, 1.4f, 0.012f, 3, 5, 10 , 15));
         this.goalSelector.addGoal(2, new SmartCover(this, this.position()));
         this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.1, 40){
             @Override
@@ -85,6 +85,14 @@ public abstract class AbstractShooter extends Monster {
         this.goalSelector.addGoal(5, new FloatGoal(this));
     }
 
+    // IDK why I'm deleted this
+    @SafeVarargs
+    public final void setTargets(Class<? extends LivingEntity>... classes) {
+        for (Class<? extends LivingEntity> clazz : classes) {
+            this.goalSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, clazz, true).setUnseenMemoryTicks(500));
+        }
+    }
+
     public void equipGun(String gun, String fireMode, int maxAmmo, String scope, String muzzle, String grip) {
         GunSetup.setGun(this, gun, fireMode, maxAmmo, scope, muzzle, grip);
     }
@@ -92,6 +100,7 @@ public abstract class AbstractShooter extends Monster {
     @Override
     @SuppressWarnings("deprecation")
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, MobSpawnType p_21436_, @Nullable SpawnGroupData p_21437_) {
+        this.goalSelector.addGoal(2, new GunAttack(this, 75, 1.4f, 0.012f, 3, 5, 10 , 15));
         return super.finalizeSpawn(p_21434_, p_21435_, p_21436_, p_21437_);
     }
 
