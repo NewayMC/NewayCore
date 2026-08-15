@@ -6,8 +6,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class EmptyBlockBlock extends Block {
-    public EmptyBlockBlock() {
+public class EmptyBlock extends Block {
+    public EmptyBlock() {
         super(Properties.of().sound(SoundType.EMPTY).strength(-1, 3600000).noCollission().replaceable());
     }
 

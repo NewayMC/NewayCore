@@ -5,22 +5,18 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import org.apache.logging.log4j.LogManager;
 
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
 
-import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.NewaycoreMod;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class GunSetup {
-    private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/GunSetup");
-
     private static String gun;
     private static String fireMode;
     private static String scope, muzzle, grip;

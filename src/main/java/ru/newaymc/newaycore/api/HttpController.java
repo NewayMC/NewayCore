@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.network;
+package ru.newaymc.newaycore.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +22,7 @@ public class HttpController {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        HttpController.LOGGER.info("Status code: " + response.statusCode());
+        LOGGER.info("Status code: " + response.statusCode());
         return response.body();
     }
 
@@ -36,7 +36,7 @@ public class HttpController {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        HttpController.LOGGER.info("Status code: " + response.statusCode());
+        LOGGER.info("Status code: " + response.statusCode());
         return response.body();
     }
 }
