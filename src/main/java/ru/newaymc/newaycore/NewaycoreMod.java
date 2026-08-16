@@ -1,6 +1,8 @@
 package ru.newaymc.newaycore;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
@@ -12,14 +14,18 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.util.thread.SidedThreadGroups;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import ru.newaymc.newaycore.register.*;
+import ru.newaymc.newaycore.worlds.providers.ModWorldgenProvider;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Mod("newaycore")
@@ -27,6 +33,7 @@ public class NewaycoreMod {
     public static final String MODID = "newaycore";
     public static final String MOD_DIR = (FMLPaths.GAMEDIR.get().toString() + "/newaycore/");
 
+    private static final Collection<Tuple<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
     public static HolderLookup.Provider provider;
 
     public NewaycoreMod(IEventBus modEventBus) {
@@ -34,13 +41,8 @@ public class NewaycoreMod {
         ModBlocks.REGISTRY.register(modEventBus);
         ModItems.REGISTRY.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
-    }
 
-    private static final Collection<Tuple<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
-
-    public static void queueServerWork(int tick, Runnable action) {
-        if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER)
-            workQueue.add(new Tuple<>(action, tick));
+        modEventBus.addListener(this::gatherData);
     }
 
     @SubscribeEvent
@@ -58,6 +60,20 @@ public class NewaycoreMod {
     @SubscribeEvent
     public void onAddReloadListeners(AddReloadListenerEvent event) {
         provider = event.getServerResources().getRegistryLookup();
+    }
+
+    private void gatherData(GatherDataEvent event) {
+        DataGenerator generator = event.getGenerator();
+        PackOutput output = generator.getPackOutput();
+        CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
+
+        generator.addProvider(event.includeServer(), new ModWorldgenProvider(output, lookup));
+    }
+
+    public static void queueServerWork(int tick, Runnable action) {
+        if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
+            workQueue.add(new Tuple<>(action, tick));
+        }
     }
 
     // For some test btw
