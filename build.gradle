@@ -19,19 +19,6 @@ sourceSets.main.resources {
     exclude("src/generated/**/.cache")
 }
 
-repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                url "https://cursemaven.com"
-            }
-        }
-        filter {
-            includeGroup "curse.maven"
-        }
-    }
-}
-
 base {
     archivesName = modId
 }
@@ -88,6 +75,21 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+repositories {
+    mavenCentral()
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
 dependencies {
     implementation "curse.maven:tacz-1353462:8387838"
 
@@ -95,6 +97,14 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.46")
     testCompileOnly("org.projectlombok:lombok:1.18.46")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.46")
+
+    implementation 'com.github.luben:zstd-jni:1.5.7-6'
+    additionalRuntimeClasspath 'com.github.luben:zstd-jni:1.5.7-6'
+    jarJar('com.github.luben:zstd-jni') {
+        version {
+            prefer '1.5.7-6'
+        }
+    }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
