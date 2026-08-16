@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.api;
+package ru.newaymc.newaycore.files;
 
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdDictCompress;
