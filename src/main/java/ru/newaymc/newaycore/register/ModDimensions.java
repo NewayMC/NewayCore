@@ -9,7 +9,6 @@ import net.minecraft.world.level.dimension.LevelStem;
 import ru.newaymc.newaycore.NewaycoreMod;
 
 public class ModDimensions {
-    // Dev dimension
     public static final ResourceKey<DimensionType> DEV_DIMENSION_TYPE = ResourceKey.create(Registries.DIMENSION_TYPE,
             ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "dev_dimension_type"));
     public static final ResourceKey<LevelStem> DEV_DIM_LEVEL_STEM = ResourceKey.create(Registries.LEVEL_STEM,

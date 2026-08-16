@@ -25,6 +25,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+// Generates dimension for tests (developer dimension)
 public class ModWorldgenProvider extends DatapackBuiltinEntriesProvider {
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(Registries.DIMENSION_TYPE, ModWorldgenProvider::bootstrapDimensionTypes)
