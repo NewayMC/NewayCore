@@ -15,6 +15,27 @@ public class FileSerialization {
         return new File(location, File.separator + name);
     }
 
+    public static long getFolderSize(File folder) {
+        long size = 0;
+
+        if (folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        size += getFolderSize(file); // Рекурсия
+                    } else {
+                        size += file.length();
+                    }
+                }
+            }
+        } else {
+            size = folder.length();
+        }
+
+        return size;
+    }
+
     public static class JavaSerialization {
         private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/JavaSerialization");
 
