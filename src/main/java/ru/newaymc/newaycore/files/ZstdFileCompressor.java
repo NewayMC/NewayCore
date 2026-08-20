@@ -1,14 +1,18 @@
 package ru.newaymc.newaycore.files;
 
+import lombok.Getter;
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdDictCompress;
 import com.github.luben.zstd.ZstdDictDecompress;
 import com.github.luben.zstd.ZstdDictTrainer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import ru.newaymc.newaycore.NewaycoreMod;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Zstandard file compression/decompression utility for game world chunks.
@@ -18,17 +22,21 @@ import java.util.logging.Logger;
  *  File format: [MAGIC_NUMBER(4 bytes)] [DECOMPRESSED_SIZE(4 bytes)] [COMPRESSED_DATA]
  */
 public class ZstdFileCompressor {
-    private static final Logger LOGGER = Logger.getLogger(ZstdFileCompressor.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/ZstdFileCompressor");
 
     /** Magic number for file format verification: 0x5A535444 ("ZSTD" in ASCII) */
     private static final int MAGIC_NUMBER = 0x5A535444;
 
     /** Minimum file size to actually perform compression (files smaller than this are copied) */
     private static final int MIN_COMPRESS_SIZE = 1024; // 1 KB
+    private final ZstdDictCompress compressDict;
+    private final ZstdDictDecompress decompressDict;
+    private final boolean useDictionary;
 
-    private ZstdDictCompress compressDict;
-    private ZstdDictDecompress decompressDict;
-    private boolean useDictionary = false;
+    @Getter
+    private static File zstdCompressDir;
+    @Getter
+    private static File zstdDecompressDir;
 
     /**
      * Creates a compressor without dictionary (standard Zstandard compression).
@@ -56,6 +64,17 @@ public class ZstdFileCompressor {
         }
     }
 
+    public static void prepareDirectory(String baseDir) {
+        zstdCompressDir = new File(baseDir + "/zstd/compress/");
+        zstdDecompressDir = new File(baseDir + "/zstd/decompress/");
+
+        if (!zstdCompressDir.exists() && !zstdDecompressDir.exists()) {
+            LOGGER.info("Preparing ZSTD directories");
+            zstdCompressDir.mkdirs();
+            zstdDecompressDir.mkdirs();
+        }
+    }
+
     // ======================== COMPRESSION METHODS ========================
 
     /**
@@ -68,7 +87,7 @@ public class ZstdFileCompressor {
      */
     public void compressToFile(byte[] data, File outputFile) throws IOException {
         if (data == null || data.length == 0) {
-            LOGGER.warning("Attempted to compress empty data. File will not be created.");
+            LOGGER.warn("Attempted to compress empty data. File will not be created.");
             return;
         }
 
@@ -104,13 +123,14 @@ public class ZstdFileCompressor {
     }
 
     /**
-     * Compresses a raw file into a compressed file.
+     * Compresses a file and deletes the original if compression was successful.
      *
      * @param inputFile  Source file to compress
      * @param outputFile Destination file for compressed data (if null, adds .zst suffix)
+     * @param deleteOriginal If true, deletes the original file after successful compression
      * @throws IOException If an I/O error occurs
      */
-    public void compressFile(File inputFile, File outputFile) throws IOException {
+    public void compressFile(File inputFile, File outputFile, boolean deleteOriginal) throws IOException {
         if (!inputFile.exists()) {
             throw new FileNotFoundException("File not found: " + inputFile.getAbsolutePath());
         }
@@ -127,6 +147,14 @@ public class ZstdFileCompressor {
         if (inputFile.length() < MIN_COMPRESS_SIZE) {
             LOGGER.info("File too small (" + inputFile.length() + " bytes), copying uncompressed: " + inputFile.getName());
             Files.copy(inputFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            if (deleteOriginal) {
+                if (inputFile.delete()) {
+                    LOGGER.info("Deleted original file: " + inputFile.getName());
+                } else {
+                    LOGGER.warn("Failed to delete original file: " + inputFile.getName());
+                }
+            }
             return;
         }
 
@@ -134,18 +162,27 @@ public class ZstdFileCompressor {
 
         byte[] data = Files.readAllBytes(inputFile.toPath());
         compressToFile(data, outputFile);
+
+        // Delete original after successful compression
+        if (deleteOriginal) {
+            if (inputFile.delete()) {
+                LOGGER.info("Deleted original file: " + inputFile.getName());
+            } else {
+                LOGGER.warn("Failed to delete original file: " + inputFile.getName());
+            }
+        }
     }
 
     /**
-     * Streams a large file for compression without loading it entirely into memory.
-     * Recommended for files larger than 100 MB.
+     * Streaming compression with automatic deletion of original file.
      *
      * @param inputFile  Source file to compress
      * @param outputFile Destination file for compressed data (if null, adds .zst suffix)
      * @param bufferSize Buffer size for reading (recommended: 64KB - 4MB)
+     * @param deleteOriginal If true, deletes the original file after successful compression
      * @throws IOException If an I/O error occurs
      */
-    public void compressFileStreaming(File inputFile, File outputFile, int bufferSize) throws IOException {
+    public void compressFileStreaming(File inputFile, File outputFile, int bufferSize, boolean deleteOriginal) throws IOException {
         if (!inputFile.exists()) {
             throw new FileNotFoundException("File not found: " + inputFile.getAbsolutePath());
         }
@@ -162,6 +199,14 @@ public class ZstdFileCompressor {
         if (inputFile.length() < MIN_COMPRESS_SIZE) {
             LOGGER.info("File too small (" + inputFile.length() + " bytes), copying uncompressed: " + inputFile.getName());
             Files.copy(inputFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            if (deleteOriginal) {
+                if (inputFile.delete()) {
+                    LOGGER.info("Deleted original file: " + inputFile.getName());
+                } else {
+                    LOGGER.warn("Failed to delete original file: " + inputFile.getName());
+                }
+            }
             return;
         }
 
@@ -205,11 +250,19 @@ public class ZstdFileCompressor {
             LOGGER.info("Compression done in " + duration + " ms. Ratio: " + String.format("%.2f", ratio));
             LOGGER.info("Original: " + totalBytes + " bytes, Compressed: " + outputFile.length() + " bytes");
         }
+
+        // Delete original after successful compression
+        if (deleteOriginal) {
+            if (inputFile.delete()) {
+                LOGGER.info("Deleted original file: " + inputFile.getName());
+            } else {
+                LOGGER.warn("Failed to delete original file: " + inputFile.getName());
+            }
+        }
     }
 
     /**
      * Compresses a serializable object to a file.
-     * Convenience method for game world chunks and entity data.
      *
      * @param object     Serializable object to compress
      * @param outputFile Destination file
@@ -244,7 +297,7 @@ public class ZstdFileCompressor {
             // If magic number doesn't match, it's an uncompressed file
             if (magic != MAGIC_NUMBER) {
                 LOGGER.info("File is uncompressed, reading directly: " + inputFile.getName());
-                // Reset to beginning and read entire file
+
                 try (FileInputStream fis = new FileInputStream(inputFile)) {
                     return fis.readAllBytes();
                 }
@@ -309,19 +362,6 @@ public class ZstdFileCompressor {
     }
 
     /**
-     * Decompresses a file directly to an OutputStream without storing in memory.
-     *
-     * @param inputFile     Compressed file to read
-     * @param outputStream  Stream to write decompressed data
-     * @throws IOException If an I/O error occurs
-     */
-    public void decompressToStream(File inputFile, OutputStream outputStream) throws IOException {
-        byte[] data = decompressFromFile(inputFile);
-        outputStream.write(data);
-        outputStream.flush();
-    }
-
-    /**
      * Decompresses a file and returns the object.
      *
      * @param inputFile Compressed file containing a serialized object
@@ -341,14 +381,7 @@ public class ZstdFileCompressor {
 
     // ======================== BATCH OPERATIONS ========================
 
-    /**
-     * Compresses all files in a folder.
-     *
-     * @param folder    Folder containing files to compress
-     * @param recursive Process subdirectories recursively
-     * @throws IOException If an I/O error occurs
-     */
-    public void compressFolder(File folder, boolean recursive) throws IOException {
+    public void compressFolder(File folder, boolean recursive, boolean deleteOriginal) throws IOException {
         if (!folder.isDirectory()) {
             throw new IllegalArgumentException("Not a folder: " + folder.getAbsolutePath());
         }
@@ -356,13 +389,91 @@ public class ZstdFileCompressor {
         File[] files = folder.listFiles();
         if (files == null) return;
 
+        int compressed = 0;
+        int deleted = 0;
+        int failed = 0;
+
         for (File file : files) {
             if (file.isFile() && !file.getName().endsWith(".zst")) {
-                compressFile(file, new File(file.getAbsolutePath() + ".zst"));
+                try {
+                    File outputFile = new File(file.getAbsolutePath() + ".zst");
+                    compressFile(file, outputFile, deleteOriginal);
+                    compressed++;
+                    if (deleteOriginal && !file.exists()) {
+                        deleted++;
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to compress: " + file.getName() + " - " + e.getMessage());
+                    failed++;
+                }
             } else if (recursive && file.isDirectory()) {
-                compressFolder(file, true);
+                compressFolder(file, true, deleteOriginal);
             }
         }
+
+        LOGGER.info("Folder compression complete. Compressed: " + compressed +
+                ", Deleted: " + deleted + ", Failed: " + failed);
+    }
+
+    /**
+     * Streaming compression for entire folders with automatic deletion.
+     *
+     * @param folder     Folder containing files to compress
+     * @param recursive  Process subdirectories recursively
+     * @param bufferSize Buffer size for streaming
+     * @param deleteOriginal Delete original files after successful compression
+     * @throws IOException If an I/O error occurs
+     */
+    public void compressFolderStreaming(File folder, boolean recursive, int bufferSize, boolean deleteOriginal) throws IOException {
+        if (!folder.isDirectory()) {
+            throw new IllegalArgumentException("Not a folder: " + folder.getAbsolutePath());
+        }
+
+        LOGGER.info("Streaming compression of folder: " + folder.getAbsolutePath());
+
+        File[] files = folder.listFiles();
+        if (files == null) return;
+
+        int compressed = 0;
+        int deleted = 0;
+        int skipped = 0;
+        int failed = 0;
+
+        for (File file : files) {
+            if (file.isFile() && !file.getName().endsWith(".zst")) {
+                try {
+                    if (file.length() < MIN_COMPRESS_SIZE) {
+                        File outputFile = new File(file.getAbsolutePath() + ".zst");
+                        Files.copy(file.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        LOGGER.info("Copied small file: " + file.getName() + " (" + file.length() + " bytes)");
+                        skipped++;
+
+                        if (deleteOriginal) {
+                            if (file.delete()) {
+                                deleted++;
+                            }
+                        }
+                    } else {
+                        File outputFile = new File(file.getAbsolutePath() + ".zst");
+                        compressFileStreaming(file, outputFile, bufferSize, deleteOriginal);
+                        compressed++;
+                        if (deleteOriginal && !file.exists()) {
+                            deleted++;
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to compress: " + file.getName() + " - " + e.getMessage());
+                    failed++;
+                }
+            } else if (recursive && file.isDirectory()) {
+                compressFolderStreaming(file, true, bufferSize, deleteOriginal);
+            }
+        }
+
+        LOGGER.info("Folder compression complete. Compressed: " + compressed +
+                ", Skipped (small): " + skipped +
+                ", Deleted: " + deleted +
+                ", Failed: " + failed);
     }
 
     /**
@@ -396,8 +507,7 @@ public class ZstdFileCompressor {
     // ======================== DICTIONARY TRAINING ========================
 
     /**
-     * Trains a dictionary on sample data for better compression of similar chunks.
-     * Dictionary improves compression for small, repetitive data structures.
+     * Trains a dictionary on sample data for better compression of similar files.
      *
      * @param sampleData     List of byte arrays (typical data samples)
      * @param dictionarySize Desired dictionary size (e.g., 16 * 1024 for 16 KB)
@@ -424,7 +534,6 @@ public class ZstdFileCompressor {
 
     /**
      * Trains a dictionary from .zst files in a folder.
-     * Convenience method for training on existing game chunks.
      *
      * @param folder         Folder containing .zst files to use as samples
      * @param dictionarySize Desired dictionary size
@@ -453,7 +562,7 @@ public class ZstdFileCompressor {
                     samples.add(sample);
                 }
             } catch (Exception e) {
-                LOGGER.warning("Failed to read sample file: " + file.getName() + " - " + e.getMessage());
+                LOGGER.warn("Failed to read sample file: " + file.getName() + " - " + e.getMessage());
             }
         }
 
@@ -462,72 +571,5 @@ public class ZstdFileCompressor {
         }
 
         return trainDictionary(samples, dictionarySize);
-    }
-
-    // ======================== UTILITY METHODS ========================
-
-    /**
-     * Checks if file exists.
-     *
-     * @param file File to check
-     * @return true if file exists
-     */
-    public static boolean fileExists(File file) {
-        return file.exists();
-    }
-
-    /**
-     * Deletes file.
-     *
-     * @param file File to delete
-     * @return true if deletion was successful
-     */
-    public static boolean deleteFile(File file) {
-        if (file.exists()) {
-            boolean deleted = file.delete();
-            if (deleted) {
-                LOGGER.info("Deleted: " + file.getName());
-            }
-            return deleted;
-        }
-        return false;
-    }
-
-    /**
-     * Gets the size of a compressed file on disk.
-     *
-     * @param file Compressed file
-     * @return File size in bytes
-     * @throws IOException If an I/O error occurs
-     */
-    public static long getCompressedSize(File file) throws IOException {
-        return file.length();
-    }
-
-    /**
-     * Checks if dictionary compression is enabled.
-     *
-     * @return true if dictionary is being used
-     */
-    public boolean isUseDictionary() {
-        return useDictionary;
-    }
-
-    /**
-     * Gets the compression dictionary.
-     *
-     * @return Dictionary for compression, or null if not used
-     */
-    public ZstdDictCompress getCompressDict() {
-        return compressDict;
-    }
-
-    /**
-     * Gets the decompression dictionary.
-     *
-     * @return Dictionary for decompression, or null if not used
-     */
-    public ZstdDictDecompress getDecompressDict() {
-        return decompressDict;
     }
 }
