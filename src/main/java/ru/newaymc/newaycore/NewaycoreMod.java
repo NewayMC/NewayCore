@@ -4,9 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.LevelAccessor;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -19,10 +16,14 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.worlds.providers.ModWorldgenProvider;
 
-import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,7 +36,11 @@ public class NewaycoreMod {
     private static final Collection<Tuple<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
     public static HolderLookup.Provider provider;
 
+    public static final Logger LOGGER = LogManager.getLogger(MODID);
+
     public NewaycoreMod(IEventBus modEventBus) {
+        prepareModDirectories();
+
         NeoForge.EVENT_BUS.register(this);
         ModBlocks.REGISTRY.register(modEventBus);
         ModItems.REGISTRY.register(modEventBus);
@@ -69,26 +74,30 @@ public class NewaycoreMod {
         generator.addProvider(event.includeServer(), new ModWorldgenProvider(output, lookup));
     }
 
+    private void prepareModDirectories() {
+        ZstdFileCompressor.prepareDirectory(MOD_DIR);
+        new File(MOD_DIR + "/saves/data/").mkdirs();
+    }
+
     public static void queueServerWork(int tick, Runnable action) {
         if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER) {
             workQueue.add(new Tuple<>(action, tick));
         }
     }
 
-    // For some test btw
     @EventBusSubscriber
-    public static class PlayerLoggedIn {
+    public static class ModEvents {
+
         @SubscribeEvent
         public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-            execute(event, event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), event.getEntity());
-        }
+            ZstdFileCompressor compressor = new ZstdFileCompressor();
+            File testFile = new File(MOD_DIR + "/test/");
 
-        public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
-            execute(null, world, x, y, z, entity);
-        }
-
-        private static void execute(@Nullable Event event, LevelAccessor world, double x, double y, double z, Entity entity) {
-
+            try {
+                compressor.compressFolder(testFile, true, true);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
