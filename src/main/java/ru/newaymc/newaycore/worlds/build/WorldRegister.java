@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.worlds;
+package ru.newaymc.newaycore.worlds.build;
 
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.RegistrySetBuilder;

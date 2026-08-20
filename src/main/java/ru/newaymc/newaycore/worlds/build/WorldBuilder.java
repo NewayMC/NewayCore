@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.worlds;
+package ru.newaymc.newaycore.worlds.build;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biomes;
