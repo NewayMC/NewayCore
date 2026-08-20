@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.worlds;
+package ru.newaymc.newaycore.worlds.build;
 
 import lombok.Getter;
 import net.minecraft.core.registries.Registries;
