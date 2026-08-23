@@ -88,16 +88,10 @@ public class NewaycoreMod {
     @EventBusSubscriber
     public static class ModEvents {
 
+        // For some test btw
         @SubscribeEvent
         public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-            ZstdFileCompressor compressor = new ZstdFileCompressor();
-            File testFile = new File(MOD_DIR + "/test/");
 
-            try {
-                compressor.compressFolder(testFile, true, true);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }
