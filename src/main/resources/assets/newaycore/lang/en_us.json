@@ -1,13 +1,6 @@
 {
-  "subtitles.ak47_fire": "",
-  "subtitles.ak47_reload": "",
   "block.newaycore.empty_block": "Empty Block",
-  "item_group.newaycore.guns": "NewayCore - AI",
-  "item_group.newaycore.als_tab": "NewayCore - ALS",
-  "block.newaycore.cover_marker_ai": "Cover Marker AI",
-  "item.newaycore.cover_marker_ai": "Cover Marker AI",
   "item.newaycore.empty_block": "Empty Block",
-  "block.newaycore.outpost_hub": "Outpost Hub",
   "item.newaycore.shooter_ai_entity_spawn_egg": "Shooter AI Entity Spawn Egg",
   "entity.newaycore.shooter_ai_entity": "Shooter AI Entity"
 }
