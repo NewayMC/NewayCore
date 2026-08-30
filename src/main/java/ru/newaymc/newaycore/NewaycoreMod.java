@@ -17,6 +17,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.register.*;
+import ru.newaymc.newaycore.register.dimensions.ModWorldgenProvider;
+//import ru.newaymc.newaycore.ai.register.ModEntities;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -36,6 +38,7 @@ public class NewaycoreMod {
         NeoForge.EVENT_BUS.register(this);
         ModBlocks.REGISTRY.register(modEventBus);
         ModItems.REGISTRY.register(modEventBus);
+        //ModEntities.REGISTRY.register(modEventBus);
 
         modEventBus.addListener(this::gatherData);
     }
@@ -49,6 +52,8 @@ public class NewaycoreMod {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
+
+        generator.addProvider(event.includeServer(), new ModWorldgenProvider(output, lookup));
     }
 
     private void prepareModDirectories() {
