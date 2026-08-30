@@ -5,6 +5,7 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.level.biome.Biome;
@@ -19,6 +20,22 @@ import java.util.Optional;
 
 public class WorldRegister {
     private static final List<WorldTemplate> REGISTERED_WORLDS = new ArrayList<>();
+
+    public static Optional<WorldTemplate> findDimension(String name) {
+        return REGISTERED_WORLDS.stream().filter(dim -> dim.getDimensionId().getPath().equals(name)).findFirst();
+    }
+
+    public static Optional<WorldTemplate> findDimension(ResourceLocation dimensionId) {
+        return REGISTERED_WORLDS.stream().filter(dim -> dim.getDimensionId().equals(dimensionId)).findFirst();
+    }
+
+    public static Optional<WorldTemplate> findDimension(String namespace, String path) {
+        return findDimension(ResourceLocation.fromNamespaceAndPath(namespace, path));
+    }
+
+    public static WorldTemplate getDimensionOrNull(String name) {
+        return findDimension(name).orElse(null);
+    }
 
     public static WorldTemplate register(WorldTemplate dimension) {
         REGISTERED_WORLDS.add(dimension);
@@ -40,9 +57,6 @@ public class WorldRegister {
         }
     }
 
-    /**
-     * Bootstrap all registered level stems
-     */
     public static void bootstrapLevelStems(BootstrapContext<LevelStem> context) {
         for (WorldTemplate dimension : REGISTERED_WORLDS) {
             context.register(dimension.getLevelStemKey(), createLevelStem(context, dimension));

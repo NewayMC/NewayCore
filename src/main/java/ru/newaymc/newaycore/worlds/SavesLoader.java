@@ -38,7 +38,7 @@ public class SavesLoader {
         }
     }
 
-    public static void prepareWorldFiles(PlayerEvent.PlayerLoggedInEvent event, ResourceLocation... dimensionId) {
+    public static void prepareWorldFiles(ResourceLocation... dimensionId) {
         for (ResourceLocation dimension : dimensionId) {
             File mainDir = new File(ZstdFileCompressor.getZstdCompressDir().getPath() + dimension.getPath());
             if (mainDir.exists()) {
