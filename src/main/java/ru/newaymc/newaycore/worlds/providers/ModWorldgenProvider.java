@@ -17,7 +17,7 @@ import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.register.ModDimensions;
+import ru.newaymc.newaycore.worlds.ModDimensions;
 
 import java.util.List;
 import java.util.Optional;

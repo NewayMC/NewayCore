@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import ru.newaymc.newaycore.NewaycoreMod;
+import ru.newaymc.newaycore.ai.register.ModEntities;
 
 public class ModItems {
     public static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(NewaycoreMod.MODID);

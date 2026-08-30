@@ -15,6 +15,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.newaymc.newaycore.ai.register.ModEntities;
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.worlds.providers.ModWorldgenProvider;

@@ -2,10 +2,14 @@ package ru.newaymc.newaycore.ai.goals;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.entity.AbstractShooter;
 import ru.newaymc.newaycore.ai.objects.Cover;
-import ru.newaymc.newaycore.register.ModTags;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -36,8 +39,10 @@ public class SmartCover extends Goal {
     private static double y;
     private static double z;
     private static AbstractShooter shooter;
-
     private static Vec3 targetPos;
+
+    private static final TagKey<Block> TERRAIN = TagKey.create(Registries.BLOCK,
+            ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "terrain"));
 
     public SmartCover(AbstractShooter mob, Vec3 pos) {
         world = mob.level();
@@ -125,7 +130,7 @@ public class SmartCover extends Goal {
         for (int index0 = 0; index0 < MAX_SEARCH_RADIUS; index0++) {
             sZ = -3;
             for (int index1 = 0; index1 < MAX_SEARCH_RADIUS; index1++) {
-                if (!(world.getBlockState(BlockPos.containing(x + sX - 5, y, z + sZ - 5))).is(ModTags.TERRAIN)) {
+                if (!(world.getBlockState(BlockPos.containing(x + sX - 5, y, z + sZ - 5))).is(TERRAIN)) {
                     Direction direction = shooter.getDirection();
                     coverPos = foundDirection(new Vec3(x + sX - 5, y, z + sZ - 5), direction);
                     if (!world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
