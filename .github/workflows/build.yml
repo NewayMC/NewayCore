@@ -1,9 +1,39 @@
-name: Build
+name: Build & Deploy
 
-on: [push]
+on:
+  push:
+    branches: [core]
 
 jobs:
+  create_tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Get the mod version
+        id: get_version
+        run: |
+          MOD_VERSION=$(grep '^modVersion=' gradle.properties | cut -d'=' -f2)
+          echo "MOD_VERSION=$MOD_VERSION" >> $GITHUB_ENV
+
+      - name: Delete existing tag if it exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -d "$MOD_VERSION" || true
+          git push origin --delete "$MOD_VERSION" || true
+
+      - name: Create and push new tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag "$MOD_VERSION"
+          git push origin "$MOD_VERSION"
+
   build:
+    needs: create_tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,11 +48,22 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.get_version.outputs.mod_version }}
+          commit: ${{ github.sha }}
+          artifacts: "build/libs/*.jar"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
+          removeArtifacts: true
+          allowUpdates: true
+          artifactContentType: application/java-archive
