@@ -44,6 +44,13 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Get the mod version
+        id: get_version
+        run: |
+          MOD_VERSION=$(grep '^modVersion=' gradle.properties | cut -d'=' -f2)
+          echo "mod_version=$MOD_VERSION" >> $GITHUB_OUTPUT
+          echo "MOD_VERSION=$MOD_VERSION" >> $GITHUB_ENV
+
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
