@@ -73,7 +73,6 @@ jobs:
           tag: ${{ steps.get_version.outputs.mod_version }}
           artifacts: "build/libs/*.jar"
           token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
           removeArtifacts: true
           allowUpdates: true
           artifactContentType: application/java-archive
