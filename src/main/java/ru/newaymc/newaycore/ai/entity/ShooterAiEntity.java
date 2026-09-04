@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Example entity
+ * Test entity
  */
 public class ShooterAiEntity extends AbstractShooter {
 

@@ -112,6 +112,7 @@ public class WorldBuilder {
     }
 
     public WorldTemplate build() {
+        createDirectories();
         return new WorldTemplate(dimensionId,
                 biomeId,
                 fixedTime,
@@ -131,5 +132,10 @@ public class WorldBuilder {
                 monsterSpawnLightLevel,
                 monsterSpawnBlockLightLimit
         );
+    }
+
+    // WIP
+    private void createDirectories() {
+
     }
 }
