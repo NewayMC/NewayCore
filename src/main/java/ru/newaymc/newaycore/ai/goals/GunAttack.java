@@ -16,6 +16,7 @@ import net.minecraft.world.phys.Vec3;
 
 import ru.newaymc.newaycore.ai.GunSetup;
 import ru.newaymc.newaycore.ai.entity.AbstractShooter;
+import ru.newaymc.newaycore.ai.utils.State;
 
 import java.util.EnumSet;
 
@@ -36,8 +37,8 @@ public class GunAttack extends Goal {
     private final int MAX_BURST_COOLDOWN_TICKS;
     private static final int MAX_TICKS_STUCK_ACTION = 100;
     private int ticksWaitingForBusyAction = 0;
-    private State currentState = State.IDLE;
-    private enum State {
+    private GunState currentState = GunState.IDLE;
+    private enum GunState {
         IDLE,
         BURST_FIRING,
         BURST_COOLDOWN
@@ -71,7 +72,7 @@ public class GunAttack extends Goal {
     public boolean canUse() {
         LivingEntity currentTarget = this.mob.getTarget();
 
-        if (mob.getMemory().getState() != AbstractShooter.State.BATTLE) {
+        if (mob.getMemory().getState() != State.BATTLE) {
             return false;
         }
 
@@ -103,7 +104,7 @@ public class GunAttack extends Goal {
         this.burstShotsFired = 0;
         this.currentBurstTarget = 0;
         this.burstCooldownTicks = 0;
-        this.currentState = State.IDLE;
+        this.currentState = GunState.IDLE;
         this.ticksWaitingForBusyAction = 0;
 
         operator.aim(true);
@@ -118,7 +119,7 @@ public class GunAttack extends Goal {
         this.burstShotsFired = 0;
         this.currentBurstTarget = 0;
         this.burstCooldownTicks = 0;
-        this.currentState = State.IDLE;
+        this.currentState = GunState.IDLE;
         this.ticksWaitingForBusyAction = 0;
 
         operator.aim(false);
@@ -136,7 +137,7 @@ public class GunAttack extends Goal {
 
         if (this.target == null || !this.target.isAlive() || this.mob.level().isClientSide) {
 
-            if (currentState != State.IDLE) {
+            if (currentState != GunState.IDLE) {
                 resetGoalStates();
             }
             return;
@@ -144,14 +145,14 @@ public class GunAttack extends Goal {
         this.mob.getLookControl().setLookAt(this.target, 30F, 30F);
 
         if (!(gunStack.getItem() instanceof AbstractGunItem)) {
-            if (currentState != State.IDLE) {
+            if (currentState != GunState.IDLE) {
                 resetGoalStates();
             }
             return;
         }
 
         if (iGun == null) {
-            if (currentState != State.IDLE) {
+            if (currentState != GunState.IDLE) {
                 resetGoalStates();
             }
             return;
@@ -203,7 +204,7 @@ public class GunAttack extends Goal {
         this.burstShotsFired = 0;
         this.currentBurstTarget = 0;
         this.burstCooldownTicks = 0;
-        this.currentState = State.IDLE;
+        this.currentState = GunState.IDLE;
         this.ticksWaitingForBusyAction = 0;
     }
 
@@ -233,7 +234,7 @@ public class GunAttack extends Goal {
         }
 
         if (operator.getSynShootCoolDown() <= 0) {
-            this.currentState = State.BURST_FIRING;
+            this.currentState = GunState.BURST_FIRING;
         }
     }
 
@@ -241,7 +242,7 @@ public class GunAttack extends Goal {
         if (this.burstCooldownTicks > 0) {
             this.burstCooldownTicks--;
         } else {
-            this.currentState = State.IDLE;
+            this.currentState = GunState.IDLE;
             this.burstShotsFired = 0;
             this.currentBurstTarget = 0;
         }
@@ -273,7 +274,7 @@ public class GunAttack extends Goal {
 
         if (this.burstShotsFired >= this.currentBurstTarget) {
             this.burstCooldownTicks = this.MIN_BURST_COOLDOWN_TICKS + this.mob.getRandom().nextInt(this.MAX_BURST_COOLDOWN_TICKS - this.MIN_BURST_COOLDOWN_TICKS + 1);
-            this.currentState = State.BURST_COOLDOWN;
+            this.currentState = GunState.BURST_COOLDOWN;
             this.currentBurstTarget = 0;
             this.burstShotsFired = 0;
 
