@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai.objects;
+package ru.newaymc.newaycore.ai.utils;
 
 import lombok.*;
 import net.minecraft.world.phys.Vec3;

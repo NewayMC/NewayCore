@@ -1,4 +1,4 @@
-package ru.newaymc.newaycore.ai.register;
+package ru.newaymc.newaycore.register;
 
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.api.distmarker.Dist;

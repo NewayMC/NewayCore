@@ -15,9 +15,8 @@ import java.nio.file.*;
 import java.util.*;
 
 /**
- * Zstandard file compression/decompression utility for game world chunks.
+ * Zstandard file compression/decompression utility.
  * Supports both standard compression and dictionary-based compression for better ratios.
- * Each chunk is stored as a separate compressed file with metadata.
  * <p>
  *  File format: [MAGIC_NUMBER(4 bytes)] [DECOMPRESSED_SIZE(4 bytes)] [COMPRESSED_DATA]
  */

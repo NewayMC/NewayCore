@@ -8,10 +8,6 @@ import java.util.stream.Stream;
 
 public class Utils {
 
-    public static File toFile(String name, String location) {
-        return new File(location, File.separator + name);
-    }
-
     public static long getFolderSize(File folder) {
         long size = 0;
 
@@ -20,7 +16,7 @@ public class Utils {
             if (files != null) {
                 for (File file : files) {
                     if (file.isDirectory()) {
-                        size += getFolderSize(file); // Рекурсия
+                        size += getFolderSize(file);
                     } else {
                         size += file.length();
                     }

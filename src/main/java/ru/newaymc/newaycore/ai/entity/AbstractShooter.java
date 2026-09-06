@@ -22,18 +22,14 @@ import org.jetbrains.annotations.Nullable;
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.goals.GunAttack;
 import ru.newaymc.newaycore.ai.goals.SmartCover;
-import ru.newaymc.newaycore.ai.objects.Memory;
+import ru.newaymc.newaycore.ai.utils.Memory;
 import ru.newaymc.newaycore.ai.GunSetup;
+import ru.newaymc.newaycore.ai.utils.State;
 
-@Getter
 public abstract class AbstractShooter extends Monster {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/AbstractShooter");
+    @Getter
     private final Memory memory = new Memory(this);
-    public enum State {
-        BATTLE,
-        SEEK,
-        CALM
-    }
 
     protected AbstractShooter(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -86,7 +82,6 @@ public abstract class AbstractShooter extends Monster {
         this.goalSelector.addGoal(5, new FloatGoal(this));
     }
 
-    // IDK why I'm deleted this
     @SafeVarargs
     public final void setTargets(Class<? extends LivingEntity>... classes) {
         for (Class<? extends LivingEntity> clazz : classes) {

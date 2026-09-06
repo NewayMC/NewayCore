@@ -1,8 +1,7 @@
-package ru.newaymc.newaycore.ai.objects;
+package ru.newaymc.newaycore.ai.utils;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 import ru.newaymc.newaycore.ai.entity.AbstractShooter;
@@ -12,7 +11,7 @@ import ru.newaymc.newaycore.ai.entity.AbstractShooter;
 public class Memory {
     // -- Entity --
     private AbstractShooter shooter;
-    private AbstractShooter.State state = AbstractShooter.State.CALM;
+    private State state = State.CALM;
     private boolean allowAttack = true;
     private Cover currentCover = null;
     private boolean coverStatus = false;

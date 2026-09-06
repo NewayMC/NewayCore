@@ -16,7 +16,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.entity.AbstractShooter;
-import ru.newaymc.newaycore.ai.objects.Cover;
+import ru.newaymc.newaycore.ai.utils.Cover;
+import ru.newaymc.newaycore.ai.utils.State;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -55,7 +56,7 @@ public class SmartCover extends Goal {
 
     @Override
     public boolean canUse() {
-        if (shooter.getMemory().getState() != AbstractShooter.State.BATTLE) {
+        if (shooter.getMemory().getState() != State.BATTLE) {
             return false;
         }
 
@@ -64,7 +65,7 @@ public class SmartCover extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return shooter.getMemory().getState() != AbstractShooter.State.BATTLE && shooter.getHealth() <= 30;
+        return shooter.getMemory().getState() != State.BATTLE && shooter.getHealth() <= 30;
     }
 
     @Override
