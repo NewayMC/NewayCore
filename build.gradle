@@ -98,6 +98,8 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.46")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.46")
 
+    implementation('com.github.luben:zstd-jni:1.5.7-15')
+    additionalRuntimeClasspath('com.github.luben:zstd-jni:1.5.7-15')
     jarJar(implementation('com.github.luben:zstd-jni')) {
         version {
             prefer '1.5.7-15'
