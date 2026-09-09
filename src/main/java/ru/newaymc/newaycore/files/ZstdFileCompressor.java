@@ -483,21 +483,31 @@ public class ZstdFileCompressor {
      * @throws IOException If an I/O error occurs
      */
     public void decompressFolder(File folder, boolean deleteAfterDecompress) throws IOException {
-        if (!folder.isDirectory()) {
-            throw new IllegalArgumentException("Not a folder: " + folder.getAbsolutePath());
+        File[] files = folder.listFiles();
+        if (files == null) {
+            return;
         }
 
-        File[] files = folder.listFiles((dir, name) -> name.endsWith(".zst"));
-        if (files == null) return;
-
         for (File file : files) {
-            String outputPath = file.getAbsolutePath();
-            outputPath = outputPath.substring(0, outputPath.length() - 4);
-            decompressToFile(file, new File(outputPath));
+            if (file.isDirectory()) {
 
-            if (deleteAfterDecompress) {
-                if (file.delete()) {
-                    LOGGER.info("Deleted: " + file.getName());
+                decompressFolder(file, deleteAfterDecompress);
+            } else if (file.getName().endsWith(".zst")) {
+                try {
+                    String outputPath = file.getAbsolutePath();
+                    outputPath = outputPath.substring(0, outputPath.length() - 4);
+                    decompressToFile(file, new File(outputPath));
+
+                    if (deleteAfterDecompress) {
+                        if (file.delete()) {
+                            LOGGER.info("Deleted: " + file.getAbsolutePath());
+                        } else {
+                            LOGGER.warn("Failed to delete: " + file.getAbsolutePath());
+                        }
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Error decompressing: " + file.getAbsolutePath(), e);
+                    throw e;
                 }
             }
         }
