@@ -1,27 +1,22 @@
 package ru.newaymc.newaycore;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.register.*;
-import ru.newaymc.newaycore.register.dimensions.ModWorldgenProvider;
 import ru.newaymc.newaycore.register.ModEntities;
 
 import java.io.File;
-import java.util.concurrent.CompletableFuture;
 
 @Mod("newaycore")
 public class NewaycoreMod {
@@ -39,21 +34,11 @@ public class NewaycoreMod {
         ModBlocks.REGISTRY.register(modEventBus);
         ModItems.REGISTRY.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
-
-        modEventBus.addListener(this::gatherData);
     }
 
     @SubscribeEvent
     public void onAddReloadListeners(AddReloadListenerEvent event) {
         provider = event.getServerResources().getRegistryLookup();
-    }
-
-    private void gatherData(GatherDataEvent event) {
-        DataGenerator generator = event.getGenerator();
-        PackOutput output = generator.getPackOutput();
-        CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
-
-        generator.addProvider(event.includeServer(), new ModWorldgenProvider(output, lookup));
     }
 
     private void prepareModDirectories() {
@@ -64,7 +49,7 @@ public class NewaycoreMod {
     @EventBusSubscriber
     public static class ModEvents {
 
-        // For some test btw
+        // For some tests btw
         @SubscribeEvent
         public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 

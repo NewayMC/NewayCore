@@ -4,11 +4,15 @@ import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +27,13 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Optional;
 
+/**
+ * <b>Directories:</b>
+ * <p>
+ * <i>world</i> - main dimension data with base regions
+ * <br>
+ * <i>region</i> - regions for replacement ( e.g. custom buildings & not generated terrain ), can be empty
+ */
 @Getter
 @EventBusSubscriber
 public class DimensionLoader {
@@ -50,15 +61,37 @@ public class DimensionLoader {
         }
     }
 
-    @SubscribeEvent
-    public static void onServerStartup(ServerStartedEvent event) {
+    // WIP
+    public static void teleportToWorld(Player player, ResourceLocation target, Vec3 pos) {
+        Level level = player.level();
+        if (!level.isClientSide) {
 
+            if (WorldRegister.getDimensionOrNull(target.getPath()) == null) {
+                return;
+            }
+
+            ServerPlayer serverPlayer = (ServerPlayer) player;
+            ServerLevel load = player.getServer().getLevel(WorldRegister.findDimension(NewaycoreMod.MODID, "load").get().getLevelKey());
+
+            serverPlayer.teleportTo(load, pos.x(), pos.y(), pos.z(), serverPlayer.getXRot(), serverPlayer.getYRot());
+            if (loadDimension(target, true)) {
+                ServerLevel targetLevel = player.getServer().getLevel(WorldRegister.findDimension(target).get().getLevelKey());
+                serverPlayer.teleportTo(targetLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
+            }
+        }
     }
 
-    public static void saveDimension(ResourceLocation dimension) {
+    /**
+     * Test compression result:
+     * <br>
+     * From 914 mb to 680 mb ( .mca files )
+     * @param dimension
+     */
+    public static void prepareDimension(ResourceLocation dimension) {
+        LOGGER.info("Preparing dimension {} ", dimension);
         File mainDir = new File(ZstdFileCompressor.getZstdCompressDir().getPath() + "/" + dimension.getPath());
         if (mainDir.exists()) {
-            File regions = new File(mainDir.getPath() + "/regions/");
+            File regions = new File(mainDir.getPath() + "/region/");
             File world = new File(mainDir.getPath() + "/world/");
 
             if (!regions.exists() || !world.exists()) {
@@ -86,12 +119,14 @@ public class DimensionLoader {
                 Files.move(worldPath, targetDir, StandardCopyOption.REPLACE_EXISTING);
                 Files.move(regionPath, targetDir, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                LOGGER.error("Compression error: {}", e.toString());
+                LOGGER.error("Preparation error: {}", e.toString());
             }
+        } else {
+            LOGGER.warn("Directory not found");
         }
     }
 
-    public static boolean loadFromRegions(ResourceLocation dimension, boolean saveCache) {
+    public static boolean loadDimension(ResourceLocation dimension, boolean copy) {
         Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimension);
         ServerLevel serverLevel = SERVER.getLevel(worldTemplate.get().getLevelKey());
         File mainDir = new File(NewaycoreMod.MOD_DIR + "/saves/data/" + dimension.getPath());
@@ -106,31 +141,23 @@ public class DimensionLoader {
             return false;
         }
 
-        File regions = new File(mainDir.getPath() + "/regions/");
-        File world = new File(mainDir.getPath() + "/world/");
-
-        if (!regions.exists() || !world.exists()) {
-            return false;
-        }
-
         try {
             serverLevel.getChunkSource().save(true);
             serverLevel.getChunkSource().close();
 
             ZstdFileCompressor compressor = new ZstdFileCompressor();
-            compressor.decompressFolder(regions, true);
-            compressor.decompressFolder(world, true);
+            compressor.decompressFolder(mainDir, true);
 
-            Path savePath = Paths.get(CURRENT_WORLD.getPath() + "/dimensions/" + dimension.getNamespace());
-            Path worldPath = world.toPath();
+            File save = new File(CURRENT_WORLD.getPath() + "/dimensions/" + dimension.getNamespace() + "/" + dimension.getPath());
 
-            if (saveCache) {
-                Files.copy(worldPath, savePath, StandardCopyOption.REPLACE_EXISTING);
+            if (copy) {
+                FileUtils.copyDirectory(mainDir, save);
             } else {
-                Files.move(worldPath, savePath, StandardCopyOption.REPLACE_EXISTING);
+                FileUtils.moveDirectory(mainDir, save);
             }
+            LOGGER.info("Dimension {} successfully loaded", dimension.toString());
         } catch (IOException e) {
-            LOGGER.error("Decompression error: {}", e.toString());
+            LOGGER.error("Loading error: {}", e.toString());
         }
         return true;
     }
