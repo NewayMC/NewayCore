@@ -37,13 +37,13 @@ public class WorldRegister {
         return findDimension(name).orElse(null);
     }
 
+    public static List<WorldTemplate> getRegisteredDimensions() {
+        return List.copyOf(REGISTERED_WORLDS);
+    }
+
     public static WorldTemplate register(WorldTemplate dimension) {
         REGISTERED_WORLDS.add(dimension);
         return dimension;
-    }
-
-    public static List<WorldTemplate> getRegisteredDimensions() {
-        return List.copyOf(REGISTERED_WORLDS);
     }
 
     public static void addToRegistryBuilder(RegistrySetBuilder registryBuilder) {

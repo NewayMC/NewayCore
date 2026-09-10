@@ -61,8 +61,7 @@ public class DimensionLoader {
         }
     }
 
-    // WIP
-    public static void teleportToWorld(Player player, ResourceLocation target, Vec3 pos) {
+    public static void teleportToWorld(Player player,Vec3 pos, ResourceLocation target, boolean autoLoad ) {
         Level level = player.level();
         if (!level.isClientSide) {
 
@@ -72,10 +71,14 @@ public class DimensionLoader {
 
             ServerPlayer serverPlayer = (ServerPlayer) player;
             ServerLevel load = player.getServer().getLevel(WorldRegister.findDimension(NewaycoreMod.MODID, "load").get().getLevelKey());
+            ServerLevel targetLevel = player.getServer().getLevel(WorldRegister.findDimension(target).get().getLevelKey());
 
-            serverPlayer.teleportTo(load, pos.x(), pos.y(), pos.z(), serverPlayer.getXRot(), serverPlayer.getYRot());
-            if (loadDimension(target, true)) {
-                ServerLevel targetLevel = player.getServer().getLevel(WorldRegister.findDimension(target).get().getLevelKey());
+            if (autoLoad) {
+                serverPlayer.teleportTo(load, pos.x(), pos.y(), pos.z(), serverPlayer.getXRot(), serverPlayer.getYRot());
+                if (loadDimension(target, false)) {
+                    serverPlayer.teleportTo(targetLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
+                }
+            } else {
                 serverPlayer.teleportTo(targetLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
             }
         }
