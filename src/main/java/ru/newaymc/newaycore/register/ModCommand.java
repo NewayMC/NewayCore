@@ -59,7 +59,7 @@ public class ModCommand {
             context.getSource().sendFailure(Component.literal("Dimension not found"));
             return 0;
         }
-        DimensionLoader.loadDimension(worldTemplate.get().getDimensionId(), false);
+        DimensionLoader.loadDimension(worldTemplate.get().getDimensionId(), true);
 
         context.getSource().sendSuccess(() -> Component.literal("Loading."), false);
         return 1;
