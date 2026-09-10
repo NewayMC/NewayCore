@@ -94,33 +94,23 @@ public class DimensionLoader {
         LOGGER.info("Preparing dimension {} ", dimension);
         File mainDir = new File(ZstdFileCompressor.getZstdCompressDir().getPath() + "/" + dimension.getPath());
         if (mainDir.exists()) {
-            File regions = new File(mainDir.getPath() + "/region/");
-            File world = new File(mainDir.getPath() + "/world/");
-
-            if (!regions.exists() || !world.exists()) {
-                return;
-            }
-
             try {
                 Path targetDir = Paths.get(NewaycoreMod.MOD_DIR + "/saves/data/" + dimension.getPath());
                 Files.createDirectory(targetDir);
 
                 ZstdFileCompressor compressor = new ZstdFileCompressor();
-                compressor.compressFolder(regions, true, true);
 
-                Path worldPath = world.toPath();
-                Path regionPath = regions.toPath();
+                Path mainDirPath = mainDir.toPath();
 
-                long worldSize = Utils.getFolderSize(worldPath);
+                long dirSize = Utils.getFolderSize(mainDirPath);
                 long maxSize = 100 * 1024 * 1024;
-                if (worldSize > maxSize) {
-                    compressor.compressFolderStreaming(world, true, 1024 * 1024, true);
+                if (dirSize > maxSize) {
+                    compressor.compressFolderStreaming(mainDir, true, 1024 * 1024, true);
                 } else {
-                    compressor.compressFolder(world, true, true);
+                    compressor.compressFolder(mainDir, true, true);
                 }
 
-                Files.move(worldPath, targetDir, StandardCopyOption.REPLACE_EXISTING);
-                Files.move(regionPath, targetDir, StandardCopyOption.REPLACE_EXISTING);
+                Files.move(mainDirPath, targetDir, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 LOGGER.error("Preparation error: {}", e.toString());
             }
@@ -153,11 +143,10 @@ public class DimensionLoader {
 
             File save = new File(CURRENT_WORLD.getPath() + "/dimensions/" + dimension.getNamespace() + "/" + dimension.getPath());
 
-            if (copy) {
-                FileUtils.copyDirectory(mainDir, save);
-            } else {
-                FileUtils.moveDirectory(mainDir, save);
-            }
+            LOGGER.debug("Copying directory");
+            FileUtils.copyDirectory(mainDir, save);
+            FileUtils.deleteDirectory(mainDir);
+
             LOGGER.info("Dimension {} successfully loaded", dimension.toString());
         } catch (IOException e) {
             LOGGER.error("Loading error: {}", e.toString());
