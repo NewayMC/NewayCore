@@ -47,7 +47,7 @@ public class ModCommand {
         }
         DimensionLoader.prepareDimension(worldTemplate.get().getDimensionId());
 
-        context.getSource().sendSuccess(() -> Component.literal("Preparing."), false);
+        context.getSource().sendSuccess(() -> Component.literal("Prepare completed"), false);
         return 1;
     }
 
@@ -61,7 +61,7 @@ public class ModCommand {
         }
         DimensionLoader.loadDimension(worldTemplate.get().getDimensionId());
 
-        context.getSource().sendSuccess(() -> Component.literal("Loading."), false);
+        context.getSource().sendSuccess(() -> Component.literal("Load completed"), false);
         return 1;
     }
 
