@@ -1,8 +1,11 @@
 package ru.newaymc.newaycore.worlds;
 
 import lombok.Getter;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -21,19 +24,13 @@ import ru.newaymc.newaycore.files.Utils;
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.worlds.build.WorldRegister;
 import ru.newaymc.newaycore.worlds.build.WorldTemplate;
+import ru.newaymc.newaycore.worlds.chunks.ChunkLoader;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Optional;
 
-/**
- * <b>Directories:</b>
- * <p>
- * <i>world</i> - main dimension data with base regions
- * <br>
- * <i>region</i> - regions for replacement ( e.g. custom buildings & not generated terrain ), can be empty
- */
 @Getter
 @EventBusSubscriber
 public class DimensionLoader {
@@ -75,7 +72,7 @@ public class DimensionLoader {
 
             if (autoLoad) {
                 serverPlayer.teleportTo(load, pos.x(), pos.y(), pos.z(), serverPlayer.getXRot(), serverPlayer.getYRot());
-                if (loadDimension(target, false)) {
+                if (loadDimension(target)) {
                     serverPlayer.teleportTo(targetLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
                 }
             } else {
@@ -119,25 +116,22 @@ public class DimensionLoader {
         }
     }
 
-    public static boolean loadDimension(ResourceLocation dimension, boolean copy) {
+    public static boolean loadDimension(ResourceLocation dimension) {
         Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimension);
         ServerLevel serverLevel = SERVER.getLevel(worldTemplate.get().getLevelKey());
         File mainDir = new File(NewaycoreMod.MOD_DIR + "/saves/data/" + dimension.getPath());
 
         if (!mainDir.exists()) {
-            LOGGER.error("Dimension directory not found: {}", dimension);
+            LOGGER.warn("Dimension directory not found: {}", dimension);
             return false;
         }
 
         if (serverLevel == null) {
-            LOGGER.error("ServerLevel is null for dimension: {}", dimension);
+            LOGGER.warn("ServerLevel is null for dimension: {}", dimension);
             return false;
         }
 
         try {
-            serverLevel.getChunkSource().save(true);
-            serverLevel.getChunkSource().close();
-
             ZstdFileCompressor compressor = new ZstdFileCompressor();
             compressor.decompressFolder(mainDir, true);
 
@@ -147,6 +141,7 @@ public class DimensionLoader {
             FileUtils.copyDirectory(mainDir, save);
             FileUtils.deleteDirectory(mainDir);
 
+            ChunkLoader.reloadRegion(serverLevel, 0, 0);
             LOGGER.info("Dimension {} successfully loaded", dimension.toString());
         } catch (IOException e) {
             LOGGER.error("Loading error: {}", e.toString());

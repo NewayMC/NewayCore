@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "ru.newaymc.newaycore.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ChunkMapAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
