@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import ru.newaymc.newaycore.NewaycoreMod;
-import ru.newaymc.newaycore.files.Utils;
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.worlds.build.WorldRegister;
 import ru.newaymc.newaycore.worlds.build.WorldTemplate;
@@ -94,14 +93,7 @@ public class DimensionLoader {
                 ZstdFileCompressor compressor = new ZstdFileCompressor();
 
                 Path mainDirPath = mainDir.toPath();
-
-                long dirSize = Utils.getFolderSize(mainDirPath);
-                long maxSize = 100 * 1024 * 1024;
-                if (dirSize > maxSize) {
-                    compressor.compressFolderStreaming(mainDir, true, 1024 * 1024, true);
-                } else {
-                    compressor.compressFolder(mainDir, true, true);
-                }
+                compressor.compressFolderStreaming(mainDir, true, 1024 * 1024, true);
 
                 Files.move(mainDirPath, targetDir, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
