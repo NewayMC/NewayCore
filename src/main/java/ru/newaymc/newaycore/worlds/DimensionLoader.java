@@ -1,11 +1,8 @@
 package ru.newaymc.newaycore.worlds;
 
 import lombok.Getter;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ChunkMap;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +21,6 @@ import ru.newaymc.newaycore.files.Utils;
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
 import ru.newaymc.newaycore.worlds.build.WorldRegister;
 import ru.newaymc.newaycore.worlds.build.WorldTemplate;
-import ru.newaymc.newaycore.worlds.chunks.ChunkLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,6 +122,12 @@ public class DimensionLoader {
             return false;
         }
 
+        File regionDir = new File(mainDir.getPath() + "/regions");
+        if (regionDir.exists()) {
+            LOGGER.error("Dimension {} already loaded", dimension);
+            return false;
+        }
+
         if (serverLevel == null) {
             LOGGER.warn("ServerLevel is null for dimension: {}", dimension);
             return false;
@@ -141,7 +143,6 @@ public class DimensionLoader {
             FileUtils.copyDirectory(mainDir, save);
             FileUtils.deleteDirectory(mainDir);
 
-            ChunkLoader.reloadRegion(serverLevel, 0, 0);
             LOGGER.info("Dimension {} successfully loaded", dimension.toString());
         } catch (IOException e) {
             LOGGER.error("Loading error: {}", e.toString());
