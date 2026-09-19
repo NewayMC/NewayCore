@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @deprecated
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public class SimpleFormation /*extends Goal*/ {
     /*private final PathfinderMob mob;
     private final PathfinderMob commander;

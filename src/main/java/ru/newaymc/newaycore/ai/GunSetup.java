@@ -1,5 +1,6 @@
 package ru.newaymc.newaycore.ai;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -10,50 +11,38 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
-
 import ru.newaymc.newaycore.NewaycoreMod;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class GunSetup {
-    private static String gun;
-    private static String fireMode;
-    private static String scope, muzzle, grip;
-    private static int maxAmmo;
 
-    public static void setGun(LivingEntity entity, String _gun, String _fireMode, int _maxAmmo, String _scope, String _muzzle, String _grip) {
-        gun = _gun;
-        fireMode = _fireMode;
-        maxAmmo = _maxAmmo;
-        scope = _scope;
-        muzzle = _muzzle;
-        grip = _grip;
-
-        GunSettings settings = buildSettings();
+    public static void setGun(LivingEntity entity, GunSettings settings) {
+        HolderLookup.Provider provider = entity.level().registryAccess();
         ItemStack gunStack = GunItemBuilder.create()
                 .setId(settings.gunId)
                 .setAmmoCount(settings.maxAmmo)
                 .setFireMode(getFireMode(settings.fireMode))
                 .setCount(1)
-                .build(NewaycoreMod.provider);
+                .build(provider);
 
         IGun iGun = IGun.getIGunOrNull(gunStack);
         assert iGun != null;
 
         settings.scopeId.ifPresent(scopeId -> {
             ItemStack scopeStack = AttachmentItemBuilder.create().setId(scopeId).build();
-            iGun.installAttachment(NewaycoreMod.provider, gunStack, scopeStack);
+            iGun.installAttachment(provider, gunStack, scopeStack);
         });
 
         settings.muzzleId.ifPresent(muzzleId -> {
             ItemStack muzzleStack = AttachmentItemBuilder.create().setId(muzzleId).build();
-            iGun.installAttachment(NewaycoreMod.provider, gunStack, muzzleStack);
+            iGun.installAttachment(provider, gunStack, muzzleStack);
         });
 
         settings.gripId.ifPresent(gripId -> {
             ItemStack gripStack = AttachmentItemBuilder.create().setId(gripId).build();
-            iGun.installAttachment(NewaycoreMod.provider, gunStack, gripStack);
+            iGun.installAttachment(provider, gunStack, gripStack);
         });
 
         iGun.setMaxDummyAmmoAmount(gunStack, Integer.MAX_VALUE);
@@ -62,12 +51,8 @@ public class GunSetup {
         entity.setItemInHand(InteractionHand.MAIN_HAND, gunStack);
     }
 
-    private static GunSettings buildSettings() {
-        ResourceLocation gunId = ResourceLocation.parse("tacz:" + gun);
-        ResourceLocation scopeId = ResourceLocation.parse("tacz:" + scope);
-        ResourceLocation muzzleId = ResourceLocation.parse("tacz:" + muzzle);
-        ResourceLocation gripId = ResourceLocation.parse("tacz:" + grip);
-        return new GunSettings(gunId, fireMode, maxAmmo, scopeId, muzzleId, gripId);
+    public static GunSettings buildSettings(ResourceLocation gun, String fireMode, int maxAmmo, ResourceLocation scope, ResourceLocation muzzle, ResourceLocation grip) {
+        return new GunSettings(gun, fireMode, maxAmmo, scope, muzzle, grip);
     }
 
     private static FireMode getFireMode(String fireMode) {
@@ -95,7 +80,7 @@ public class GunSetup {
         public final Optional<ResourceLocation> muzzleId;
         public final Optional<ResourceLocation> gripId;
 
-        public GunSettings(ResourceLocation gunId,String fireMode, int maxAmmo,  @Nullable ResourceLocation scopeId, @Nullable ResourceLocation muzzleId, @Nullable ResourceLocation gripId) {
+        public GunSettings(ResourceLocation gunId, String fireMode, int maxAmmo,  @Nullable ResourceLocation scopeId, @Nullable ResourceLocation muzzleId, @Nullable ResourceLocation gripId) {
             this.gunId = gunId;
             this.maxAmmo = maxAmmo;
             this.fireMode = fireMode;

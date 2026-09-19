@@ -22,7 +22,6 @@ import ru.newaymc.newaycore.ai.utils.State;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SmartCover extends Goal {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/SmartCover");
@@ -75,12 +74,7 @@ public class SmartCover extends Goal {
 
     @Override
     public void tick() {
-        if (shooter.getTarget() == null) {
-            LOGGER.error("Unexpected error with SmartCover. Entity type: {}, UUID: {}", shooter.getType(), shooter.getUUID());
-            stop();
-        }
-
-        targetPos = shooter.getTarget().position();
+        targetPos = shooter.getMemory().getLastTargetPos();
         Cover bestCover = findBestCover();
 
         if (bestCover != null) {
@@ -97,11 +91,6 @@ public class SmartCover extends Goal {
         } else {
             stop();
         }
-    }
-
-    @Override
-    public void start() {
-        shooter.getMemory().setAllowAttack(false);
     }
 
     @Override
@@ -134,17 +123,15 @@ public class SmartCover extends Goal {
                 if (!(world.getBlockState(BlockPos.containing(x + sX - 5, y, z + sZ - 5))).is(TERRAIN)) {
                     Direction direction = shooter.getDirection();
                     coverPos = foundDirection(new Vec3(x + sX - 5, y, z + sZ - 5), direction);
-                    if (!world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
-                        possibleCovers.add(new Cover(coverPos, shooter.position().distanceTo(coverPos)));
-                    } else {
+                    while (!world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
                         coverPos = foundDirection(new Vec3(x + sX - 5, y, z + sZ - 5), direction);
                     }
+                    possibleCovers.add(new Cover(coverPos, shooter.distanceToSqr(coverPos)));
                 }
                 sZ = sZ + 1;
             }
             sX = sX + 1;
         }
-        covers = covers.stream().distinct().collect(Collectors.toList());
         debug();
 
         return possibleCovers;
@@ -170,7 +157,7 @@ public class SmartCover extends Goal {
             }
 
             if ((shooter instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) <= (shooter instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.3) {
-                total *= 1.3;
+                total *= 1.2;
             }
 
             cover.setScore(total);
@@ -180,7 +167,6 @@ public class SmartCover extends Goal {
                 bestCover = cover;
             }
         }
-        covers.sort((c1, c2) -> Double.compare(c2.getScore(), c1.getScore()));
         return bestCover;
     }
 

@@ -29,56 +29,62 @@ public class ModCommand {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
         dispatcher.register(Commands.literal("newaycore").requires(s -> s.hasPermission(4))
-                .then(Commands.literal("prepare").then(Commands.argument("worldId", MessageArgument.message()).executes(ModCommand::prepare)))
-                .then(Commands.literal("load").then(Commands.argument("worldId", MessageArgument.message()).executes(ModCommand::load)))
-                .then(Commands.literal("teleport").then(Commands.argument("autoLoad", BoolArgumentType.bool())
-                        .then(Commands.argument("coordinates", BlockPosArgument.blockPos()).then(Commands.argument("worldId", MessageArgument.message())
-                                .executes(ModCommand::teleport)))))
+                .then(Commands.literal("world")
+                        .then(Commands.literal("prepare").then(Commands.argument("worldId", MessageArgument.message()).executes(ModCommand.WorldArgs::prepare)))
+                        .then(Commands.literal("load").then(Commands.argument("worldId", MessageArgument.message()).executes(ModCommand.WorldArgs::load)))
+                        .then(Commands.literal("teleport").then(Commands.argument("autoLoad", BoolArgumentType.bool())
+                                .then(Commands.argument("coordinates", BlockPosArgument.blockPos()).then(Commands.argument("worldId", MessageArgument.message())
+                                        .executes(ModCommand.WorldArgs::teleport))))))
+                .then(Commands.literal("ai"))
         );
     }
 
-    private static int prepare(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        String dimensionPath = MessageArgument.getMessage(context, "worldId").getString();
+    private static class WorldArgs {
+        private static int prepare(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            String dimensionPath = MessageArgument.getMessage(context, "worldId").getString();
 
-        Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimensionPath);
-        if (worldTemplate.isEmpty()) {
-            context.getSource().sendFailure(Component.literal("Dimension not found"));
-            return 0;
+            Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimensionPath);
+            if (worldTemplate.isEmpty()) {
+                context.getSource().sendFailure(Component.literal("Dimension not found"));
+                return 0;
+            }
+            DimensionLoader.prepareDimension(worldTemplate.get().getDimensionId());
+
+            context.getSource().sendSuccess(() -> Component.literal("Prepare completed"), false);
+            return 1;
         }
-        DimensionLoader.prepareDimension(worldTemplate.get().getDimensionId());
 
-        context.getSource().sendSuccess(() -> Component.literal("Prepare completed"), false);
-        return 1;
+        private static int load(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            String dimensionPath = MessageArgument.getMessage(context, "worldId").getString();
+
+            Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimensionPath);
+            if (worldTemplate.isEmpty()) {
+                context.getSource().sendFailure(Component.literal("Dimension not found"));
+                return 0;
+            }
+            DimensionLoader.loadDimension(worldTemplate.get().getDimensionId());
+
+            context.getSource().sendSuccess(() -> Component.literal("Load completed"), false);
+            return 1;
+        }
+
+        private static int teleport(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            boolean autoLoad = BoolArgumentType.getBool(context, "autoLoad");
+            String dimensionPath = MessageArgument.getMessage(context, "worldId").getString();
+            Vec3 pos = BlockPosArgument.getBlockPos(context, "coordinates").getCenter();
+            Player player = context.getSource().getPlayer();
+
+            Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimensionPath);
+            if (worldTemplate.isEmpty()) {
+                context.getSource().sendFailure(Component.literal("Dimension not found"));
+                return 0;
+            }
+            DimensionLoader.teleportToWorld(player, pos, worldTemplate.get().getDimensionId(), false);
+
+            context.getSource().sendSuccess(() -> Component.literal("Teleportation."), autoLoad);
+            return 1;
+        }
     }
 
-    private static int load(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        String dimensionPath = MessageArgument.getMessage(context, "worldId").getString();
-
-        Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimensionPath);
-        if (worldTemplate.isEmpty()) {
-            context.getSource().sendFailure(Component.literal("Dimension not found"));
-            return 0;
-        }
-        DimensionLoader.loadDimension(worldTemplate.get().getDimensionId());
-
-        context.getSource().sendSuccess(() -> Component.literal("Load completed"), false);
-        return 1;
-    }
-
-    private static int teleport(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        boolean autoLoad = BoolArgumentType.getBool(context, "autoLoad");
-        String dimensionPath = MessageArgument.getMessage(context, "worldId").getString();
-        Vec3 pos = BlockPosArgument.getBlockPos(context, "coordinates").getCenter();
-        Player player = context.getSource().getPlayer();
-
-        Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimensionPath);
-        if (worldTemplate.isEmpty()) {
-            context.getSource().sendFailure(Component.literal("Dimension not found"));
-            return 0;
-        }
-        DimensionLoader.teleportToWorld(player, pos, worldTemplate.get().getDimensionId(), false);
-
-        context.getSource().sendSuccess(() -> Component.literal("Teleportation."), autoLoad);
-        return 1;
-    }
+    private static class AiArgs {}
 }
