@@ -11,7 +11,6 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.api.item.gun.FireMode;
-import ru.newaymc.newaycore.NewaycoreMod;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
