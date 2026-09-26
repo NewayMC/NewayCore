@@ -1,13 +1,10 @@
 package ru.newaymc.newaycore;
 
-import net.minecraft.core.HolderLookup;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,22 +20,15 @@ public class NewaycoreMod {
     public static final String MODID = "newaycore";
     public static final String MOD_DIR = (FMLPaths.GAMEDIR.get().toString() + "/newaycore/");
 
-    public static HolderLookup.Provider provider;
-
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
     public NewaycoreMod(IEventBus modEventBus) {
         prepareModDirectories();
 
-        NeoForge.EVENT_BUS.register(this);
+        //NeoForge.EVENT_BUS.register(this);
         ModBlocks.REGISTRY.register(modEventBus);
         ModItems.REGISTRY.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
-    }
-
-    @SubscribeEvent
-    public void onAddReloadListeners(AddReloadListenerEvent event) {
-        provider = event.getServerResources().getRegistryLookup();
     }
 
     private void prepareModDirectories() {

@@ -5,24 +5,25 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import ru.newaymc.newaycore.NewaycoreMod;
 import ru.newaymc.newaycore.ai.entity.AbstractShooter;
 import ru.newaymc.newaycore.ai.utils.Cover;
+import ru.newaymc.newaycore.ai.memory.Memory;
 import ru.newaymc.newaycore.ai.utils.State;
+import ru.newaymc.newaycore.ai.utils.Order;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class SmartCover extends Goal {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/SmartCover");
@@ -30,7 +31,7 @@ public class SmartCover extends Goal {
 
     private static List<Cover> covers = new ArrayList<>();
 
-    private static final double MAX_SEARCH_RADIUS = 17;
+    private static final double MAX_SEARCH_RADIUS = 16;
     private static final double MIN_ENEMY_DISTANCE = 5;
     private static final double SAFETY_MODIFIER = 0.4;
     private static final double DISTANCE_MODIFIER = 0.5;
@@ -56,34 +57,30 @@ public class SmartCover extends Goal {
 
     @Override
     public boolean canUse() {
-        if (shooter.getMemory().getState() != State.BATTLE) {
+        if (shooter.getMemory().getState() == State.CALM) {
             return false;
         }
 
-        return shooter.getHealth() <= 30;
+        return shooter.getHealth() <= 50 || shooter.getMemory().getCurrentOrder() == Order.DEFEND;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return shooter.getMemory().getState() != State.BATTLE && shooter.getHealth() <= 30;
-    }
-
-    @Override
-    public boolean requiresUpdateEveryTick() {
-        return true;
+        if (shooter.getMemory().getState() != State.CALM && shooter.getHealth() <= 50 || shooter.getMemory().getCurrentOrder() == Order.DEFEND) {
+            return true;
+        } else {
+            stop();
+            return false;
+        }
     }
 
     @Override
     public void tick() {
-        if (shooter.getTarget() == null) {
-            LOGGER.error("Unexpected error with SmartCover. Entity type: {}, UUID: {}", shooter.getType(), shooter.getUUID());
-            stop();
-        }
-
-        targetPos = shooter.getTarget().position();
+        targetPos = shooter.getMemory().getLastTargetPos();
         Cover bestCover = findBestCover();
 
         if (bestCover != null) {
+            shooter.getMemory().setCoverStatus(true);
             PathNavigation nav = shooter.getNavigation();
             double dist = bestCover.getDistance();
             if (dist <= 0.05) {
@@ -92,7 +89,6 @@ public class SmartCover extends Goal {
                 shooter.getMemory().setAllowAttack(true);
             } else {
                 nav.moveTo(bestCover.getVec3().x(), bestCover.getVec3().y(), bestCover.getVec3().z(), 1.1);
-                shooter.getMemory().setCoverStatus(true);
             }
         } else {
             stop();
@@ -100,12 +96,9 @@ public class SmartCover extends Goal {
     }
 
     @Override
-    public void start() {
-        shooter.getMemory().setAllowAttack(false);
-    }
-
-    @Override
     public void stop() {
+        shooter.getMemory().getBlockedCovers().remove(shooter);
+
         shooter.getMemory().setAllowAttack(true);
         shooter.getMemory().setCurrentCover(null);
         shooter.getMemory().setCoverStatus(false);
@@ -124,27 +117,27 @@ public class SmartCover extends Goal {
     private static List<Cover> findPossibleCovers() {
         List<Cover> possibleCovers = new ArrayList<>();
         Vec3 coverPos;
+
+        double searchDiameter = MAX_SEARCH_RADIUS + MAX_SEARCH_RADIUS + 1;
         double sX;
         double sZ;
 
-        sX = -3;
-        for (int index0 = 0; index0 < MAX_SEARCH_RADIUS; index0++) {
-            sZ = -3;
-            for (int index1 = 0; index1 < MAX_SEARCH_RADIUS; index1++) {
-                if (!(world.getBlockState(BlockPos.containing(x + sX - 5, y, z + sZ - 5))).is(TERRAIN)) {
+        sX = -MAX_SEARCH_RADIUS;
+        for (int index0 = 0; index0 < searchDiameter; index0++) {
+            sZ = -MAX_SEARCH_RADIUS;
+            for (int index1 = 0; index1 < searchDiameter; index1++) {
+                if (!(world.getBlockState(BlockPos.containing(x + sX, y, z + sZ))).is(TERRAIN)) {
                     Direction direction = shooter.getDirection();
-                    coverPos = foundDirection(new Vec3(x + sX - 5, y, z + sZ - 5), direction);
-                    if (!world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
-                        possibleCovers.add(new Cover(coverPos, shooter.position().distanceTo(coverPos)));
-                    } else {
-                        coverPos = foundDirection(new Vec3(x + sX - 5, y, z + sZ - 5), direction);
+                    coverPos = foundDirection(new Vec3(x + sX, y, z + sZ), direction);
+                    while (!world.getBlockState(BlockPos.containing(coverPos)).canOcclude()) {
+                        coverPos = foundDirection(new Vec3(x + sX, y, z + sZ), direction);
                     }
+                    possibleCovers.add(new Cover(coverPos, shooter.distanceToSqr(coverPos)));
                 }
                 sZ = sZ + 1;
             }
             sX = sX + 1;
         }
-        covers = covers.stream().distinct().collect(Collectors.toList());
         debug();
 
         return possibleCovers;
@@ -158,6 +151,7 @@ public class SmartCover extends Goal {
         double bestScore = -Double.MAX_VALUE;
         Cover bestCover = null;
 
+        checkCoverBlock();
         for (Cover cover : covers) {
             double dist = cover.getDistance();
             double safety = evaluateSafety(cover);
@@ -165,12 +159,16 @@ public class SmartCover extends Goal {
 
             double total = (DISTANCE_MODIFIER * dist) + (SAFETY_MODIFIER * safety);
 
+            if (shooter.getMemory().getBlockedCovers().containsValue(cover)) {
+                total *= 0.0;
+            }
+
             if (coverDistToTarget <= MIN_ENEMY_DISTANCE) {
                 total *= 0.5;
             }
 
-            if ((shooter instanceof LivingEntity _livEnt ? _livEnt.getHealth() : -1) <= (shooter instanceof LivingEntity _livEnt ? _livEnt.getMaxHealth() : -1) * 0.3) {
-                total *= 1.3;
+            if (shooter.getHealth() <= 30) {
+                total *= 1.2;
             }
 
             cover.setScore(total);
@@ -180,7 +178,6 @@ public class SmartCover extends Goal {
                 bestCover = cover;
             }
         }
-        covers.sort((c1, c2) -> Double.compare(c2.getScore(), c1.getScore()));
         return bestCover;
     }
 
@@ -208,5 +205,15 @@ public class SmartCover extends Goal {
             vec3 = new Vec3(vec3.x - 1, vec3.y, vec3.z);
         }
         return vec3;
+    }
+
+    private static void checkCoverBlock() {
+        Map<AbstractShooter, Cover> blocked = shooter.getMemory().getBlockedCovers();
+        for (AbstractShooter teammate : shooter.getMemory().getTeammates()) {
+            Memory memory = teammate.getMemory();
+            if (memory.isCoverStatus()) {
+                blocked.putIfAbsent(teammate, memory.getCurrentCover());
+            }
+        }
     }
 }

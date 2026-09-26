@@ -1,14 +1,11 @@
 package ru.newaymc.newaycore.ai.entity;
 
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Test entity
@@ -28,12 +25,6 @@ public class ShooterAiEntity extends AbstractShooter {
         setTargets(Player.class);
     }
 
-    @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, MobSpawnType p_21436_, @Nullable SpawnGroupData p_21437_) {
-        equipGun("ak47", "auto", 31, null, null, null);
-        return super.finalizeSpawn(p_21434_, p_21435_, p_21436_, p_21437_);
-    }
-
     public static void init(RegisterSpawnPlacementsEvent event) {
 
     }
@@ -45,6 +36,7 @@ public class ShooterAiEntity extends AbstractShooter {
         builder = builder.add(Attributes.ARMOR, 10);
         builder = builder.add(Attributes.ATTACK_DAMAGE, 3);
         builder = builder.add(Attributes.FOLLOW_RANGE, 32);
+        builder = builder.add(Attributes.KNOCKBACK_RESISTANCE, 0.2);
         return builder;
     }
 }
