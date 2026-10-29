@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.Optional;
 
+@Deprecated(forRemoval = true)
 public class ObjectSerialization {
 
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/JavaSerialization");

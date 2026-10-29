@@ -26,8 +26,6 @@ public class NewaycoreMod {
         prepareModDirectories();
 
         //NeoForge.EVENT_BUS.register(this);
-        ModBlocks.REGISTRY.register(modEventBus);
-        ModItems.REGISTRY.register(modEventBus);
         ModEntities.REGISTRY.register(modEventBus);
     }
 

@@ -25,3 +25,10 @@ type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "tacz"
+type = "required"
+versionRange = "${taczVersion}"
+ordering = "NONE"
+side = "BOTH"

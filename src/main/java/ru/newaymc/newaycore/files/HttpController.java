@@ -9,6 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+@Deprecated(forRemoval = true)
 public class HttpController {
     public static final Logger LOGGER = LogManager.getLogger(HttpController.class);
 
