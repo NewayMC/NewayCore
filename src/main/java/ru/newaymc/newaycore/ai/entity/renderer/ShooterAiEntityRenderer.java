@@ -18,6 +18,6 @@ public class ShooterAiEntityRenderer extends HumanoidMobRenderer<ShooterAiEntity
 
     @Override
     public @NotNull ResourceLocation getTextureLocation(ShooterAiEntity entity) {
-        return ResourceLocation.parse("newaycore:textures/entities/standart.png");
+        return ResourceLocation.parse("newaycore:textures/entities/standard.png");
     }
 }
