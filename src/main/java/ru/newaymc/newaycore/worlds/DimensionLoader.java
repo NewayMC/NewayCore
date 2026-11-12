@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,23 +34,22 @@ public class DimensionLoader {
 
     private static File CURRENT_WORLD;
     private static MinecraftServer SERVER;
-    private static boolean FIRST_JOIN;
+    private static boolean FIRST_STARTUP;
 
     @SubscribeEvent
-    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        SERVER = event.getEntity().getServer();
-        if (!event.getEntity().level().isClientSide) {
-            CURRENT_WORLD = event.getEntity().getServer().getWorldPath(LevelResource.ROOT).toFile().getParentFile();
-            File worldFile = new File(NewaycoreMod.MOD_DIR + "/saves/data/", File.separator + CURRENT_WORLD.getName());
-            if (!worldFile.exists()) {
-                try {
-                    worldFile.createNewFile();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                FIRST_JOIN = true;
+    public static void onServerStartup(ServerStartedEvent event) {
+        SERVER = event.getServer();
+        CURRENT_WORLD = event.getServer().getWorldPath(LevelResource.ROOT).toFile().getParentFile();
+
+        File worldFile = new File(NewaycoreMod.MOD_DIR + "/saves/data/", File.separator + CURRENT_WORLD.getName());
+        if (!worldFile.exists()) {
+            try {
+                worldFile.createNewFile();
+            } catch (IOException e) {
+                LOGGER.error(e);
             }
+        } else {
+            FIRST_STARTUP = true;
         }
     }
 
@@ -69,6 +69,10 @@ public class DimensionLoader {
                 serverPlayer.teleportTo(load, pos.x(), pos.y(), pos.z(), serverPlayer.getXRot(), serverPlayer.getYRot());
                 if (loadDimension(target)) {
                     serverPlayer.teleportTo(targetLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
+                } else {
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverPlayer.teleportTo(serverLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
+                    }
                 }
             } else {
                 serverPlayer.teleportTo(targetLevel, pos.x(), pos.y(), pos.z(), player.getXRot(), player.getYRot());
@@ -88,8 +92,12 @@ public class DimensionLoader {
         if (mainDir.exists()) {
             try {
                 Path targetDir = Paths.get(NewaycoreMod.MOD_DIR + "/saves/data/" + dimension.getPath());
-                Files.createDirectory(targetDir);
+                if (Files.exists(targetDir)) {
+                    LOGGER.warn("Directory {} already exists", targetDir.toString());
+                    return;
+                }
 
+                Files.createDirectory(targetDir);
                 ZstdFileCompressor compressor = new ZstdFileCompressor();
 
                 Path mainDirPath = mainDir.toPath();
@@ -106,6 +114,11 @@ public class DimensionLoader {
 
     public static boolean loadDimension(ResourceLocation dimension) {
         Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimension);
+        if (!worldTemplate.isPresent()) {
+            LOGGER.warn("Dimension {} not found", dimension.getPath());
+            return false;
+        }
+
         ServerLevel serverLevel = SERVER.getLevel(worldTemplate.get().getLevelKey());
         File mainDir = new File(NewaycoreMod.MOD_DIR + "/saves/data/" + dimension.getPath());
 

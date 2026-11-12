@@ -29,22 +29,21 @@ public class SmartCover extends Goal {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/SmartCover");
     private static final boolean debug = false;
 
-    private static List<Cover> covers = new ArrayList<>();
+    private List<Cover> covers = new ArrayList<>();
 
     private static final double MAX_SEARCH_RADIUS = 16;
     private static final double MIN_ENEMY_DISTANCE = 5;
     private static final double SAFETY_MODIFIER = 0.4;
     private static final double DISTANCE_MODIFIER = 0.5;
 
-    private static LevelAccessor world;
-    private static double x;
-    private static double y;
-    private static double z;
-    private static AbstractShooter shooter;
-    private static Vec3 targetPos;
+    private final LevelAccessor world;
+    private final double x;
+    private final double y;
+    private final  double z;
+    private final AbstractShooter shooter;
+    private Vec3 targetPos;
 
-    private static final TagKey<Block> TERRAIN = TagKey.create(Registries.BLOCK,
-            ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "terrain"));
+    private static final TagKey<Block> TERRAIN = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "terrain"));
 
     public SmartCover(AbstractShooter mob, Vec3 pos) {
         world = mob.level();
@@ -104,7 +103,7 @@ public class SmartCover extends Goal {
         shooter.getMemory().setCoverStatus(false);
     }
 
-    private static void debug() {
+    private void debug() {
         if (debug) {
             if (!covers.isEmpty()) {
                 LOGGER.debug("Size: {} ,Covers: {}", covers.size(), covers);
@@ -114,7 +113,7 @@ public class SmartCover extends Goal {
         }
     }
 
-    private static List<Cover> findPossibleCovers() {
+    private List<Cover> findPossibleCovers() {
         List<Cover> possibleCovers = new ArrayList<>();
         Vec3 coverPos;
 
@@ -143,7 +142,7 @@ public class SmartCover extends Goal {
         return possibleCovers;
     }
 
-    private static Cover findBestCover() {
+    private Cover findBestCover() {
         covers = findPossibleCovers();
         if (covers.isEmpty()) {
             return null;
@@ -181,7 +180,7 @@ public class SmartCover extends Goal {
         return bestCover;
     }
 
-    private static double evaluateSafety(Cover cover) {
+    private double evaluateSafety(Cover cover) {
         double distToTarget = cover.getVec3().distanceTo(targetPos);
         double distFactor = Math.min(1.0, distToTarget / 10.0);
 
@@ -191,7 +190,7 @@ public class SmartCover extends Goal {
         return 0.7 + 0.3 * distFactor;
     }
 
-    private static Vec3 foundDirection(Vec3 vec3, Direction direction) {
+    private Vec3 foundDirection(Vec3 vec3, Direction direction) {
         if (direction == Direction.SOUTH) {
             vec3 = new Vec3(vec3.x, vec3.y, vec3.z - 1);
 
@@ -207,7 +206,7 @@ public class SmartCover extends Goal {
         return vec3;
     }
 
-    private static void checkCoverBlock() {
+    private void checkCoverBlock() {
         Map<AbstractShooter, Cover> blocked = shooter.getMemory().getBlockedCovers();
         for (AbstractShooter teammate : shooter.getMemory().getTeammates()) {
             Memory memory = teammate.getMemory();

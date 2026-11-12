@@ -43,7 +43,7 @@ import java.util.Objects;
 
 public abstract class AbstractShooter extends Monster {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/AbstractShooter");
-    private static final boolean debug = true;
+    private static final boolean debug = false;
 
     @Getter
     private final Memory memory = new Memory(this);
@@ -61,14 +61,16 @@ public abstract class AbstractShooter extends Monster {
             return;
         }
 
-        memory.setTeammates(findTeammates());
+        if (this.tickCount % 40 == 0) {
+            memory.setTeammates(findTeammates());
 
-        findCommander();
-        if (memory.getCommander() != null) {
-            memory.setCurrentOrder(memory.getCommander().getMemory().getCurrentOrder());
+            findCommander();
+            if (memory.getCommander() != null) {
+                memory.setCurrentOrder(memory.getCommander().getMemory().getCurrentOrder());
+            }
         }
 
-        commander();
+        //commander();
 
         if (this.getTarget() != null) {
             battle();
@@ -170,11 +172,6 @@ public abstract class AbstractShooter extends Monster {
         if (memory.getRole() != TeamRole.COMMANDER) {
             return;
         }
-
-        AttributeModifier maxHealthM = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "commander_health"), this.getMaxHealth() * 1.5f - this.getMaxHealth(), AttributeModifier.Operation.ADD_VALUE);
-        if (!this.getAttribute(Attributes.MAX_HEALTH).hasModifier(maxHealthM.id())) {
-            this.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(maxHealthM);
-        }
     }
 
     @SafeVarargs
@@ -210,8 +207,15 @@ public abstract class AbstractShooter extends Monster {
     @SuppressWarnings("deprecation")
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, MobSpawnType p_21436_, @Nullable SpawnGroupData p_21437_) {
         GunSetup.setGun(this, equipGun());
-
         this.goalSelector.addGoal(1, new GunAttack(this, 64, 1.4f, 0.012f, 3, 5, 10 , 15));
+
+        if (memory.getRole() == TeamRole.COMMANDER) {
+            AttributeModifier maxHealthM = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(NewaycoreMod.MODID, "commander_health"), this.getMaxHealth() * 1.5f - this.getMaxHealth(), AttributeModifier.Operation.ADD_VALUE);
+
+            if (!this.getAttribute(Attributes.MAX_HEALTH).hasModifier(maxHealthM.id())) {
+                this.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(maxHealthM);
+            }
+        }
         return super.finalizeSpawn(p_21434_, p_21435_, p_21436_, p_21437_);
     }
 

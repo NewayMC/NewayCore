@@ -27,7 +27,9 @@ public class GunSetup {
                 .build(provider);
 
         IGun iGun = IGun.getIGunOrNull(gunStack);
-        assert iGun != null;
+        if (iGun == null) {
+            return;
+        }
 
         settings.scopeId.ifPresent(scopeId -> {
             ItemStack scopeStack = AttachmentItemBuilder.create().setId(scopeId).build();
