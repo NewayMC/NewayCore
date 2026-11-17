@@ -11,7 +11,6 @@ import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -27,21 +26,21 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Optional;
 
-@Getter
 @EventBusSubscriber
 public class DimensionLoader {
     private static final Logger LOGGER = LogManager.getLogger(NewaycoreMod.MODID + "/DimensionLoader");
 
-    private static File CURRENT_WORLD;
+    @Getter
+    private static File currentWorld;
     private static MinecraftServer SERVER;
-    private static boolean FIRST_STARTUP;
+    //private static boolean firstStartup;
 
     @SubscribeEvent
     public static void onServerStartup(ServerStartedEvent event) {
         SERVER = event.getServer();
-        CURRENT_WORLD = event.getServer().getWorldPath(LevelResource.ROOT).toFile().getParentFile();
+        currentWorld = event.getServer().getWorldPath(LevelResource.ROOT).toFile().getParentFile();
 
-        File worldFile = new File(NewaycoreMod.MOD_DIR + "/saves/data/", File.separator + CURRENT_WORLD.getName());
+        /*File worldFile = new File(NewaycoreMod.MOD_DIR + "/saves/data/", File.separator + currentWorld.getName());
         if (!worldFile.exists()) {
             try {
                 worldFile.createNewFile();
@@ -49,8 +48,8 @@ public class DimensionLoader {
                 LOGGER.error(e);
             }
         } else {
-            FIRST_STARTUP = true;
-        }
+            firstStartup = true;
+        }*/
     }
 
     public static void teleportToWorld(Player player,Vec3 pos, ResourceLocation target, boolean autoLoad ) {
@@ -114,7 +113,7 @@ public class DimensionLoader {
 
     public static boolean loadDimension(ResourceLocation dimension) {
         Optional<WorldTemplate> worldTemplate = WorldRegister.findDimension(dimension);
-        if (!worldTemplate.isPresent()) {
+        if (worldTemplate.isEmpty()) {
             LOGGER.warn("Dimension {} not found", dimension.getPath());
             return false;
         }
@@ -142,7 +141,7 @@ public class DimensionLoader {
             ZstdFileCompressor compressor = new ZstdFileCompressor();
             compressor.decompressFolder(mainDir, true);
 
-            File save = new File(CURRENT_WORLD.getPath() + "/dimensions/" + dimension.getNamespace() + "/" + dimension.getPath());
+            File save = new File(currentWorld.getPath() + "/dimensions/" + dimension.getNamespace() + "/" + dimension.getPath());
 
             LOGGER.debug("Copying directory");
             FileUtils.copyDirectory(mainDir, save);

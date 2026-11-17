@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import ru.newaymc.newaycore.files.ZstdFileCompressor;
-import ru.newaymc.newaycore.register.*;
 import ru.newaymc.newaycore.register.ModEntities;
 
 import java.io.File;
@@ -18,7 +17,7 @@ import java.io.File;
 @Mod("newaycore")
 public class NewaycoreMod {
     public static final String MODID = "newaycore";
-    public static final String MOD_DIR = (FMLPaths.GAMEDIR.get().toString() + "/newaycore/");
+    public static final String MOD_DIR = (FMLPaths.GAMEDIR.get().toString() + "/newaycore");
 
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 

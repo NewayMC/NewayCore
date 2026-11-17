@@ -105,6 +105,14 @@ dependencies {
             prefer '1.5.7-15'
         }
     }
+
+    runtimeOnly('com.h2database:h2:2.2.224')
+    additionalRuntimeClasspath('com.h2database:h2:2.2.224')
+    jarJar(implementation('com.h2database:h2')) {
+        version {
+            prefer '2.2.224'
+        }
+    }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
